@@ -1,7 +1,6 @@
 #ifndef VEC3_HPP
 #define VEC3_HPP
 
-#include <iostream>
 #include <ostream>
 
 /* Three dimensional vectors */
@@ -11,7 +10,7 @@ template <class T>
 class Vec3 {
     static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
 
-public:
+   public:
     /* Vector components */
     T x, y, z;
 
@@ -139,15 +138,16 @@ public:
     }
 #undef _MAX_COLOUR
 
-    /* Output the colour to a stream */
+    /* Print the vector for debugging purposes */
     template <class charT, class charTraits = std::char_traits<charT>>
     friend std::basic_ostream<charT, charTraits> & operator<<(std::basic_ostream<charT, charTraits> & os, const Vec3 & self) {
-        return os << self.red() << self.green() << self.blue();
+        return os << "Vec3(" << self.x << ", " << self.y << ", " << self.z << ")";
     }
 
-    /* Print the vector for debugging purposes */
-    void debug() {
-        std::cout << "Vec3(" << x << ", " << y << ", " << z << ")";
+    /* Output the colour to a stream */
+    template <class charT, class charTraits = std::char_traits<charT>>
+    void write(std::basic_ostream<charT, charTraits> & os) const {
+        os << red() << green() << blue();
     }
 };
 
@@ -155,7 +155,7 @@ public:
 template <class T>
 using Point3 = Vec3<T>;
 
-}; // namespace vector
+};  // namespace vector
 
 /* RGB colours */
 namespace colour {
@@ -180,10 +180,11 @@ const Colour MAGENTA(1, 0, 1);
 const Colour BLACK(0, 0, 0);
 /* Pure white colour */
 const Colour WHITE(1, 1, 1);
-} // namespace colour
+}  // namespace colour
 
 /* Standard vec3 and point3 implementation */
 using vec3 = vector::Vec3<double>;
 using point3 = vector::Point3<double>;
+using colour::Colour;
 
 #endif
