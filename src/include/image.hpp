@@ -3,9 +3,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
-#include <istream>
-#include <ostream>
 #include <string>
 #include <vector>
 
@@ -43,6 +40,10 @@ class Image {
             is >> width >> height >> maxval;
         } else {
             throw "Could not load PPM image: header not found.";
+        }
+
+        if (maxval >= 65536) {
+            throw "Could not load PPM image: colour samples must be either one or two bytes long.";
         }
 
         if (!std::isspace(is.get())) {
