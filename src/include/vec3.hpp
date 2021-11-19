@@ -19,24 +19,22 @@ inline float clamp(const float value) {
 namespace vec3 {
 /* A three dimensional vector class */
 template <class T>
-class Vec3 {
+struct Vec3 {
     static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
-
-  public:
     /* Vector components */
     T x, y, z;
 
     /// Constants
     /* Null vector */
-    constexpr static Vec3 ZEROS() { return Vec3(0, 0, 0); }
+    inline constexpr static Vec3 ZEROS() { return Vec3(0, 0, 0); }
     /* Vector of ones */
-    constexpr static Vec3 ONES() { return Vec3(1, 1, 1); }
+    inline constexpr static Vec3 ONES() { return Vec3(1, 1, 1); }
     /* Unit x vector */
-    constexpr static Vec3 X() { return Vec3(1, 0, 0); }
+    inline constexpr static Vec3 X() { return Vec3(1, 0, 0); }
     /* Unit y vector */
-    constexpr static Vec3 Y() { return Vec3(0, 1, 0); }
+    inline constexpr static Vec3 Y() { return Vec3(0, 1, 0); }
     /* Unit z vector */
-    constexpr static Vec3 Z() { return Vec3(0, 0, 1); }
+    inline constexpr static Vec3 Z() { return Vec3(0, 0, 1); }
 
     /// Constructors
     /* Default Constructor */
