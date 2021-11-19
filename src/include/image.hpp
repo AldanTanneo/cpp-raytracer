@@ -33,17 +33,14 @@ class Image {
     /* Parse a PPM image from a stream */
     template <class charT, class charTraits = std::char_traits<charT>>
     static Image decode_stream(std::basic_istream<charT, charTraits> & is) {
-        uint64_t width, height, maxval;
+        uint64_t width, height;
         char buffer[8];
+        uint16_t maxval;
 
         if (is.getline(buffer, 3).good() && !std::strcmp(buffer, "P6")) {
             is >> width >> height >> maxval;
         } else {
-            throw "Could not load PPM image: header not found.";
-        }
-
-        if (maxval >= 65536) {
-            throw "Could not load PPM image: colour samples must be either one or two bytes long.";
+            throw "Could not load PPM image: invalid header.";
         }
 
         if (!std::isspace(is.get())) {
