@@ -4,6 +4,7 @@
 #include <image.hpp>
 #include <vec3.hpp>
 
+/* Error handling macro that wraps main() */
 #define main()                                                            \
     _main();                                                              \
     int main() {                                                          \
@@ -51,7 +52,7 @@ int main() {
     std::cout << "Image1 size: " << img.get_width() << "x" << img.get_height() << std::endl;
     std::cout << "Image2 size: " << img2.get_width() << "x" << img2.get_height() << std::endl;
 
-    std::cout << "Image1 == Image2: " << (img == img2) << std::endl;
+    std::cout << "Image1 == Image2: " << (img == img2 ? "true" : "false") << std::endl;
 
     img2.save("image2.ppm");
 

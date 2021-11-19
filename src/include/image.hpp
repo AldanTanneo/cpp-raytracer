@@ -11,7 +11,7 @@
 
 using colour::Colour;
 
-// Class for writing PPM images. See the PPM specification at http://netpbm.sourceforge.net/doc/ppm.html
+// Class for writing and reading PPM images. See the PPM specification at http://netpbm.sourceforge.net/doc/ppm.html
 class Image {
   private:
     /* A vector of pixels */
