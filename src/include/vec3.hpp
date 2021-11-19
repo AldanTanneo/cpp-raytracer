@@ -12,7 +12,7 @@ template <class T>
 class Vec3 {
     static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
 
-   public:
+  public:
     /* Vector components */
     T x, y, z;
 
@@ -155,7 +155,7 @@ class Vec3 {
 template <class T>
 using Point3 = Vec3<T>;
 
-};  // namespace vec3
+}; // namespace vec3
 
 /* RGB colours */
 namespace colour {
@@ -180,7 +180,7 @@ const Colour MAGENTA(1, 0, 1);
 const Colour BLACK(0, 0, 0);
 /* Pure white colour */
 const Colour WHITE(1, 1, 1);
-}  // namespace colour
+} // namespace colour
 
 /* Standard vec3 and point3 implementation */
 using Vec3 = vec3::Vec3<double>;
