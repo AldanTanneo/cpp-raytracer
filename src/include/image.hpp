@@ -14,22 +14,26 @@
 
 using colour::Colour;
 
-// Class for writing PPM images
+// Class for writing PPM images. See the PPM specification at http://netpbm.sourceforge.net/doc/ppm.html
 class Image {
-   private:
+  private:
     /* A vector of pixels */
     std::vector<Colour> data;
     /* Size of the image */
     uint64_t width, height;
 
-   public:
+  public:
     /* Create an empty image of size width * height */
-    inline Image(uint64_t width, uint64_t height) : data(std::vector<Colour>()), width(width), height(height) {
+    inline Image(uint64_t width, uint64_t height)
+        : data(std::vector<Colour>()), width(width), height(height) {
         data.reserve(width * height);
     }
     /* Create an image of size width * height, using the pixels in the given vector */
-    inline Image(std::vector<Colour> data, uint64_t width, uint64_t height) : data(data), width(width), height(height) {}
+    inline Image(std::vector<Colour> data, uint64_t width, uint64_t height)
+        : data(data), width(width), height(height) {
+    }
 
+    /* Parse a PPM image from a stream */
     template <class charT, class charTraits = std::char_traits<charT>>
     static Image decode_stream(std::basic_istream<charT, charTraits> & is) {
         uint64_t width, height, maxval;
@@ -81,10 +85,11 @@ class Image {
         return Image(pixels, width, height);
     }
 
+    /* Load an image from a filename */
     inline static Image load(const std::string & filename) {
         std::ifstream file(filename, std::ios_base::in | std::ios_base::binary);
         if (!file) {
-            throw "Could not open file!";
+            throw "Could not load PPM image: could not open file!";
         }
         Image result = Image::decode_stream(file);
         file.close();
@@ -129,7 +134,7 @@ class Image {
         if (data.size() == width * height) {
             os << "P6" << std::endl
                << width << ' ' << height << std::endl
-               << "255" << std::endl;
+               << static_cast<uint64_t>(MAX_COLOUR) << std::endl;
 
             std::for_each(std::begin(data), std::end(data), [&os](Colour const & c) {
                 c.write(os);
@@ -149,12 +154,12 @@ class Image {
         output_file.close();
     }
 
+    /* Compare two images for equality */
     inline bool operator==(const Image & other) const {
         if (width != other.width || height != other.height || size() != other.size()) {
             return false;
         }
 
-        Colour c1, c2;
         for (uint64_t i = 0; i < size(); i++) {
             if (data[i] != other.data[i]) {
                 return false;
@@ -164,6 +169,7 @@ class Image {
         return true;
     }
 
+    /* Compare two images for inequality */
     inline bool operator!=(const Image & other) const {
         return !(*this == other);
     }
