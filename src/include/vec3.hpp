@@ -4,7 +4,7 @@
 #include <ostream>
 
 /* Three dimensional vectors */
-namespace vector {
+namespace vec3 {
 /* A three dimensional vector class */
 template <class T>
 class Vec3 {
@@ -28,11 +28,11 @@ class Vec3 {
 
     /// Constructors
     /* Default Constructor */
-    Vec3() : x(0), y(0), z(0) {}
+    inline Vec3() : x(0), y(0), z(0) {}
     /* Two dimensional constructor */
-    Vec3(T x, T y) : x(x), y(y), z(0) {}
+    inline Vec3(T x, T y) : x(x), y(y), z(0) {}
     /* Three dimensional constructor */
-    Vec3(T x, T y, T z) : x(x), y(y), z(z) {}
+    inline Vec3(T x, T y, T z) : x(x), y(y), z(z) {}
 
     /// Operator overloading
     /* Get the opposite of a vector */
@@ -114,11 +114,11 @@ class Vec3 {
         return sqrt(squared_norm());
     }
     /* Normalize the vector */
-    Vec3 unit_vector() const {
+    inline Vec3 unit_vector() const {
         return *this / norm();
     }
     /* Get the distance between two points */
-    T distance(const Vec3 & other) const {
+    inline T distance(const Vec3 & other) const {
         return (other - *this).norm();
     }
 
@@ -155,12 +155,12 @@ class Vec3 {
 template <class T>
 using Point3 = Vec3<T>;
 
-};  // namespace vector
+};  // namespace vec3
 
 /* RGB colours */
 namespace colour {
 /* RGB colour type */
-using Colour = vector::Vec3<float>;
+using Colour = vec3::Vec3<float>;
 /* For the americans */
 using Color = Colour;
 
@@ -183,8 +183,15 @@ const Colour WHITE(1, 1, 1);
 }  // namespace colour
 
 /* Standard vec3 and point3 implementation */
-using vec3 = vector::Vec3<double>;
-using point3 = vector::Point3<double>;
-using colour::Colour;
+using Vec3 = vec3::Vec3<double>;
+using Point3 = vec3::Point3<double>;
+
+inline bool operator==(const colour::Colour & a, const colour::Colour & b) {
+    return a.red() == b.red() && a.green() == b.green() && a.blue() == b.blue();
+}
+
+inline bool operator!=(const colour::Colour & a, const colour::Colour & b) {
+    return a.red() != b.red() || a.green() != b.green() || a.blue() != b.blue();
+}
 
 #endif
