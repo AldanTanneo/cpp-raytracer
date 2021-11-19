@@ -5,6 +5,16 @@
 
 const float MAX_COLOUR = 255.999f;
 
+namespace utils {
+inline float clamp(const float value) {
+    if (value < 0.0)
+        return 0.0;
+    if (value > 1.0)
+        return 1.0;
+    return value;
+}
+} // namespace utils
+
 /* Three dimensional vectors */
 namespace vec3 {
 /* A three dimensional vector class */
@@ -127,15 +137,15 @@ class Vec3 {
     /// Colour functions
     /* Red component */
     uint8_t red() const {
-        return static_cast<uint8_t>(x * MAX_COLOUR);
+        return static_cast<uint8_t>(utils::clamp(x) * MAX_COLOUR);
     }
     /* Green component */
     uint8_t green() const {
-        return static_cast<uint8_t>(y * MAX_COLOUR);
+        return static_cast<uint8_t>(utils::clamp(y) * MAX_COLOUR);
     }
     /* Blue component */
     uint8_t blue() const {
-        return static_cast<uint8_t>(z * MAX_COLOUR);
+        return static_cast<uint8_t>(utils::clamp(z) * MAX_COLOUR);
     }
 
     /* Print the vector for debugging purposes */
@@ -185,14 +195,15 @@ const Colour WHITE(1, 1, 1);
 /* Standard vec3 and point3 implementation */
 using Vec3 = vec3::Vec3<double>;
 using Point3 = vec3::Point3<double>;
+using colour::Colour;
 
 /* Compare two colours for equality */
-inline bool operator==(const colour::Colour & a, const colour::Colour & b) {
+inline bool operator==(const Colour & a, const Colour & b) {
     return a.red() == b.red() && a.green() == b.green() && a.blue() == b.blue();
 }
 
 /* Compare two colours for inequality */
-inline bool operator!=(const colour::Colour & a, const colour::Colour & b) {
+inline bool operator!=(const Colour & a, const Colour & b) {
     return a.red() != b.red() || a.green() != b.green() || a.blue() != b.blue();
 }
 
