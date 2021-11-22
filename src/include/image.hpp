@@ -1,7 +1,6 @@
 #ifndef IMAGE_HPP
 #define IMAGE_HPP
 
-#include <algorithm>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -21,13 +20,16 @@ class Image {
 
   public:
     /* Create an empty image of size width * height */
-    inline Image(uint64_t width, uint64_t height)
+    inline Image(uint64_t width, uint64_t height) noexcept
         : data(std::vector<Colour>()), width(width), height(height) {
         data.reserve(width * height);
     }
     /* Create an image of size width * height, using the pixels in the given vector */
     inline Image(std::vector<Colour> data, uint64_t width, uint64_t height)
         : data(data), width(width), height(height) {
+        if (data.size() >= width * height) {
+            throw "Could not construct Image: too many pixels in the given vector.";
+        }
     }
 
     /* Parse a PPM image from a stream */
@@ -95,13 +97,13 @@ class Image {
     }
 
     /* Get the image width */
-    inline uint64_t get_width() const { return width; }
+    constexpr uint64_t get_width() const noexcept { return width; }
     /* Get the image height */
-    inline uint64_t get_height() const { return height; }
+    constexpr uint64_t get_height() const noexcept { return height; }
     /* Get the image size */
-    inline uint64_t size() const { return data.size(); }
+    constexpr uint64_t size() const noexcept { return data.size(); }
     /* Get the image container capacity */
-    inline uint64_t capacity() const { return data.capacity(); }
+    constexpr uint64_t capacity() const noexcept { return data.capacity(); }
 
     /* Index the image by indexing the underlying vector */
     inline Colour operator[](uint64_t index) const {
@@ -109,21 +111,21 @@ class Image {
     }
 
     /* Append a pixel to the image */
-    inline void push(Colour pixel) {
+    inline void push(Colour pixel) noexcept {
         data.push_back(pixel);
     }
 
     /* Append a pixel by its (r, g, b) components */
-    inline void push(float r, float g, float b) {
+    inline void push(float r, float g, float b) noexcept {
         data.push_back(Colour(r, g, b));
     }
 
     /* Append each element of an iterator to the image */
     template <class It>
-    inline void push(It & iterator) {
-        std::for_each(std::begin(iterator), std::end(iterator), [this](Colour const & c) {
+    inline void push(const It & iterator) noexcept {
+        for (Colour const & c : iterator) {
             data.push_back(c);
-        });
+        }
     }
 
     /* Write the image to a stream */
@@ -134,9 +136,9 @@ class Image {
                << width << ' ' << height << std::endl
                << static_cast<uint64_t>(MAX_COLOUR) << std::endl;
 
-            std::for_each(std::begin(data), std::end(data), [&os](Colour const & c) {
+            for (Colour const & c : data) {
                 c.write(os);
-            });
+            }
         } else {
             throw "Could not write image to stream: Data size mismatch";
         }
@@ -153,12 +155,13 @@ class Image {
     }
 
     /* Compare two images for equality */
-    inline bool operator==(const Image & other) const {
+    inline bool operator==(const Image & other) const noexcept {
         if (width != other.width || height != other.height || size() != other.size()) {
             return false;
         }
 
-        for (uint64_t i = 0; i < size(); i++) {
+        uint64_t data_size = size();
+        for (uint64_t i = 0; i < data_size; i++) {
             if (data[i] != other.data[i]) {
                 return false;
             }
@@ -168,7 +171,7 @@ class Image {
     }
 
     /* Compare two images for inequality */
-    inline bool operator!=(const Image & other) const {
+    inline bool operator!=(const Image & other) const noexcept {
         return !(*this == other);
     }
 };

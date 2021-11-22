@@ -6,13 +6,17 @@
 const float MAX_COLOUR = 255.999f;
 
 namespace utils {
-inline float clamp(const float value) {
+/* Clamps a value to the [0.0, 1.0] range */
+template <class T>
+constexpr T clamp(const T value) noexcept {
+    static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
     if (value < 0.0)
-        return 0.0;
+        return static_cast<T>(0.0);
     if (value > 1.0)
-        return 1.0;
+        return static_cast<T>(1.0);
     return value;
 }
+
 } // namespace utils
 
 /* Three dimensional vectors */
@@ -26,101 +30,101 @@ struct Vec3 {
 
     /// Constants
     /* Null vector */
-    inline constexpr static Vec3 ZEROS() { return Vec3(0, 0, 0); }
+    constexpr static Vec3 ZEROS() noexcept { return Vec3(0, 0, 0); }
     /* Vector of ones */
-    inline constexpr static Vec3 ONES() { return Vec3(1, 1, 1); }
+    constexpr static Vec3 ONES() noexcept { return Vec3(1, 1, 1); }
     /* Unit x vector */
-    inline constexpr static Vec3 X() { return Vec3(1, 0, 0); }
+    constexpr static Vec3 X() noexcept { return Vec3(1, 0, 0); }
     /* Unit y vector */
-    inline constexpr static Vec3 Y() { return Vec3(0, 1, 0); }
+    constexpr static Vec3 Y() noexcept { return Vec3(0, 1, 0); }
     /* Unit z vector */
-    inline constexpr static Vec3 Z() { return Vec3(0, 0, 1); }
+    constexpr static Vec3 Z() noexcept { return Vec3(0, 0, 1); }
 
     /// Constructors
     /* Default Constructor */
-    inline Vec3() : x(0), y(0), z(0) {}
+    constexpr Vec3() noexcept : x(0), y(0), z(0) {}
     /* Two dimensional constructor */
-    inline Vec3(T x, T y) : x(x), y(y), z(0) {}
+    constexpr Vec3(T x, T y) noexcept : x(x), y(y), z(0) {}
     /* Three dimensional constructor */
-    inline Vec3(T x, T y, T z) : x(x), y(y), z(z) {}
+    constexpr Vec3(T x, T y, T z) noexcept : x(x), y(y), z(z) {}
 
     /// Operator overloading
     /* Get the opposite of a vector */
-    inline Vec3 operator-() const {
+    constexpr Vec3 operator-() const noexcept {
         return Vec3(-x, -y, -z);
     }
     /* Unary + operator */
-    inline Vec3 operator+() const {
+    constexpr Vec3 operator+() const noexcept {
         return *this;
     }
     /// Addition
     /* Add two vectors componentwise */
-    inline Vec3 operator+(const Vec3 & other) const {
+    constexpr Vec3 operator+(const Vec3 & other) const noexcept {
         return Vec3(x + other.x, y + other.y, z + other.z);
     }
     /* Add a scalar value to all components of a vector */
-    inline Vec3 operator+(const T f) const {
+    constexpr Vec3 operator+(const T f) const noexcept {
         return Vec3(x + f, y + f, z + f);
     }
     /* Add a scalar value to all components of a vector */
-    inline friend Vec3 operator+(const T f, const Vec3 & self) {
+    constexpr friend Vec3 operator+(const T f, const Vec3 & self) noexcept {
         return self + f;
     }
     /// Subtraction
     /* Substract two vectors componentwise */
-    inline Vec3 operator-(const Vec3 & other) const {
+    constexpr Vec3 operator-(const Vec3 & other) const noexcept {
         return Vec3(x - other.x, y - other.y, z - other.z);
     }
     /* Substract a scalar value from all components of a vector */
-    inline Vec3 operator-(const T f) const {
+    constexpr Vec3 operator-(const T f) const noexcept {
         return Vec3(x - f, y - f, z - f);
     }
     /* Substract a vector from a scalar value, returning a new vector */
-    inline friend Vec3 operator-(const T f, const Vec3 & self) {
+    constexpr friend Vec3 operator-(const T f, const Vec3 & self) noexcept {
         return Vec3(f - self.x, f - self.y, f - self.z);
     }
     /// Multiplication
     /* Multiply two vectors componentwise */
-    inline Vec3 operator*(const Vec3 & other) const {
+    constexpr Vec3 operator*(const Vec3 & other) const noexcept {
         return Vec3(x * other.x, y * other.y, z * other.z);
     }
     /* Multiply a vector by a scalar value */
-    inline Vec3 operator*(const T f) const {
+    constexpr Vec3 operator*(const T f) const noexcept {
         return Vec3(x * f, y * f, z * f);
     }
     /* Multiply a vector by a scalar value */
-    inline friend Vec3 operator*(const T f, const Vec3 & self) {
+    constexpr friend Vec3 operator*(const T f, const Vec3 & self) noexcept {
         return self * f;
     }
     /// Division
     /* Divide two vectors componentwise */
-    inline Vec3 operator/(const Vec3 & other) const {
+    constexpr Vec3 operator/(const Vec3 & other) const {
         return Vec3(x / other.x, y / other.y, z / other.z);
     }
     /* Divide a vector by a scalar value */
-    inline Vec3 operator/(const T f) const {
+    constexpr Vec3 operator/(const T f) const {
         return Vec3(x / f, y / f, z / f);
     }
     /* Divide a scalar by a vector, returning a new vector */
-    inline friend Vec3 operator/(const T f, const Vec3 & self) {
+    constexpr friend Vec3 operator/(const T f, const Vec3 & self) {
         return Vec3(f / self.x, f / self.y, f / self.z);
     }
 
     /// Geometric operations
     /* Dot product */
-    inline float dot(const Vec3 & other) const {
+    constexpr float dot(const Vec3 & other) const noexcept {
         return x * other.x + y * other.y + z * other.z;
     }
     /* Cross product */
-    inline Vec3 cross(const Vec3 & other) const {
+    constexpr Vec3 cross(const Vec3 & other) const noexcept {
         return Vec3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
     }
     /* Squared norm of the vector */
-    inline T squared_norm() const {
+    constexpr T squared_norm() const noexcept {
         return x * x + y * y + z * z;
     }
     /* Norm of the vector */
-    inline T norm() const {
+    inline T norm() const noexcept {
         return sqrt(squared_norm());
     }
     /* Normalize the vector */
@@ -134,27 +138,27 @@ struct Vec3 {
 
     /// Colour functions
     /* Red component */
-    uint8_t red() const {
+    constexpr uint8_t red() const noexcept {
         return static_cast<uint8_t>(utils::clamp(x) * MAX_COLOUR);
     }
     /* Green component */
-    uint8_t green() const {
+    constexpr uint8_t green() const noexcept {
         return static_cast<uint8_t>(utils::clamp(y) * MAX_COLOUR);
     }
     /* Blue component */
-    uint8_t blue() const {
+    constexpr uint8_t blue() const noexcept {
         return static_cast<uint8_t>(utils::clamp(z) * MAX_COLOUR);
     }
 
     /* Print the vector for debugging purposes */
     template <class charT, class charTraits = std::char_traits<charT>>
-    friend std::basic_ostream<charT, charTraits> & operator<<(std::basic_ostream<charT, charTraits> & os, const Vec3 & self) {
+    inline friend std::basic_ostream<charT, charTraits> & operator<<(std::basic_ostream<charT, charTraits> & os, const Vec3 & self) {
         return os << "Vec3(" << self.x << ", " << self.y << ", " << self.z << ")";
     }
 
     /* Output the colour to a stream */
     template <class charT, class charTraits = std::char_traits<charT>>
-    void write(std::basic_ostream<charT, charTraits> & os) const {
+    inline void write(std::basic_ostream<charT, charTraits> & os) const {
         os << red() << green() << blue();
     }
 };
@@ -173,21 +177,21 @@ using Colour = vec3::Vec3<float>;
 using Color = Colour;
 
 /* Pure red colour */
-const Colour RED(1, 0, 0);
+constexpr Colour RED(1, 0, 0);
 /* Pure green colour */
-const Colour GREEN(0, 1, 0);
+constexpr Colour GREEN(0, 1, 0);
 /* Pure blue colour */
-const Colour BLUE(0, 0, 1);
+constexpr Colour BLUE(0, 0, 1);
 /* Pure yellow colour */
-const Colour YELLOW(1, 1, 0);
+constexpr Colour YELLOW(1, 1, 0);
 /* Pure cyan colour */
-const Colour CYAN(0, 1, 1);
+constexpr Colour CYAN(0, 1, 1);
 /* Pure magenta colour */
-const Colour MAGENTA(1, 0, 1);
+constexpr Colour MAGENTA(1, 0, 1);
 /* Pure black colour */
-const Colour BLACK(0, 0, 0);
+constexpr Colour BLACK(0, 0, 0);
 /* Pure white colour */
-const Colour WHITE(1, 1, 1);
+constexpr Colour WHITE(1, 1, 1);
 } // namespace colour
 
 /* Standard vec3 and point3 implementation */
@@ -196,12 +200,12 @@ using Point3 = vec3::Point3<double>;
 using colour::Colour;
 
 /* Compare two colours for equality */
-inline bool operator==(const Colour & a, const Colour & b) {
+constexpr bool operator==(const Colour & a, const Colour & b) noexcept {
     return a.red() == b.red() && a.green() == b.green() && a.blue() == b.blue();
 }
 
 /* Compare two colours for inequality */
-inline bool operator!=(const Colour & a, const Colour & b) {
+constexpr bool operator!=(const Colour & a, const Colour & b) noexcept {
     return a.red() != b.red() || a.green() != b.green() || a.blue() != b.blue();
 }
 
