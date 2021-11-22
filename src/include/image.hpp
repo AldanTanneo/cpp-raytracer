@@ -27,7 +27,7 @@ class Image {
     /* Create an image of size width * height, using the pixels in the given vector */
     inline Image(std::vector<Colour> data, uint64_t width, uint64_t height)
         : data(data), width(width), height(height) {
-        if (data.size() >= width * height) {
+        if (data.size() > width * height) {
             throw "Could not construct Image: too many pixels in the given vector.";
         }
     }
