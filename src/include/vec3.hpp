@@ -3,10 +3,12 @@
 
 #include <ostream>
 
-const float MAX_COLOUR = 255.999f;
-
 namespace utils {
-/* Clamps a value to the [0.0, 1.0] range */
+
+/* Maximum floating point color value. Used for conversion between floating point and integer color. */
+constexpr float MAX_COLOUR = 255.999f;
+
+/* Clamps a floating point value to the [0.0, 1.0] range */
 template <class T>
 constexpr T clamp(const T value) noexcept {
     static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
@@ -139,15 +141,15 @@ struct Vec3 {
     /// Colour functions
     /* Red component */
     constexpr uint8_t red() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(x) * MAX_COLOUR);
+        return static_cast<uint8_t>(utils::clamp(x) * utils::MAX_COLOUR);
     }
     /* Green component */
     constexpr uint8_t green() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(y) * MAX_COLOUR);
+        return static_cast<uint8_t>(utils::clamp(y) * utils::MAX_COLOUR);
     }
     /* Blue component */
     constexpr uint8_t blue() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(z) * MAX_COLOUR);
+        return static_cast<uint8_t>(utils::clamp(z) * utils::MAX_COLOUR);
     }
 
     /* Print the vector for debugging purposes */

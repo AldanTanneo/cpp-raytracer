@@ -134,7 +134,7 @@ class Image {
         if (data.size() == width * height) {
             os << "P6" << std::endl
                << width << ' ' << height << std::endl
-               << static_cast<uint64_t>(MAX_COLOUR) << std::endl;
+               << static_cast<uint64_t>(utils::MAX_COLOUR) << std::endl;
 
             for (Colour const & c : data) {
                 c.write(os);
