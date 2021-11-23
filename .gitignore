@@ -2,4 +2,6 @@
 compile_flags.txt
 *.ppm
 main
-.vscode/settings.json
+xtrem-raytracer
+.vscode
+obj
