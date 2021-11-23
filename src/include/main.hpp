@@ -4,12 +4,12 @@
 #include <iostream>
 
 /* Error handling macro that wraps main() */
-#define main()                                                                 \
-    _main();                                                                   \
-    int main() {                                                               \
+#define main(args)                                                             \
+    _main(int _argc, char * _argv[]);                                          \
+    int main(int _argc, char * _argv[]) {                                      \
         int res = EXIT_SUCCESS;                                                \
         try {                                                                  \
-            res = _main();                                                     \
+            res = _main(_argc, _argv);                                         \
         } catch (const char * s) {                                             \
             std::cout << "Uncaught exception: " << s << std::endl;             \
         } catch (const std::string & s) {                                      \
@@ -21,6 +21,6 @@
         }                                                                      \
         return res;                                                            \
     }                                                                          \
-    int _main()
+    int _main(int argc, char * argv[])
 
 #endif
