@@ -12,7 +12,7 @@ NEG = $(ESC)[7m
 ifeq ($(OS),Windows_NT)
 TARGET = main.exe
 RELEASE_TARGET = raytracer.exe
-DEL = del -ErrorAction SilentlyContinue
+DEL = del
 else
 TARGET = main
 RELEASE_TARGET = raytracer
