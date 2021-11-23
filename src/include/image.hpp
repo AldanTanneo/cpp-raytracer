@@ -106,9 +106,9 @@ class Image {
     /* Get the image height */
     constexpr uint64_t get_height() const noexcept { return height; }
     /* Get the image size */
-    constexpr uint64_t size() const noexcept { return data.size(); }
+    inline uint64_t size() const noexcept { return data.size(); }
     /* Get the image container capacity */
-    constexpr uint64_t capacity() const noexcept { return data.capacity(); }
+    inline uint64_t capacity() const noexcept { return data.capacity(); }
 
     /* Index the image by indexing the underlying vector */
     inline Colour operator[](uint64_t index) const {
