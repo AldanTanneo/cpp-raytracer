@@ -1,9 +1,11 @@
 #ifndef IMAGE_HPP
 #define IMAGE_HPP
 
-#include <fstream>
 #include <cstring>
+#include <fstream>
+#include <string>
 #include <vector>
+
 
 // From src/include
 #include <vec3.hpp>
