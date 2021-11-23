@@ -1,3 +1,4 @@
 *.exe
 compile_flags.txt
 *.ppm
+main
