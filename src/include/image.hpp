@@ -43,7 +43,11 @@ class Image {
         if (is.getline(buffer, 3).good() && !std::strcmp(buffer, "P6")) {
             is >> width >> height >> maxval;
         } else {
-            throw "Could not load PPM image: invalid header.";
+            throw "Could not load PPM image: invalid magic number";
+        }
+
+        if (!is.good()) {
+            throw "Could not load PPM image: invalid header";
         }
 
         if (!std::isspace(is.get())) {
