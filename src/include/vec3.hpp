@@ -2,6 +2,7 @@
 #define VEC3_HPP
 
 #include <ostream>
+#include <cmath>
 
 namespace utils {
 
