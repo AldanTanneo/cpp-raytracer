@@ -4,11 +4,18 @@
 #include <cmath>
 #include <ostream>
 
-
 namespace utils {
 
 /* Maximum floating point color value. Used for conversion between floating point and integer color. */
 constexpr float MAX_COLOUR = 255.999f;
+constexpr double EPSILON = 1e-9;
+constexpr double PI = 3.14159265358979323846264338327950288;
+
+template <class T>
+constexpr T to_radians(T value) noexcept {
+    static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
+    return value * static_cast<T>(PI) / 180.0;
+}
 
 /* Clamps a floating point value to the [0.0, 1.0] range */
 template <class T>
@@ -27,7 +34,8 @@ constexpr T clamp(const T value) noexcept {
 namespace vec3 {
 /* A three dimensional vector class */
 template <class T>
-struct Vec3 {
+class Vec3 {
+  public:
     static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
     /* Vector components */
     T x, y, z;
