@@ -13,10 +13,11 @@ MODE     := [debug] # Default mode
 
 # Cool colours
 ESC   := 
-GREEN := $(ESC)[32m
-RED   := $(ESC)[31m
 NC    := $(ESC)[0m
+BOLD  := $(ESC)[1m
 NEG   := $(ESC)[7m
+RED   := $(ESC)[31m
+GREEN := $(ESC)[32m
 
 # Platform specific variables
 ifeq ($(OS),Windows_NT)
@@ -39,11 +40,11 @@ ifeq ("$(wildcard $(OBJ))","")
 endif
 
 $(OBJ)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ)
-	@echo $(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE)$(NC)
+	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE)$(NC)
 	@$(CC) -c $< -o $@ -Isrc/include $(OPT) $(CFLAGS) 
 
 $(TARGET): $(OBJ) $(OBJS)
-	@echo $(GREEN)    Linking $(NC)$(TARGET)$(GREEN) $(MODE)$(NC)
+	@echo $(BOLD)$(GREEN)    Linking $(NC)$(TARGET)$(GREEN) $(MODE)$(NC)
 	@$(CC) -o $(TARGET) $(OBJS) $(OPT) $(CFLAGS)
 
 .PHONY: all release run benchmark clean build
@@ -55,27 +56,25 @@ release: $(OBJ) $(OBJS) $(TARGET)
 
 debug: $(OBJ) $(OBJS) $(TARGET)
 
-build: debug
-
 run: $(TARGET)
-	@echo $(GREEN)    Running $(NC)$(TARGET)$(GREEN) [debug]$(NC)
+	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET)$(GREEN) [debug]$(NC)
 	@./$(TARGET)
 
 benchmark: release # run in release mode
-	@echo $(GREEN)    Running $(NC)$(TARGET)$(GREEN) [release]$(NC)
+	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET)$(GREEN) [release]$(NC)
 	@./$(TARGET)
 
 clean:
 ifneq ("$(wildcard $(TARGET))","")
-	@echo $(RED)Cleaning up $(NC)$(TARGET)$(RED)...$(NC)
+	@echo $(BOLD)$(RED)Cleaning up $(NC)$(TARGET)$(RED)...$(NC)
 	@$(DEL) $(TARGET)
 endif
 ifneq ("$(wildcard $(RELEASE_TARGET))","")
-	@echo $(RED)Cleaning up $(NC)$(RELEASE_TARGET)$(RED)...$(NC)
+	@echo $(BOLD)$(RED)Cleaning up $(NC)$(RELEASE_TARGET)$(RED)...$(NC)
 	@$(DEL) $(RELEASE_TARGET)
 endif
 ifneq ("$(wildcard $(OBJ))","")
-	@echo $(RED)Cleaning up $(NC)$(OBJ)$(RED)...$(NC)
+	@echo $(BOLD)$(RED)Cleaning up $(NC)$(OBJ)$(RED)...$(NC)
 	@$(RMDIR) $(OBJ)
 endif
 
