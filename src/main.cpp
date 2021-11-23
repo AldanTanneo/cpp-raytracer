@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 // From src/include
 #include <image.hpp>
