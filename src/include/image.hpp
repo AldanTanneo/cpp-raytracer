@@ -2,7 +2,7 @@
 #define IMAGE_HPP
 
 #include <fstream>
-#include <string>
+#include <cstring>
 #include <vector>
 
 // From src/include
