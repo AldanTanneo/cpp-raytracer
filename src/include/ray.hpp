@@ -10,10 +10,9 @@ class Ray {
     Vec3 direction;
 
   public:
-    constexpr Ray(Point3 origin, Vec3 direction)
-        : origin(origin), direction(direction) {}
+    constexpr Ray(Point3 origin, Vec3 direction) noexcept : origin(origin), direction(direction) {}
 
-    Point3 at(double t0) { return origin + t0 * direction; }
+    constexpr Point3 at(double t0) noexcept { return origin + t0 * direction; }
 };
 
 #endif
