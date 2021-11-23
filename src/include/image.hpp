@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-
 // From src/include
 #include <vec3.hpp>
 

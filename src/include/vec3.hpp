@@ -1,8 +1,9 @@
 #ifndef VEC3_HPP
 #define VEC3_HPP
 
-#include <ostream>
 #include <cmath>
+#include <ostream>
+
 
 namespace utils {
 
