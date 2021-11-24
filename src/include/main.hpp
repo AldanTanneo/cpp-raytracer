@@ -3,6 +3,10 @@
 
 #include <iostream>
 
+/* Debugging macro */
+#define DBG(args) \
+    std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #args << " = " << (args) << std::endl
+
 /* Error handling macro that wraps main() */
 #define main(args)                                                             \
     _main(int _argc, char * _argv[]);                                          \
