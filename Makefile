@@ -1,15 +1,40 @@
 PROJECT_NAME := xtrem-raytracer
 
+# Platform specific variables
+ifeq ($(OS),Windows_NT)
+TARGET_DEBUG   := main.exe
+TARGET_RELEASE := $(PROJECT_NAME).exe
+DEL            := del
+RMDIR          := rd /S /Q
+MKDIR          := md
+else
+TARGET_DEBUG   := main
+TARGET_RELEASE := $(PROJECT_NAME)
+DEL            := rm -f
+RMDIR          := rm -rf
+MKDIR          := mkdir -p
+endif
+
+# Sources
 SRC      := src
-OBJ      := obj
 SRCS     := $(wildcard $(SRC)/*.cpp)
-OBJS     := $(patsubst $(SRC)/%.cpp,$(OBJ)/%.o,$(SRCS))
-# Headers
 INCLUDES := $(wildcard $(SRC)/include/*.hpp) $(wildcard $(SRC)/include/**/*.hpp)
-CC       := clang++ # Compiler
-CFLAGS   := -Wall -Werror -Wfatal-errors # Compiler flags
-OPT      := -O0     # Default optimisation setting
-MODE     := [debug] # Default mode
+
+# Object files
+OBJ          := obj
+OBJ_DEBUG    := $(OBJ)/debug
+OBJ_RELEASE  := $(OBJ)/release
+OBJS_DEBUG   := $(patsubst $(SRC)/%.cpp,$(OBJ_DEBUG)/%.o,$(SRCS))
+OBJS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.o,$(SRCS))
+
+# Compiler and compile flags
+CC          := g++
+CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors
+OPT_DEBUG   := -O0
+OPT_RELEASE := -Ofast
+
+MODE_DEBUG   := [debug]
+MODE_RELEASE := [release]
 
 # Cool colours
 ESC   := 
@@ -19,65 +44,70 @@ NEG   := $(ESC)[7m
 RED   := $(ESC)[31m
 GREEN := $(ESC)[32m
 
-# Platform specific variables
+all: $(TARGET_DEBUG)
+
+# Create build directories
+
+$(OBJ_DEBUG) $(OBJ_RELEASE):
 ifeq ($(OS),Windows_NT)
-TARGET         := main.exe
-RELEASE_TARGET := $(PROJECT_NAME).exe
-DEL            := del
-RMDIR          := rd /S /Q
+	@if not exist $(subst /,\,$@) $(MKDIR) $(subst /,\,$@)
 else
-TARGET         := main
-RELEASE_TARGET := $(PROJECT_NAME)
-DEL            := rm -f
-RMDIR          := rm -rf
+	@$(MKDIR) $@
 endif
 
-all: $(TARGET)
+# Debug build
 
-$(OBJ):
-ifeq ("$(wildcard $(OBJ))","")
-	@mkdir $@
-endif
+$(OBJ_DEBUG)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_DEBUG)
+	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_DEBUG)$(NC)
+	@$(CC) -c $< -o $@ $(OPT_DEBUG) $(CFLAGS) 
 
-$(OBJ)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ)
-	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE)$(NC)
-	@$(CC) -c $< -o $@ -Isrc/include $(OPT) $(CFLAGS) 
+$(TARGET_DEBUG): $(OBJS_DEBUG) | $(OBJ_DEBUG)
+	@echo $(BOLD)$(GREEN)    Linking $(NC)$@$(GREEN) $(MODE_DEBUG)$(NC)
+	@$(CC) -o $@ $(OBJS_DEBUG) $(OPT_DEBUG) $(CFLAGS)
 
-$(TARGET): $(OBJS) | $(OBJ)
-	@echo $(BOLD)$(GREEN)    Linking $(NC)$(TARGET)$(GREEN) $(MODE)$(NC)
-	@$(CC) -o $(TARGET) $(OBJS) $(OPT) $(CFLAGS)
+# Release build
 
-.PHONY: all release run benchmark clean build
+$(OBJ_RELEASE)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_RELEASE)
+	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_RELEASE)$(NC)
+	@$(CC) -c $< -o $@ $(OPT_RELEASE) $(CFLAGS) 
 
-release: OPT    := -Ofast
-release: MODE   := [release]
-release: TARGET := $(RELEASE_TARGET)
-release: $(OBJS) $(TARGET) | $(OBJ)
+$(TARGET_RELEASE): $(OBJS_RELEASE) | $(OBJ_RELEASE)
+	@echo $(BOLD)$(GREEN)    Linking $(NC)$@$(GREEN) $(MODE_RELEASE)$(NC)
+	@$(CC) -o $@ $(OBJS_RELEASE) $(OPT_RELEASE) $(CFLAGS)
 
-debug: $(OBJS) $(TARGET) | $(OBJ)
+# Phony targets
 
-run: $(TARGET)
-	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET)$(GREEN) [debug]$(NC)
-	@./$(TARGET)
+debug: $(TARGET_DEBUG)
 
-benchmark: TARGET := $(RELEASE_TARGET)
-benchmark: # run in release mode
-	@make -s clean
-	@make -s release
-	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET)$(GREEN) [release]$(NC)
-	@./$(TARGET)
+run: $(TARGET_DEBUG)
+	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET_DEBUG)$(GREEN) $(MODE_DEBUG)$(NC)
+	@./$(TARGET_DEBUG)
+
+release: $(TARGET_RELEASE)
+
+benchmark: $(TARGET_RELEASE)
+	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET_RELEASE)$(GREEN) $(MODE_RELEASE)$(NC)
+	@./$(TARGET_RELEASE)
 
 clean:
-ifneq ("$(wildcard $(TARGET))","")
-	@echo $(BOLD)$(RED)Cleaning up $(NC)$(TARGET)$(RED)...$(NC)
-	@$(DEL) $(TARGET)
+ifneq ("$(wildcard $(TARGET_DEBUG))","")
+	@echo $(BOLD)$(RED)Cleaning up $(NC)$(TARGET_DEBUG)$(RED)...$(NC)
+	@$(DEL) $(TARGET_DEBUG)
 endif
-ifneq ("$(wildcard $(RELEASE_TARGET))","")
-	@echo $(BOLD)$(RED)Cleaning up $(NC)$(RELEASE_TARGET)$(RED)...$(NC)
-	@$(DEL) $(RELEASE_TARGET)
+ifneq ("$(wildcard $(TARGET_RELEASE))","")
+	@echo $(BOLD)$(RED)Cleaning up $(NC)$(TARGET_RELEASE)$(RED)...$(NC)
+	@$(DEL) $(TARGET_RELEASE)
 endif
 ifneq ("$(wildcard $(OBJ))","")
 	@echo $(BOLD)$(RED)Cleaning up $(NC)$(OBJ)$(RED)...$(NC)
 	@$(RMDIR) $(OBJ)
 endif
 
+.PHONY: debug run release bench benchmark clean _create_dir
+
+_create_dir:
+ifeq ($(OS),Windows_NT)
+	@if not exist $(subst /,\,$(DIR)) $(MKDIR) $(subst /,\,$(DIR))
+else
+	@$(MKDIR) $(DIR)
+endif
