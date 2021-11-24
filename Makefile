@@ -43,7 +43,7 @@ $(OBJ)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE)$(NC)
 	@$(CC) -c $< -o $@ -Isrc/include $(OPT) $(CFLAGS) 
 
-$(TARGET): $(OBJ) $(OBJS)
+$(TARGET): $(OBJS) | $(OBJ)
 	@echo $(BOLD)$(GREEN)    Linking $(NC)$(TARGET)$(GREEN) $(MODE)$(NC)
 	@$(CC) -o $(TARGET) $(OBJS) $(OPT) $(CFLAGS)
 
@@ -52,15 +52,18 @@ $(TARGET): $(OBJ) $(OBJS)
 release: OPT    := -Ofast
 release: MODE   := [release]
 release: TARGET := $(RELEASE_TARGET)
-release: $(OBJ) $(OBJS) $(TARGET)
+release: $(OBJS) $(TARGET) | $(OBJ)
 
-debug: $(OBJ) $(OBJS) $(TARGET)
+debug: $(OBJS) $(TARGET) | $(OBJ)
 
 run: $(TARGET)
 	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET)$(GREEN) [debug]$(NC)
 	@./$(TARGET)
 
-benchmark: release # run in release mode
+benchmark: TARGET := $(RELEASE_TARGET)
+benchmark: # run in release mode
+	@make -s clean
+	@make -s release
 	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET)$(GREEN) [release]$(NC)
 	@./$(TARGET)
 
