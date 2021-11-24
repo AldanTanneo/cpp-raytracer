@@ -131,6 +131,11 @@ class Vec3 {
     constexpr Vec3 cross(const Vec3 & other) const noexcept {
         return Vec3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
     }
+    /* Reflect a vector against a plane defined by its normal */
+    constexpr Vec3 reflect(const Vec3 & normal) const noexcept {
+        const Vec3 normal_component = dot(normal) * normal;
+        return *this - 2 * normal_component;
+    }
     /* Squared norm of the vector */
     constexpr T squared_norm() const noexcept {
         return x * x + y * y + z * z;
