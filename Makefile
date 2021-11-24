@@ -31,7 +31,7 @@ OBJS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.o,$(SRCS))
 CC          := clang++
 CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors
 OPT_DEBUG   := -O0
-OPT_RELEASE := -Ofast
+OPT_RELEASE := -Ofast -march=native -mavx
 
 MODE_DEBUG   := [debug]
 MODE_RELEASE := [release]
@@ -69,11 +69,11 @@ $(TARGET_DEBUG): $(OBJS_DEBUG) | $(OBJ_DEBUG)
 
 $(OBJ_RELEASE)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_RELEASE)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_RELEASE)$(NC)
-	@$(CC) -c $< -o $@ $(OPT_RELEASE) $(CFLAGS) 
+	@$(CC) -c $< -o $@ $(OPT_RELEASE) $(CFLAGS)
 
 $(TARGET_RELEASE): $(OBJS_RELEASE) | $(OBJ_RELEASE)
 	@echo $(BOLD)$(GREEN)    Linking $(NC)$@$(GREEN) $(MODE_RELEASE)$(NC)
-	@$(CC) -o $@ $(OBJS_RELEASE) $(OPT_RELEASE) $(CFLAGS)
+	@$(CC) $(OBJS_RELEASE) -o $@ $(OPT_RELEASE) $(CFLAGS)
 
 # Phony targets
 
