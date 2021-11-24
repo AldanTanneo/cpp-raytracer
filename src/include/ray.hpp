@@ -4,6 +4,7 @@
 // From src/include
 #include <vec3.hpp>
 
+/* Light ray class with origin and direction */
 class Ray {
   private:
     /* The origin of the ray */
