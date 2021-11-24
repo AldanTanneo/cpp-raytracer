@@ -28,7 +28,7 @@ OBJS_DEBUG   := $(patsubst $(SRC)/%.cpp,$(OBJ_DEBUG)/%.o,$(SRCS))
 OBJS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.o,$(SRCS))
 
 # Compiler and compile flags
-CC          := g++
+CC          := clang++
 CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors
 OPT_DEBUG   := -O0
 OPT_RELEASE := -Ofast
@@ -44,7 +44,7 @@ NEG   := $(ESC)[7m
 RED   := $(ESC)[31m
 GREEN := $(ESC)[32m
 
-all: $(TARGET_DEBUG)
+build: $(TARGET_DEBUG)
 
 # Create build directories
 
@@ -103,11 +103,4 @@ ifneq ("$(wildcard $(OBJ))","")
 	@$(RMDIR) $(OBJ)
 endif
 
-.PHONY: debug run release bench benchmark clean _create_dir
-
-_create_dir:
-ifeq ($(OS),Windows_NT)
-	@if not exist $(subst /,\,$(DIR)) $(MKDIR) $(subst /,\,$(DIR))
-else
-	@$(MKDIR) $(DIR)
-endif
+.PHONY: build debug run release bench benchmark clean
