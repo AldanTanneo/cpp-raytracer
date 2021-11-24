@@ -13,7 +13,7 @@ void test_camera() {
     DBG(cam.get_ray(0.5, 0.5)); // looking right in the middle of the screen: direction = X
     DBG(cam.get_ray(0, 0));     // bottom left corner of the screen
     DBG(cam.get_ray(1, 1));     // top right corner of the screen
-    std::cout << std::endl;
+    newline();
 }
 
 int main() {
@@ -41,12 +41,12 @@ int main() {
     DBG(img.get_width());
     DBG(img.get_height());
 
-    std::cout << std::endl;
+    newline();
 
     DBG(img2.get_width());
     DBG(img2.get_height());
 
-    std::cout << std::endl;
+    newline();
 
     DBG(img == img2);
 

@@ -3,6 +3,11 @@
 
 #include <iostream>
 
+/* Outputs a newline */
+inline void newline() {
+    std::cout << std::endl;
+}
+
 /* Debugging macro */
 #define DBG(args) \
     std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #args << " = " << (args) << std::endl
