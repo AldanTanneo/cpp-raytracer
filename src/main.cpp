@@ -10,9 +10,9 @@
 void test_camera() {
     Camera cam(Point3::ZEROS(), Point3::X(), Vec3::Y(), 90, AspectRatio(1));
 
-    std::cout << cam.get_ray(0.5, 0.5) << std::endl; // looking right in the middle of the screen: direction = X
-    std::cout << cam.get_ray(0, 0) << std::endl;     // bottom left corner of the screen
-    std::cout << cam.get_ray(1, 1) << std::endl;     // top right corner of the screen
+    DBG(cam.get_ray(0.5, 0.5)); // looking right in the middle of the screen: direction = X
+    DBG(cam.get_ray(0, 0));     // bottom left corner of the screen
+    DBG(cam.get_ray(1, 1));     // top right corner of the screen
     std::cout << std::endl;
 }
 
@@ -38,10 +38,17 @@ int main() {
 
     Image img2 = Image::load("image.ppm");
 
-    std::cout << "Image1 size: " << img.get_width() << "x" << img.get_height() << std::endl;
-    std::cout << "Image2 size: " << img2.get_width() << "x" << img2.get_height() << std::endl;
+    DBG(img.get_width());
+    DBG(img.get_height());
 
-    std::cout << "Image1 == Image2: " << (img == img2 ? "true" : "false") << std::endl;
+    std::cout << std::endl;
+
+    DBG(img2.get_width());
+    DBG(img2.get_height());
+
+    std::cout << std::endl;
+
+    DBG(img == img2);
 
     img2.save("image2.ppm");
 
