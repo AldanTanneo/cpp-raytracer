@@ -2,20 +2,22 @@
 #include <iostream>
 
 // From src/include
+#include <camera.hpp>
 #include <image.hpp>
 #include <main.hpp>
 #include <vec3.hpp>
 
-void test_3d_vectors() {
-    Vec3 u(0, 1, 0);
-    Vec3 v(sqrt(2) / 2, 0, sqrt(2) / 2);
-    std::cout << "u . v = " << u.dot(v) << std::endl;
-    std::cout << "u x v = " << u.cross(v) << std::endl;
-    std::cout << 3 * Vec3::ONES() << std::endl;
+void test_camera() {
+    Camera cam(Point3::ZEROS(), Point3::X(), Vec3::Y(), 90, AspectRatio(1));
+
+    std::cout << cam.get_ray(0.5, 0.5) << std::endl; // looking right in the middle of the screen: direction = X
+    std::cout << cam.get_ray(0, 0) << std::endl;     // bottom left corner of the screen
+    std::cout << cam.get_ray(1, 1) << std::endl;     // top right corner of the screen
+    std::cout << std::endl;
 }
 
 int main() {
-    test_3d_vectors();
+    test_camera();
 
     int width = 200;
     int height = 200;
