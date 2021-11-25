@@ -16,7 +16,7 @@ struct AspectRatio {
 
   public:
     /* Construct an aspect ratio from two integers */
-    constexpr AspectRatio(unsigned int width, unsigned int height) : aspect_ratio((double)width / (double)height) {
+    constexpr AspectRatio(unsigned int width, unsigned int height) : aspect_ratio(double(width) / double(height)) {
         if (aspect_ratio < utils::EPSILON || !std::isfinite(aspect_ratio)) {
             throw "Could not construct AspectRatio: value must be positive";
         }
