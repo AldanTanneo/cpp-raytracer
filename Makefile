@@ -31,7 +31,7 @@ OBJS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.o,$(SRCS))
 CC          := clang++
 CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors
 OPT_DEBUG   := -O0
-OPT_RELEASE := -Ofast -march=native -mavx
+OPT_RELEASE := -Ofast -mavx2
 
 MODE_DEBUG   := [debug]
 MODE_RELEASE := [release]
@@ -85,7 +85,7 @@ run: $(TARGET_DEBUG)
 
 release: $(TARGET_RELEASE)
 
-benchmark: $(TARGET_RELEASE)
+bench benchmark: $(TARGET_RELEASE)
 	@echo $(BOLD)$(GREEN)    Running $(NC)$(TARGET_RELEASE)$(GREEN) $(MODE_RELEASE)$(NC)
 	@./$(TARGET_RELEASE)
 
