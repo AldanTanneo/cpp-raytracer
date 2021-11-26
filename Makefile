@@ -17,15 +17,16 @@ endif
 
 # Sources
 SRC      := src
-SRCS     := $(wildcard $(SRC)/*.cpp)
-INCLUDES := $(wildcard $(SRC)/include/*.hpp) $(wildcard $(SRC)/include/**/*.hpp)
+SRCS     := $(wildcard $(SRC)/*.cpp) $(wildcard $(SRC)/**/*.cpp)
+INCLUDE  := $(SRC)/include
+INCLUDES := $(wildcard $(INCLUDE)/*.hpp) $(wildcard $(INCLUDE)/**/*.hpp)
 
 # Object files
 OBJ          := obj
 OBJ_DEBUG    := $(OBJ)/debug
 OBJ_RELEASE  := $(OBJ)/release
-OBJS_DEBUG   := $(patsubst $(SRC)/%.cpp,$(OBJ_DEBUG)/%.o,$(SRCS))
-OBJS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.o,$(SRCS))
+OBJS_DEBUG   := $(foreach obj_file,$(patsubst $(SRC)/%.cpp,%.o,$(SRCS)),$(OBJ_DEBUG)/$(notdir $(obj_file)))
+OBJS_RELEASE := $(foreach obj_file,$(patsubst $(SRC)/%.cpp,%.o,$(SRCS)),$(OBJ_RELEASE)/$(notdir $(obj_file)))
 
 # Compiler and compile flags
 CC          := clang++
