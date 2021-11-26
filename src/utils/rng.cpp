@@ -31,7 +31,8 @@ struct FastRng {
 /* Global, thread-local RNG instance */
 thread_local FastRng glob_rng(0x193a6754ULL);
 
-/* Export a single function to the external library, users cannot see the inside of the beast */
+/* Export a limited number of functions to the external library,
+users cannot see the inside of the beast */
 namespace rng {
 double gen() {
     return glob_rng.next_f64();
