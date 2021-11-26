@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+/* Thread-local random number generator */
 namespace rng {
 /* Return a random double in the range [0, 1) */
 double gen();
