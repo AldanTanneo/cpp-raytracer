@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <ostream>
+#include <limits>
 
 namespace utils {
 /* Maximum floating point color value. Used for conversion between floating point and integer color. */
@@ -414,7 +415,7 @@ class Vec3 {
     inline Vec3 refract(const Vec3 & normal, double refraction_ratio) const noexcept {
         double cos_theta = -dot(normal);
         Vec3 orth_out = refraction_ratio * (*this + normal * cos_theta);
-        Vec3 parr_out = -sqrt(abs((1 - orth_out.squared_norm()))) * normal;
+        Vec3 parr_out = -sqrt(fabs((1 - orth_out.squared_norm()))) * normal;
         return orth_out + parr_out;
     }
 
