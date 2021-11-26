@@ -7,6 +7,7 @@
 
 /* The returned structure if a ray hits an object */
 struct HitRecord {
+    double time;
     /* The point of intersection between the ray and the object */
     Point3 hit_point;
     /* The normal of the object surface at the intersection point */
@@ -20,7 +21,7 @@ class Hittable {
     // get_materiau
 
     /* define behaviour of ray when hitting hittable object */
-    virtual bool hit(Ray ray_in, double tmin, double tmax, HitRecord & hit_record) const = 0;
+    virtual bool hit(const Ray & ray_in, double tmin, double tmax, HitRecord & hit_record) const = 0;
 };
 
 #endif
