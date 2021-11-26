@@ -28,9 +28,13 @@ OBJ_RELEASE  := $(OBJ)/release
 OBJS_DEBUG   := $(patsubst $(SRC)/%.cpp,$(OBJ_DEBUG)/%.o,$(SRCS))
 OBJS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.o,$(SRCS))
 
+# Dependencies
+DEPS_DEBUG   := $(patsubst $(SRC)/%.cpp,$(OBJ_DEBUG)/%.d,$(SRCS))
+DEPS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.d,$(SRCS))
+
 # Compiler and compile flags
 CC          := clang++
-CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors
+CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors -MMD -MP
 OPT_DEBUG   := -O0
 OPT_RELEASE := -Ofast -mavx2
 
@@ -61,7 +65,7 @@ $(OBJ_DEBUG) $(OBJ_RELEASE):
 
 # Debug build
 
-$(OBJ_DEBUG)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_DEBUG)
+$(OBJ_DEBUG)/%.o: $(SRC)/%.cpp | $(OBJ_DEBUG)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_DEBUG)$(NC)
 	@$(CREATE_DIR)
 	@$(CC) -c $< -o $@ $(OPT_DEBUG) $(CFLAGS) 
@@ -72,7 +76,7 @@ $(TARGET_DEBUG): $(OBJS_DEBUG) | $(OBJ_DEBUG)
 
 # Release build
 
-$(OBJ_RELEASE)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_RELEASE)
+$(OBJ_RELEASE)/%.o: $(SRC)/%.cpp | $(OBJ_RELEASE)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_RELEASE)$(NC)
 	@$(CREATE_DIR)
 	@$(CC) -c $< -o $@ $(OPT_RELEASE) $(CFLAGS)
@@ -110,3 +114,6 @@ ifneq ("$(wildcard $(OBJ))","")
 endif
 
 .PHONY: build debug run release bench benchmark clean
+
+-include $(DEPS_DEBUG)
+-include $(DEPS_RELEASE)
