@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <memory>
 
 // From src/include
 #include <camera.hpp>
@@ -18,7 +19,7 @@ void test_3d_vectors() {
 
 int main(int argc, char * argv[]) {
 
-    int height = 1080;
+    int height = 720;
     int width = (height * 16) / 9;
 
     image::Image img(width, height);
@@ -27,6 +28,11 @@ int main(int argc, char * argv[]) {
 
     Sphere ball(-point3::Z, 0.5);
     Sphere ball2(Vec3(0.2, 0.2, -1.2), 0.5);
+    Sphere ground(Vec3(0, -100, 0), 99);
+    HittableList world;
+    world.add(ball);
+    world.add(ball2);
+    world.add(ground);
     HitRecord h;
 
     for (int j = height - 1; j >= 0; j--) {
@@ -34,19 +40,11 @@ int main(int argc, char * argv[]) {
             double u = double(i) / double(width - 1);
             double v = double(j) / double(height - 1);
             Ray r = cam.get_ray(u, v);
-            bool hit = false;
-            double tmin = utils::EPSILON;
-            double tmax = utils::INF;
-            if (ball.hit(r, tmin, tmax, h)) {
-                hit = true;
-                tmax = h.time;
-            }
-            hit = ball2.hit(r, tmin, tmax, h) ? true : hit;
 
-            if (hit) {
+            if (world.hit(r, utils::EPSILON, utils::INF, h)) {
                 img.push(0.5 * Colour(h.surface_normal + 1));
             } else {
-                img.push(colour::BLACK);
+                img.push(0.8 * colour::WHITE + 0.2 * colour::CYAN);
             }
         }
     }
