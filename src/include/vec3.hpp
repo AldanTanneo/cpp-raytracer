@@ -169,6 +169,28 @@ class Vec3 {
         z /= f;
     }
 
+    /// Norm and distance
+    /* Squared norm of the vector */
+    constexpr double squared_norm() const noexcept {
+        return x * x + y * y + z * z;
+    }
+    /* Norm of the vector */
+    inline double norm() const noexcept {
+        return sqrt(squared_norm());
+    }
+    /* Normalize the vector */
+    inline Vec3 unit_vector() const {
+        return *this / norm();
+    }
+    /* Normalize the vector. Modifies the original vector. */
+    inline void normalize() {
+        *this /= norm();
+    }
+    /* Get the distance between two points */
+    inline double distance(const Vec3 & other) const noexcept {
+        return (other - *this).norm();
+    }
+
     /// Geometric operations
     /* Dot product */
     constexpr double dot(const Vec3 & other) const noexcept {
@@ -190,26 +212,6 @@ class Vec3 {
         Vec3 orth_out = refraction_ratio * (*this + normal * cos_theta);
         Vec3 parr_out = -sqrt(abs((1 - orth_out.squared_norm()))) * normal;
         return orth_out + parr_out;
-    }
-    /* Squared norm of the vector */
-    constexpr double squared_norm() const noexcept {
-        return x * x + y * y + z * z;
-    }
-    /* Norm of the vector */
-    inline double norm() const noexcept {
-        return sqrt(squared_norm());
-    }
-    /* Normalize the vector */
-    inline Vec3 unit_vector() const {
-        return *this / norm();
-    }
-    /* Normalize the vector. Modifies the original vector. */
-    inline void normalize() {
-        *this /= norm();
-    }
-    /* Get the distance between two points */
-    inline double distance(const Vec3 & other) const noexcept {
-        return (other - *this).norm();
     }
 
     /* Print the vector for debugging purposes */
