@@ -19,6 +19,12 @@ class Ray {
     /* Compute the position of the ray at time t0 */
     constexpr Point3 at(double t0) noexcept { return origin + t0 * direction; }
 
+    /* Get ray origin */
+    constexpr Point3 get_origin() const noexcept { return origin }
+
+    /* Get ray direction */
+    constexpr Point3 get_direction() const noexcept { return direction }
+
     /* Print the ray for debugging purposes */
     template <class charT, class charTraits = std::char_traits<charT>>
     inline friend std::basic_ostream<charT, charTraits> & operator<<(std::basic_ostream<charT, charTraits> & os, const Ray & self) {
