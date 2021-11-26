@@ -9,10 +9,13 @@
 // From src/include
 #include <vec3.hpp>
 
+/* PPM images */
+namespace image {
 using colour::Colour;
 
 // Class for writing and reading PPM images. See the PPM specification at http://netpbm.sourceforge.net/doc/ppm.html
 class Image {
+
   private:
     /* A vector of pixels */
     std::vector<Colour> data;
@@ -65,7 +68,7 @@ class Image {
                 g = is.get();
                 b = is.get();
                 if (is.good()) {
-                    pixels.push_back(Colour(float(r) / maxval, float(g) / maxval, float(b) / maxval));
+                    pixels.push_back(Colour(double(r) / maxval, double(g) / maxval, double(b) / maxval));
                 } else {
                     break;
                 }
@@ -76,7 +79,7 @@ class Image {
                 g = (is.get() << 8) + is.get();
                 b = (is.get() << 8) + is.get();
                 if (is.good()) {
-                    pixels.push_back(Colour(float(r) / maxval, float(g) / maxval, float(b) / maxval));
+                    pixels.push_back(Colour(double(r) / maxval, double(g) / maxval, double(b) / maxval));
                 } else {
                     break;
                 }
@@ -120,8 +123,8 @@ class Image {
         data.push_back(pixel);
     }
 
-    /* Append a pixel by its (r, g, b) components */
-    inline void push(float r, float g, float b) noexcept {
+    /* Append a pixel by its normalized RGB components */
+    inline void push(double r, double g, double b) noexcept {
         data.push_back(Colour(r, g, b));
     }
 
@@ -180,5 +183,6 @@ class Image {
         return !(*this == other);
     }
 };
+} // namespace image
 
 #endif
