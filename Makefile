@@ -45,26 +45,25 @@ NEG   := $(ESC)[7m
 RED   := $(ESC)[31m
 GREEN := $(ESC)[32m
 
+# Useful commands
+ifeq ($(OS),Windows_NT)
+CREATE_DIR = if not exist $(subst /,\,$(dir $@)) $(MKDIR) $(subst /,\,$(dir $@))
+else
+CREATE_DIR = $(MKDIR) $(dir $@)
+endif
+
 build: $(TARGET_DEBUG)
 
 # Create build directories
 
 $(OBJ_DEBUG) $(OBJ_RELEASE):
-ifeq ($(OS),Windows_NT)
-	@if not exist $(subst /,\,$@) $(MKDIR) $(subst /,\,$@)
-else
-	@$(MKDIR) $@
-endif
+	@$(CREATE_DIR)
 
 # Debug build
 
 $(OBJ_DEBUG)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_DEBUG)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_DEBUG)$(NC)
-ifeq ($(OS),Windows_NT)
-	@if not exist $(subst /,\,$(dir $@)) $(MKDIR) $(subst /,\,$(dir $@))
-else
-	@$(MKDIR) $(dir $@)
-endif
+	@$(CREATE_DIR)
 	@$(CC) -c $< -o $@ $(OPT_DEBUG) $(CFLAGS) 
 
 $(TARGET_DEBUG): $(OBJS_DEBUG) | $(OBJ_DEBUG)
@@ -75,11 +74,7 @@ $(TARGET_DEBUG): $(OBJS_DEBUG) | $(OBJ_DEBUG)
 
 $(OBJ_RELEASE)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_RELEASE)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_RELEASE)$(NC)
-ifeq ($(OS),Windows_NT)
-	@if not exist $(subst /,\,$(dir $@)) $(MKDIR) $(subst /,\,$(dir $@))
-else
-	@$(MKDIR) $(dir $@)
-endif
+	@$(CREATE_DIR)
 	@$(CC) -c $< -o $@ $(OPT_RELEASE) $(CFLAGS)
 
 $(TARGET_RELEASE): $(OBJS_RELEASE) | $(OBJ_RELEASE)
