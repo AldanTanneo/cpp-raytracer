@@ -9,6 +9,8 @@ namespace utils {
 constexpr double MAX_COLOUR = 255.999999;
 /* Common epsilon for floating point uses */
 constexpr double EPSILON = 1e-9;
+/* Infinity */
+constexpr double INF = std::numeric_limits<double>::infinity();
 /* Geometric PI constant */
 constexpr double PI = 3.14159265358979323846264338327950288;
 
@@ -43,6 +45,206 @@ constexpr T clamp(const T value, const T min, const T max) noexcept {
 
 } // namespace utils
 
+/* RGB colours */
+namespace colour {
+/* RGB colour type. Uses 24-bits colour encoding for output and input. */
+class Colour {
+  public:
+    /* RGB components */
+    double r, g, b;
+
+    /* Construct a colour from its hexadecimal representation */
+    explicit constexpr Colour(uint32_t value)
+        : r(((value >> 16) & 0xff) / 255.0),
+          g(((value >> 8) & 0xff) / 255.0),
+          b((value & 0xff) / 255.0) {}
+    /* Construct a colour from its normalized floating point RGB components */
+    explicit constexpr Colour(double r, double g, double b) : r(r), g(g), b(b) {}
+
+    /* Construct a colour from its byte RGB components */
+    constexpr static Colour rgb(uint8_t red, uint8_t green, uint8_t blue) {
+        return Colour(double(red) / 255.0, double(green) / 255.0, double(blue) / 255.0);
+    }
+    /* Red component */
+    constexpr uint8_t red() const noexcept {
+        return static_cast<uint8_t>(utils::clamp(r) * utils::MAX_COLOUR);
+    }
+    /* Green component */
+    constexpr uint8_t green() const noexcept {
+        return static_cast<uint8_t>(utils::clamp(g) * utils::MAX_COLOUR);
+    }
+    /* Blue component */
+    constexpr uint8_t blue() const noexcept {
+        return static_cast<uint8_t>(utils::clamp(b) * utils::MAX_COLOUR);
+    }
+    /* Get the hexadecimal representation of the colour */
+    constexpr uint32_t to_hex() const noexcept {
+        return (red() << 16) | (green() << 8) | blue();
+    }
+    /* Invert a colour */
+    constexpr Colour invert() const noexcept {
+        return Colour(1.0 - r, 1.0 - g, 1.0 - b);
+    }
+
+    /// Addition
+    /* Add two colours componentwise */
+    constexpr Colour operator+(const Colour & other) const noexcept {
+        return Colour(r + other.r, g + other.g, b + other.b);
+    }
+    /* Add a scalar value to all RGB components */
+    constexpr Colour operator+(const double f) const noexcept {
+        return Colour(r + f, g + f, b + f);
+    }
+    /* Add a scalar value to all RGB components */
+    constexpr friend Colour operator+(const double f, const Colour & self) noexcept {
+        return self + f;
+    }
+    /* Add-assign a colour componentwise */
+    constexpr void operator+=(const Colour & other) noexcept {
+        r += other.r;
+        g += other.g;
+        b += other.b;
+    }
+    /* Add-assign a scalar value to all RGB components */
+    constexpr void operator+=(const double f) noexcept {
+        r += f;
+        g += f;
+        b += f;
+    }
+    /// Subtraction
+    /* Substract two colours componentwise */
+    constexpr Colour operator-(const Colour & other) const noexcept {
+        return Colour(r - other.r, g - other.g, b - other.b);
+    }
+    /* Substract a scalar value from all RGB components */
+    constexpr Colour operator-(const double f) const noexcept {
+        return Colour(r - f, g - f, b - f);
+    }
+    /* Substract RGB components to a scalar value, returning a new colour */
+    constexpr friend Colour operator-(const double f, const Colour & self) noexcept {
+        return Colour(f - self.r, f - self.g, f - self.b);
+    }
+    /* Substract-assign a colour componentwise */
+    constexpr void operator-=(const Colour & other) noexcept {
+        r -= other.r;
+        g -= other.g;
+        b -= other.b;
+    }
+    /* Substract-assign a scalar value to all RGB components */
+    constexpr void operator-=(const double f) noexcept {
+        r -= f;
+        g -= f;
+        b -= f;
+    }
+    /// Multiplication
+    /* Multiply two colours componentwise */
+    constexpr Colour operator*(const Colour & other) const noexcept {
+        return Colour(r * other.r, g * other.g, b * other.b);
+    }
+    /* Multiply a colour by a scalar value */
+    constexpr Colour operator*(const double f) const noexcept {
+        return Colour(r * f, g * f, b * f);
+    }
+    /* Multiply a colour by a scalar value */
+    constexpr friend Colour operator*(const double f, const Colour & self) noexcept {
+        return self * f;
+    }
+    /* Multiply-assign a colour componentwise */
+    constexpr void operator*=(const Colour & other) noexcept {
+        r *= other.r;
+        g *= other.g;
+        b *= other.b;
+    }
+    /* Multiply-assign a scalar value to all RGB components */
+    constexpr void operator*=(const double f) noexcept {
+        r *= f;
+        g *= f;
+        b *= f;
+    }
+    /// Division
+    /* Divide two colours componentwise */
+    constexpr Colour operator/(const Colour & other) const noexcept {
+        return Colour(r / other.r, g / other.g, b / other.b);
+    }
+    /* Divide all RGB components by a scalar value */
+    constexpr Colour operator/(const double f) const noexcept {
+        return Colour(r / f, g / f, b / f);
+    }
+    /* Divide-assign a colour componentwise */
+    constexpr void operator/=(const Colour & other) noexcept {
+        r /= other.r;
+        g /= other.g;
+        b /= other.b;
+    }
+    /* Divide-assign all RGB components by a scalar value */
+    constexpr void operator/=(const double f) noexcept {
+        r /= f;
+        g /= f;
+        b /= f;
+    }
+
+    /* Compare two colours for equality */
+    constexpr bool operator==(const Colour & other) const noexcept {
+        return red() == other.red() && green() == other.green() && blue() == other.blue();
+    }
+
+    /* Compare two colours for inequality */
+    constexpr bool operator!=(const Colour & other) const noexcept {
+        return red() != other.red() || green() != other.green() || blue() != other.blue();
+    }
+
+    /* Print the color for debugging purposes */
+    template <class charT, class charTraits = std::char_traits<charT>>
+    inline friend std::basic_ostream<charT, charTraits> & operator<<(std::basic_ostream<charT, charTraits> & os, const Colour & self) {
+        return os << "Colour(" << self.r << ", " << self.g << ", " << self.b << ")";
+    }
+
+    /* Output the colour to a stream */
+    template <class charT, class charTraits = std::char_traits<charT>>
+    inline void write(std::basic_ostream<charT, charTraits> & os) const {
+        os << red() << green() << blue();
+    }
+};
+
+/* For the americans */
+using Color = Colour;
+
+} // namespace colour
+
+/* Namespace alias */
+namespace color = colour;
+
+/* External declarations */
+using color::Color;
+using colour::Colour;
+
+/// Constants
+namespace colour {
+/* Pure red colour */
+constexpr Colour RED(0xff0000);
+
+/* Pure green colour */
+constexpr Colour GREEN(0x00ff00);
+
+/* Pure blue colour */
+constexpr Colour BLUE(0x0000ff);
+
+/* Pure yellow colour */
+constexpr Colour YELLOW(0xffff00);
+
+/* Pure cyan colour */
+constexpr Colour CYAN(0x00ffff);
+
+/* Pure magenta colour */
+constexpr Colour MAGENTA(0xff00ff);
+
+/* Pure black colour */
+constexpr Colour BLACK(0x000000);
+
+/* Pure white colour */
+constexpr Colour WHITE(0xffffff);
+} // namespace colour
+
 /* Three dimensional vectors */
 namespace vec3 {
 /* A three dimensional vector class */
@@ -58,6 +260,8 @@ class Vec3 {
     explicit constexpr Vec3(double x, double y) noexcept : x(x), y(y), z(0) {}
     /* Three dimensional constructor */
     explicit constexpr Vec3(double x, double y, double z) noexcept : x(x), y(y), z(z) {}
+    /* Convert a Vec3 to a Colour */
+    explicit constexpr operator Colour() noexcept { return Colour(x, y, z); }
 
     /// Operator overloading
     /* Get the opposite of a vector */
@@ -246,209 +450,5 @@ constexpr Vec3 Y(0, 1, 0);
 /* Unit z vector */
 constexpr Vec3 Z(0, 0, 1);
 } // namespace vec3
-
-/* RGB colours */
-namespace colour {
-/* RGB colour type. Uses 24-bits colour encoding for output and input. */
-class Colour {
-  public:
-    /* RGB components */
-    double r, g, b;
-
-    /* Construct a colour from its hexadecimal representation */
-    explicit constexpr Colour(uint32_t value)
-        : r(((value >> 16) & 0xff) / 255.0),
-          g(((value >> 8) & 0xff) / 255.0),
-          b((value & 0xff) / 255.0) {}
-    /* Construct a colour from its normalized floating point RGB components */
-    explicit constexpr Colour(double r, double g, double b) : r(r), g(g), b(b) {}
-    /* Convert a colour to a 3D vector */
-    explicit constexpr operator Vec3() {
-        return Vec3(r, g, b);
-    }
-
-    /* Construct a colour from its byte RGB components */
-    constexpr static Colour rgb(uint8_t red, uint8_t green, uint8_t blue) {
-        return Colour(double(red) / 255.0, double(green) / 255.0, double(blue) / 255.0);
-    }
-    /* Red component */
-    constexpr uint8_t red() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(r) * utils::MAX_COLOUR);
-    }
-    /* Green component */
-    constexpr uint8_t green() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(g) * utils::MAX_COLOUR);
-    }
-    /* Blue component */
-    constexpr uint8_t blue() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(b) * utils::MAX_COLOUR);
-    }
-    /* Get the hexadecimal representation of the colour */
-    constexpr uint32_t to_hex() const noexcept {
-        return (red() << 16) | (green() << 8) | blue();
-    }
-    /* Invert a colour */
-    constexpr Colour invert() const noexcept {
-        return Colour(1.0 - r, 1.0 - g, 1.0 - b);
-    }
-
-    /// Addition
-    /* Add two colours componentwise */
-    constexpr Colour operator+(const Colour & other) const noexcept {
-        return Colour(r + other.r, g + other.g, b + other.b);
-    }
-    /* Add a scalar value to all RGB components */
-    constexpr Colour operator+(const double f) const noexcept {
-        return Colour(r + f, g + f, b + f);
-    }
-    /* Add a scalar value to all RGB components */
-    constexpr friend Colour operator+(const double f, const Colour & self) noexcept {
-        return self + f;
-    }
-    /* Add-assign a colour componentwise */
-    constexpr void operator+=(const Colour & other) noexcept {
-        r += other.r;
-        g += other.g;
-        b += other.b;
-    }
-    /* Add-assign a scalar value to all RGB components */
-    constexpr void operator+=(const double f) noexcept {
-        r += f;
-        g += f;
-        b += f;
-    }
-    /// Subtraction
-    /* Substract two colours componentwise */
-    constexpr Colour operator-(const Colour & other) const noexcept {
-        return Colour(r - other.r, g - other.g, b - other.b);
-    }
-    /* Substract a scalar value from all RGB components */
-    constexpr Colour operator-(const double f) const noexcept {
-        return Colour(r - f, g - f, b - f);
-    }
-    /* Substract RGB components to a scalar value, returning a new colour */
-    constexpr friend Colour operator-(const double f, const Colour & self) noexcept {
-        return Colour(f - self.r, f - self.g, f - self.b);
-    }
-    /* Substract-assign a colour componentwise */
-    constexpr void operator-=(const Colour & other) noexcept {
-        r -= other.r;
-        g -= other.g;
-        b -= other.b;
-    }
-    /* Substract-assign a scalar value to all RGB components */
-    constexpr void operator-=(const double f) noexcept {
-        r -= f;
-        g -= f;
-        b -= f;
-    }
-    /// Multiplication
-    /* Multiply two colours componentwise */
-    constexpr Colour operator*(const Colour & other) const noexcept {
-        return Colour(r * other.r, g * other.g, b * other.b);
-    }
-    /* Multiply a colour by a scalar value */
-    constexpr Colour operator*(const double f) const noexcept {
-        return Colour(r * f, g * f, b * f);
-    }
-    /* Multiply a colour by a scalar value */
-    constexpr friend Colour operator*(const double f, const Colour & self) noexcept {
-        return self * f;
-    }
-    /* Multiply-assign a colour componentwise */
-    constexpr void operator*=(const Colour & other) noexcept {
-        r *= other.r;
-        g *= other.g;
-        b *= other.b;
-    }
-    /* Multiply-assign a scalar value to all RGB components */
-    constexpr void operator*=(const double f) noexcept {
-        r *= f;
-        g *= f;
-        b *= f;
-    }
-    /// Division
-    /* Divide two colours componentwise */
-    constexpr Colour operator/(const Colour & other) const noexcept {
-        return Colour(r / other.r, g / other.g, b / other.b);
-    }
-    /* Divide all RGB components by a scalar value */
-    constexpr Colour operator/(const double f) const noexcept {
-        return Colour(r / f, g / f, b / f);
-    }
-    /* Divide-assign a colour componentwise */
-    constexpr void operator/=(const Colour & other) noexcept {
-        r /= other.r;
-        g /= other.g;
-        b /= other.b;
-    }
-    /* Divide-assign all RGB components by a scalar value */
-    constexpr void operator/=(const double f) noexcept {
-        r /= f;
-        g /= f;
-        b /= f;
-    }
-
-    /* Compare two colours for equality */
-    constexpr bool operator==(const Colour & other) const noexcept {
-        return red() == other.red() && green() == other.green() && blue() == other.blue();
-    }
-
-    /* Compare two colours for inequality */
-    constexpr bool operator!=(const Colour & other) const noexcept {
-        return red() != other.red() || green() != other.green() || blue() != other.blue();
-    }
-
-    /* Print the color for debugging purposes */
-    template <class charT, class charTraits = std::char_traits<charT>>
-    inline friend std::basic_ostream<charT, charTraits> & operator<<(std::basic_ostream<charT, charTraits> & os, const Colour & self) {
-        return os << "Colour(" << self.r << ", " << self.g << ", " << self.b << ")";
-    }
-
-    /* Output the colour to a stream */
-    template <class charT, class charTraits = std::char_traits<charT>>
-    inline void write(std::basic_ostream<charT, charTraits> & os) const {
-        os << red() << green() << blue();
-    }
-};
-
-/* For the americans */
-using Color = Colour;
-
-} // namespace colour
-
-/* Namespace alias */
-namespace color = colour;
-
-/* External declarations */
-using color::Color;
-using colour::Colour;
-
-/// Constants
-namespace colour {
-/* Pure red colour */
-constexpr Colour RED(0xff0000);
-
-/* Pure green colour */
-constexpr Colour GREEN(0x00ff00);
-
-/* Pure blue colour */
-constexpr Colour BLUE(0x0000ff);
-
-/* Pure yellow colour */
-constexpr Colour YELLOW(0xffff00);
-
-/* Pure cyan colour */
-constexpr Colour CYAN(0x00ffff);
-
-/* Pure magenta colour */
-constexpr Colour MAGENTA(0xff00ff);
-
-/* Pure black colour */
-constexpr Colour BLACK(0x000000);
-
-/* Pure white colour */
-constexpr Colour WHITE(0xffffff);
-} // namespace colour
 
 #endif
