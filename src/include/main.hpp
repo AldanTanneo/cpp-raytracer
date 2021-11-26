@@ -10,9 +10,9 @@ inline void newline() {
 }
 
 constexpr char _esc = 27;
-constexpr char _cyan[6] = {_esc, '[', '3', '6', 'm', NULL};
-constexpr char _nc[5] = {_esc, '[', '0', 'm', NULL};
-constexpr char _bold[5] = {_esc, '[', '1', 'm', NULL};
+constexpr char _cyan[6] = {_esc, '[', '3', '6', 'm', '\0'};
+constexpr char _nc[5] = {_esc, '[', '0', 'm', '\0'};
+constexpr char _bold[5] = {_esc, '[', '1', 'm', '\0'};
 
 #define _DBG_COUT_IDENT "[" __FILE__ ":" << __FUNCTION__ << ":" << __LINE__ << "] "
 
