@@ -15,7 +15,6 @@ using colour::Colour;
 
 // Class for writing and reading PPM images. See the PPM specification at http://netpbm.sourceforge.net/doc/ppm.html
 class Image {
-
   private:
     /* A vector of pixels */
     std::vector<Colour> data;
@@ -43,16 +42,20 @@ class Image {
         char buffer[8];
         uint16_t maxval;
 
+        /* Parsing PPM header, under the form
+        "P6 <width> <height> <max sample value>" (in ascii) */
         if (is.getline(buffer, 3).good() && !std::strcmp(buffer, "P6")) {
             is >> width >> height >> maxval;
         } else {
             throw "Could not load PPM image: invalid magic number";
         }
 
+        /* Check stream health */
         if (!is.good()) {
             throw "Could not load PPM image: invalid header";
         }
 
+        /* A single whitespace character between the header and the samples */
         if (!std::isspace(is.get())) {
             throw "Could not load PPM image: unexpected character after MAXVAL";
         }
@@ -60,10 +63,13 @@ class Image {
         std::vector<Colour> pixels;
         int r, g, b;
 
+        /* Reserve appropriate space */
         pixels.reserve(width * height);
 
+        /* Read samples from stream according to sample size;
+        one byte if maxval is one byte long, two if maxval is two bytes long. */
         if (maxval < 256) {
-            while (1) {
+            while (pixels.size() < width * height) {
                 r = is.get();
                 g = is.get();
                 b = is.get();
@@ -74,7 +80,7 @@ class Image {
                 }
             }
         } else {
-            while (1) {
+            while (pixels.size() < width * height) {
                 r = (is.get() << 8) + is.get();
                 g = (is.get() << 8) + is.get();
                 b = (is.get() << 8) + is.get();
@@ -86,6 +92,7 @@ class Image {
             }
         }
 
+        /* Check that the right amount of pixels was read */
         if (pixels.size() != width * height) {
             throw "Could not load PPM image: data size mismatch: found " + std::to_string(pixels.size()) + " pixels where there should be " + std::to_string(width * height) + ".";
         }
