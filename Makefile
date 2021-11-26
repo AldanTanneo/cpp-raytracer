@@ -25,8 +25,8 @@ INCLUDES := $(wildcard $(INCLUDE)/*.hpp) $(wildcard $(INCLUDE)/**/*.hpp)
 OBJ          := obj
 OBJ_DEBUG    := $(OBJ)/debug
 OBJ_RELEASE  := $(OBJ)/release
-OBJS_DEBUG   := $(foreach obj_file,$(patsubst $(SRC)/%.cpp,%.o,$(SRCS)),$(OBJ_DEBUG)/$(notdir $(obj_file)))
-OBJS_RELEASE := $(foreach obj_file,$(patsubst $(SRC)/%.cpp,%.o,$(SRCS)),$(OBJ_RELEASE)/$(notdir $(obj_file)))
+OBJS_DEBUG   := $(patsubst $(SRC)/%.cpp,$(OBJ_DEBUG)/%.o,$(SRCS))
+OBJS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.o,$(SRCS))
 
 # Compiler and compile flags
 CC          := clang++
@@ -60,6 +60,11 @@ endif
 
 $(OBJ_DEBUG)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_DEBUG)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_DEBUG)$(NC)
+ifeq ($(OS),Windows_NT)
+	@if not exist $(subst /,\,$(dir $@)) $(MKDIR) $(subst /,\,$(dir $@))
+else
+	@$(MKDIR) $(dir $@)
+endif
 	@$(CC) -c $< -o $@ $(OPT_DEBUG) $(CFLAGS) 
 
 $(TARGET_DEBUG): $(OBJS_DEBUG) | $(OBJ_DEBUG)
@@ -70,6 +75,11 @@ $(TARGET_DEBUG): $(OBJS_DEBUG) | $(OBJ_DEBUG)
 
 $(OBJ_RELEASE)/%.o: $(SRC)/%.cpp $(INCLUDES) | $(OBJ_RELEASE)
 	@echo $(BOLD)$(GREEN)  Compiling $(NC)$(notdir $@)$(GREEN) $(MODE_RELEASE)$(NC)
+ifeq ($(OS),Windows_NT)
+	@if not exist $(subst /,\,$(dir $@)) $(MKDIR) $(subst /,\,$(dir $@))
+else
+	@$(MKDIR) $(dir $@)
+endif
 	@$(CC) -c $< -o $@ $(OPT_RELEASE) $(CFLAGS)
 
 $(TARGET_RELEASE): $(OBJS_RELEASE) | $(OBJ_RELEASE)
