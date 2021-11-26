@@ -25,8 +25,8 @@ struct FastRng {
 
 thread_local FastRng glob_rng(0x193a6754ULL);
 
-namespace random {
+namespace rng {
 double gen() {
     return glob_rng.next_f64();
 }
-} // namespace random
+} // namespace rng

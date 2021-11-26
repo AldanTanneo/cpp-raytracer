@@ -1,8 +1,9 @@
 #ifndef RNG_HPP
 #define RNG_HPP
 
-namespace random {
+namespace rng {
+/* Return a random double in the range [0, 1) */
 double gen();
-}
+} // namespace rng
 
 #endif
