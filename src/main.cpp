@@ -1,34 +1,49 @@
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 
 // From src/include
 #include <camera.hpp>
 #include <image.hpp>
 #include <main.hpp>
+#include <vcruntime_new.h>
 #include <vec3.hpp>
 
-void test_camera() {
-    Camera cam(Point3::ZEROS(), Point3::X(), Vec3::Y(), 90, AspectRatio(1));
+void tests() {
+    Camera cam(vec3::ZEROS, vec3::X, vec3::Y, 90, AspectRatio(1));
 
-    DBG(cam.get_ray(0.5, 0.5)); // looking right in the middle of the screen: direction = X
-    DBG(cam.get_ray(0, 0));     // bottom left corner of the screen
-    DBG(cam.get_ray(1, 1));     // top right corner of the screen
+    DEBUG(cam.get_ray(0.5, 0.5), "looking right in the middle of the screen: direction = X");
+    DEBUG(cam.get_ray(0, 0), "bottom left corner of the screen");
+    DEBUG(cam.get_ray(1, 1), "top right corner of the screen");
+    newline();
+
+    Vec3 u(1, -1, 1);
+    DEBUG(u);
+    DEBUG(u.reflect(vec3::Y), "Reflect u along the (x, z) plane, defined by its normal y");
+    DEBUG(u + vec3::Y);
+    newline();
+
+    Colour test = 0.503 * colour::RED + 0.7 * colour::BLUE + 0.3 * colour::GREEN;
+    DEBUG(test);
+    DEBUG(test.to_hex());
+    std::cout << "0x" << std::hex << test.to_hex() << std::endl;
+    DEBUG("test");
     newline();
 }
 
-int main() {
-    test_camera();
+int main(int argc, char * argv[]) {
+    tests();
 
     int width = 200;
     int height = 200;
 
-    Image img(width, height);
+    image::Image img(width, height);
 
     for (int j = height - 1; j >= 0; j--) {
         for (int i = 0; i < width; i++) {
-            float r = float(i) / float(width - 1);
-            float g = float(j) / float(height - 1);
-            float b = (1.0 - r) * (1.0 - g);
+            double r = double(i) / double(width - 1);
+            double g = double(j) / double(height - 1);
+            double b = (1.0 - r) * (1.0 - g);
 
             img.push(r, g, b);
         }
@@ -36,19 +51,19 @@ int main() {
 
     img.save("image.ppm");
 
-    Image img2 = Image::load("image.ppm");
+    image::Image img2 = image::Image::load("image.ppm");
 
-    DBG(img.get_width());
-    DBG(img.get_height());
-
+    DEBUG(img.get_width());
+    DEBUG(img.get_height());
     newline();
 
-    DBG(img2.get_width());
-    DBG(img2.get_height());
-
+    DEBUG(img2.get_width());
+    DEBUG(img2.get_height());
     newline();
 
-    DBG(img == img2);
+    std::cout.setf(std::ios_base::boolalpha);
+    DEBUG(img == img2);
+    std::cout.unsetf(std::ios_base::boolalpha);
 
     img2.save("image2.ppm");
 
