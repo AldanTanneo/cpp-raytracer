@@ -6,7 +6,7 @@ struct FastRng {
 
     constexpr FastRng(const uint64_t seed) noexcept : value(seed) {}
 
-    inline uint64_t next_u64() noexcept {
+    constexpr uint64_t next_u64() noexcept {
         uint64_t z = value + 0x9E3779B97F4A7C15ULL;
         value = z;
         z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
@@ -25,6 +25,8 @@ struct FastRng {
 
 thread_local FastRng glob_rng(0x193a6754ULL);
 
-double random() {
+namespace random {
+double gen() {
     return glob_rng.next_f64();
 }
+} // namespace random

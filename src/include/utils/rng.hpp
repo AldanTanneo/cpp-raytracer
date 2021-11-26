@@ -1,6 +1,8 @@
 #ifndef RNG_HPP
 #define RNG_HPP
 
-double random();
+namespace random {
+double gen();
+}
 
 #endif
