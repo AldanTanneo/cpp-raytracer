@@ -3,10 +3,9 @@
 
 // From src/include
 #include <camera.hpp>
-#include <image.hpp>
 #include <main.hpp>
-#include <vcruntime_new.h>
-#include <vec3.hpp>
+#include <utils.hpp>
+
 
 void tests() {
     Camera cam(vec3::ZEROS, vec3::X, vec3::Y, 90, AspectRatio(1));

@@ -3,7 +3,8 @@
 
 // From src/include
 #include <camera.hpp>
-#include <vec3.hpp>
+#include <utils/vec3.hpp>
+
 
 Camera::Camera(Point3 origin, Point3 look_at, Vec3 up_vector, double vertical_fov, AspectRatio aspect_ratio) : origin(origin) {
     if (vertical_fov < utils::EPSILON || vertical_fov > 180 - utils::EPSILON) {

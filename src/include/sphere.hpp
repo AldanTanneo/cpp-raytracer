@@ -3,6 +3,7 @@
 
 // From src/include
 #include <hittable.hpp>
+#include <utils/vec3.hpp>
 
 class Sphere : public Hittable {
   private:
@@ -13,11 +14,11 @@ class Sphere : public Hittable {
 
   public:
     /* Construct sphere from its centre and its radius */
-    constexpr Sphere(Point3 centre, double radius) : centre(centre), radius(radius) {}
+    constexpr Sphere(Point3 centre, double radius) noexcept : centre(centre), radius(radius) {}
 
     /* define behaviour of ray when hitting sphere */
-    virtual bool hit(Ray ray_in, double tmin, double tmax, Ray & ray_out) {
-        // Vec3 normal 
+    virtual bool hit(Ray ray_in, double tmin, double tmax, Ray & ray_out) const {
+        // Vec3 normal
     }
 };
 

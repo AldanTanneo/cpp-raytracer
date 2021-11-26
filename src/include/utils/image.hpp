@@ -7,7 +7,7 @@
 #include <vector>
 
 // From src/include
-#include <vec3.hpp>
+#include <utils/vec3.hpp>
 
 /* PPM images */
 namespace image {

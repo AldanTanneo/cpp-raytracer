@@ -6,7 +6,7 @@
 
 // From src/include
 #include <ray.hpp>
-#include <vec3.hpp>
+#include <utils/vec3.hpp>
 
 /* Aspect ratio wrapper class */
 struct AspectRatio {
