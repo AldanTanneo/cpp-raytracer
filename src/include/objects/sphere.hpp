@@ -17,9 +17,7 @@ class Sphere : public Hittable {
     constexpr Sphere(Point3 centre, double radius) noexcept : centre(centre), radius(radius) {}
 
     /* define behaviour of ray when hitting sphere */
-    virtual bool hit(Ray ray_in, double tmin, double tmax, Ray & ray_out) const {
-        // Vec3 normal
-    }
+    virtual bool hit(Ray ray_in, double tmin, double tmax, Ray & ray_out) const override;
 };
 
 #endif
