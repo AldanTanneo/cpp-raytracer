@@ -47,6 +47,10 @@ constexpr T clamp(const T value, const T min, const T max) noexcept {
     return value;
 }
 
+inline double gamma_correction(double sample) noexcept {
+    return sqrt(clamp(sample));
+}
+
 } // namespace utils
 
 /* RGB colours */
@@ -73,15 +77,15 @@ class Colour {
     }
     /* Red component */
     constexpr uint8_t red() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(r) * utils::MAX_COLOUR);
+        return static_cast<uint8_t>(utils::gamma_correction(r) * utils::MAX_COLOUR);
     }
     /* Green component */
     constexpr uint8_t green() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(g) * utils::MAX_COLOUR);
+        return static_cast<uint8_t>(utils::gamma_correction(g) * utils::MAX_COLOUR);
     }
     /* Blue component */
     constexpr uint8_t blue() const noexcept {
-        return static_cast<uint8_t>(utils::clamp(b) * utils::MAX_COLOUR);
+        return static_cast<uint8_t>(utils::gamma_correction(b) * utils::MAX_COLOUR);
     }
     /* Get the hexadecimal representation of the colour */
     constexpr uint32_t to_hex() const noexcept {
