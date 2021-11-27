@@ -4,6 +4,7 @@
 #include <cmath>
 #include <limits>
 #include <ostream>
+#include <type_traits>
 
 // From src/include
 #include <utils/rng.hpp>
@@ -19,15 +20,13 @@ constexpr double INF = std::numeric_limits<double>::infinity();
 constexpr double PI = 3.14159265358979323846264338327950288;
 
 template <class T>
-constexpr T to_radians(T value) noexcept {
-    static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
+constexpr std::enable_if_t<std::is_floating_point_v<T>, T> to_radians(T value) noexcept {
     return value * static_cast<T>(PI) / 180.0;
 }
 
 /* Clamps a floating point value to the [0.0, 1.0] range */
 template <class T>
-constexpr T clamp(const T value) noexcept {
-    static_assert(std::is_floating_point<T>::value, "T must be a floating-point type!");
+constexpr std::enable_if_t<std::is_floating_point_v<T>, T> clamp(const T value) noexcept {
     if (value < 0.0)
         return static_cast<T>(0.0);
     if (value > 1.0)
