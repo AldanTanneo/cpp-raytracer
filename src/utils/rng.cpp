@@ -1,5 +1,13 @@
-#include <stdint.h>
+#include <cfloat>
+#include <cstdint>
+
+// From src/include
+#include <float.h>
 #include <utils/rng.hpp>
+
+constexpr uint64_t FLOAT_SIZE = sizeof(double) * 8;
+constexpr uint64_t PRECISION = DBL_MANT_DIG;
+constexpr double SCALE = 1.0 / static_cast<double>(1ULL << PRECISION);
 
 /* Private random number generator based on SplitMix64. */
 struct FastRng {
@@ -19,12 +27,9 @@ struct FastRng {
     }
 
     /* Fetch the next 64-bit integer and cast it to a double in the [0, 1) range */
-    inline double next_f64() noexcept {
-        uint64_t i = next_u64();
-        constexpr uint64_t mask1 = 0x3FF0000000000000ULL;
-        constexpr uint64_t mask2 = 0x3FFFFFFFFFFFFFFFULL;
-        const uint64_t to_12 = (i | mask1) & mask2;
-        return reinterpret_cast<const double &>(to_12) - 1;
+    constexpr double next_f64() noexcept {
+        const uint64_t z = next_u64() >> (FLOAT_SIZE - PRECISION);
+        return SCALE * static_cast<double>(z);
     }
 };
 
@@ -34,15 +39,19 @@ thread_local FastRng glob_rng(0x193a6754ULL);
 /* Export a limited number of functions to the external library,
 users cannot see the inside of the beast */
 namespace rng {
-double gen() {
+void seed(uint64_t seed) noexcept {
+    glob_rng.value = seed;
+}
+
+double gen() noexcept {
     return glob_rng.next_f64();
 }
 
-uint64_t gen_u64() {
+uint64_t gen_u64() noexcept {
     return glob_rng.next_u64();
 }
 
-uint32_t gen_u32() {
+uint32_t gen_u32() noexcept {
     return glob_rng.next_u64() >> 32;
 }
 } // namespace rng
