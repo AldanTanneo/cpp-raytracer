@@ -12,17 +12,12 @@ class Ray {
     /* The direction of the ray */
     Vec3 direction;
 
+    constexpr Ray() noexcept = default;
     /* Construct a ray from its origin and direction */
     constexpr Ray(Point3 origin, Vec3 direction) noexcept : origin(origin), direction(direction) {}
 
     /* Compute the position of the ray at time t0 */
     constexpr Point3 at(double t0) const noexcept { return origin + t0 * direction; }
-
-    /* Get ray origin */
-    constexpr Point3 get_origin() const noexcept { return origin; }
-
-    /* Get ray direction */
-    constexpr Point3 get_direction() const noexcept { return direction; }
 
     /* Print the ray for debugging purposes */
     template <class charT, class charTraits = std::char_traits<charT>>
