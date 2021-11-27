@@ -47,6 +47,7 @@ constexpr T clamp(const T value, const T min, const T max) noexcept {
     return value;
 }
 
+/* Gamma corrects the colour for writing to a file */
 inline double gamma_correction(double sample) noexcept {
     return sqrt(clamp(sample));
 }
