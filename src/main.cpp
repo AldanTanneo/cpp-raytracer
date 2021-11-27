@@ -4,24 +4,15 @@
 
 // From src/include
 #include <camera.hpp>
+#include <common.hpp>
 #include <image.hpp>
-#include <main.hpp>
 #include <objects/sphere.hpp>
 #include <utils.hpp>
 
-
-void test_3d_vectors() {
-    Vec3 u(0, 1, 0);
-    Vec3 v(sqrt(2) / 2, 0, sqrt(2) / 2);
-    std::cout << "u . v = " << u.dot(v) << std::endl;
-    std::cout << "u x v = " << u.cross(v) << std::endl;
-    std::cout << 3 * vec3::ONES << std::endl;
-}
-
 int main(int argc, char * argv[]) {
 
-    int height = 1080;
-    int width = (height * 16) / 9;
+    const int height = 1080;
+    const int width = (height * 16) / 9;
 
     image::Image img(width, height);
 
@@ -37,10 +28,11 @@ int main(int argc, char * argv[]) {
     world.add(ball2);
     world.add(ground);
 
-    uint64_t spp = 100;
+    constexpr int spp = 64;
+    constexpr double scale = 1.0 / double(spp);
 
-    for (int64_t j = height - 1; j >= 0; j--) {
-        for (int64_t i = 0; i < width; i++) {
+    for (int j = height - 1; j >= 0; j--) {
+        for (int i = 0; i < width; i++) {
             Colour c;
             for (int k = 0; k < spp; k++) {
                 double u = (double(i) + rng::gen()) / double(width - 1);
@@ -54,7 +46,7 @@ int main(int argc, char * argv[]) {
                     c += 0.8 * colour::WHITE + 0.2 * colour::CYAN;
                 }
             }
-            img.push(c / double(spp));
+            img.push(c * scale);
         }
         if (!(j % 50))
             DEBUG(j);
