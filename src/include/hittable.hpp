@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 // From src/include
@@ -10,7 +11,7 @@
 #include <ray.hpp>
 #include <utils/vec3.hpp>
 
-class Material;
+class Material; // Forward declaration of material
 
 /* The returned structure if a ray hits an object */
 struct HitRecord {
@@ -22,14 +23,15 @@ struct HitRecord {
     /* Determines if the surface is hit from the front or the back */
     bool front_face;
     /* The material of the object surface */
-    // std::shared_ptr<Material> mat;
+    std::shared_ptr<Material> material;
 
     /* Construct an empty hit record */
     inline HitRecord() noexcept
         : time(0.0),
           hit_point(point3::ZEROS),
           surface_normal(point3::ZEROS),
-          front_face(false) {}
+          front_face(false),
+          material(std::shared_ptr<Material>()) {}
 
     /* Set the correct orientation of the normal */
     constexpr void set_face_normal(const Ray & r, const Vec3 & outward_normal) noexcept {
@@ -38,19 +40,17 @@ struct HitRecord {
     }
 };
 
+/* Abstract interface of a material */
 class Material {
   public:
     /* Define how a ray should interact with the material */
-    virtual bool scatter(const Ray & ray_in, const HitRecord & hit_record, Ray & scattered, Color & attenuation) const noexcept = 0;
-
-    /* Get the material's colour */
-    virtual Colour colour() const noexcept = 0;
+    virtual bool scatter(const HitRecord & hit_record, Ray & scattered, Color & attenuation) const noexcept = 0;
 
     /* Virtual destructor */
     virtual ~Material() noexcept = default;
 };
 
-/* Abstract class of a hittable object */
+/* Abstract interface of a hittable object */
 class Hittable {
   public:
     /* Check if a ray hits the hittable object. If there is a hit, return a hit record */
@@ -62,32 +62,38 @@ class Hittable {
 
 /* A dynamic list of hittable objects */
 class HittableList : public Hittable {
+  public:
+    using value_type = std::unique_ptr<Hittable>;
+    using container = std::vector<value_type>;
+    using const_iterator = container::const_iterator;
+
   private:
     /* The inner container */
-    std::vector<std::unique_ptr<Hittable>> objects;
+    container objects;
 
   public:
     /* Construct an empty hittable list */
-    inline HittableList() noexcept : objects(std::vector<std::unique_ptr<Hittable>>()) {}
+    inline HittableList() noexcept : objects(container()) {}
 
     /* Add an object inheriting from the Hittable class */
     template <class T>
-    void add(T object) noexcept {
+    inline void add(T object) noexcept {
+        static_assert(std::is_convertible<T *, Hittable *>(), "T must publicly inherit from the Hittable abstract interface!");
         objects.push_back(std::make_unique<T>(object));
     }
 
     /* Indexing operator overloading */
-    constexpr const std::unique_ptr<Hittable> & operator[](int index) const {
+    constexpr const value_type & operator[](int index) const {
         return objects[index];
     }
 
     /* const iterator begin definition */
-    inline std::vector<std::unique_ptr<Hittable>>::const_iterator begin() const noexcept {
+    inline const_iterator begin() const noexcept {
         return objects.begin();
     }
 
     /* Const iterator end definition */
-    inline std::vector<std::unique_ptr<Hittable>>::const_iterator end() const noexcept {
+    inline const_iterator end() const noexcept {
         return objects.end();
     }
 
