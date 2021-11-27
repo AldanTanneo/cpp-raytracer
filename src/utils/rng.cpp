@@ -5,7 +5,7 @@
 #include <float.h>
 #include <utils/rng.hpp>
 
-constexpr uint64_t FLOAT_SIZE = sizeof(double) * 8;
+constexpr uint64_t DOUBLE_SIZE = sizeof(double) * 8;
 constexpr uint64_t PRECISION = DBL_MANT_DIG;
 constexpr double SCALE = 1.0 / static_cast<double>(1ULL << PRECISION);
 
@@ -28,7 +28,7 @@ struct FastRng {
 
     /* Fetch the next 64-bit integer and cast it to a double in the [0, 1) range */
     constexpr double next_f64() noexcept {
-        const uint64_t z = next_u64() >> (FLOAT_SIZE - PRECISION);
+        const uint64_t z = next_u64() >> (DOUBLE_SIZE - PRECISION);
         return SCALE * static_cast<double>(z);
     }
 };
