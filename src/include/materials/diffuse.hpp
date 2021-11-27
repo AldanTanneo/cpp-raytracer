@@ -10,7 +10,9 @@ class Diffuse : public Material {
     Colour albedo;
 
   public:
-    virtual bool scatter(const Ray & ray_in, const HitRecord & hit_record, Ray & ray_out, Colour & attenuation) const noexcept override;
+    constexpr Diffuse(Colour albedo) noexcept : albedo(albedo) {}
+
+    virtual bool scatter(const HitRecord & hit_record, Ray & ray_out, Colour & attenuation) const noexcept override;
 };
 
 #endif
