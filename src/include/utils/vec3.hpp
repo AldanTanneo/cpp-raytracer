@@ -5,6 +5,9 @@
 #include <limits>
 #include <ostream>
 
+// From src/include
+#include <utils/rng.hpp>
+
 namespace utils {
 /* Maximum floating point color value. Used for conversion between floating point and integer color. */
 constexpr double MAX_COLOUR = 255.999999;
@@ -397,6 +400,10 @@ class Vec3 {
     inline double distance(const Vec3 & other) const noexcept {
         return (other - *this).norm();
     }
+    /* Check if the vector is near zero */
+    constexpr bool near_zero() const noexcept {
+        return fabs(x) < utils::EPSILON && fabs(y) < utils::EPSILON && fabs(z) < utils::EPSILON;
+    }
 
     /// Geometric operations
     /* Dot product */
@@ -409,8 +416,7 @@ class Vec3 {
     }
     /* Reflect a vector against a plane defined by its normal */
     constexpr Vec3 reflect(const Vec3 & normal) const noexcept {
-        const Vec3 normal_component = dot(normal) * normal;
-        return *this - 2 * normal_component;
+        return *this - 2.0 * dot(normal) * normal;
     }
     /* Refract a vector against a plane defined by its normal, with a given refraction ratio.
     The current vector and the normal MUST BE unit vectors */
@@ -419,6 +425,32 @@ class Vec3 {
         Vec3 orth_out = refraction_ratio * (*this + normal * cos_theta);
         Vec3 parr_out = -sqrt(fabs((1 - orth_out.squared_norm()))) * normal;
         return orth_out + parr_out;
+    }
+
+    /// Random vector functions
+    /* Returns a random vector with coordinates in range [-1, 1) */
+    inline static Vec3 random() noexcept {
+        return 2.0 * Vec3(rng::gen(), rng::gen(), rng::gen()) - 1.0;
+    }
+    /* Returns a random vector in the unit sphere */
+    inline static Vec3 random_in_unit_sphere() noexcept {
+        Vec3 res = Vec3::random();
+        while (res.squared_norm() > 1.0) {
+            res = Vec3::random();
+        }
+        return res;
+    }
+    /* Returns a random unit vector */
+    inline static Vec3 random_unit_vector() noexcept {
+        return Vec3::random_in_unit_sphere().unit_vector();
+    }
+    /* Returns a random vector in the hemisphere defined by the given vector */
+    inline static Vec3 random_in_hemisphere(const Vec3 & u) noexcept {
+        Vec3 res = Vec3::random();
+        while (res.dot(u) < 0.0) {
+            res = Vec3::random();
+        }
+        return res;
     }
 
     /* Print the vector for debugging purposes */
