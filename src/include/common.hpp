@@ -4,6 +4,9 @@
 #include <cstdio>
 #include <iostream>
 
+// Common imports
+#include <utils.hpp>
+
 /* Outputs a newline */
 inline void newline() {
     printf("\n");
@@ -29,6 +32,7 @@ constexpr char _bold[5] = {_esc, '[', '1', 'm', '\0'};
               << (#args) << " = " << (args) << std::endl;
 #endif
 
+#ifdef ERROR_HANDLER_MACRO
 /* Error handling macro that wraps main() */
 #define main(...)                                                              \
     _main(int _argc, char * _argv[]);                                          \
@@ -48,5 +52,6 @@ constexpr char _bold[5] = {_esc, '[', '1', 'm', '\0'};
         return res;                                                            \
     }                                                                          \
     int _main(int argc, char * argv[])
+#endif
 
 #endif
