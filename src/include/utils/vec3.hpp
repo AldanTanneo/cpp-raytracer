@@ -2,8 +2,8 @@
 #define VEC3_HPP
 
 #include <cmath>
-#include <ostream>
 #include <limits>
+#include <ostream>
 
 namespace utils {
 /* Maximum floating point color value. Used for conversion between floating point and integer color. */
@@ -55,15 +55,17 @@ class Colour {
     double r, g, b;
 
     /* Construct a colour from its hexadecimal representation */
-    explicit constexpr Colour(uint32_t value)
+    explicit constexpr Colour(uint32_t value) noexcept
         : r(((value >> 16) & 0xff) / 255.0),
           g(((value >> 8) & 0xff) / 255.0),
           b((value & 0xff) / 255.0) {}
+    /* Construct an empty (black) colour */
+    explicit constexpr Colour() noexcept : r(0.0), g(0.0), b(0.0) {}
     /* Construct a colour from its normalized floating point RGB components */
-    explicit constexpr Colour(double r, double g, double b) : r(r), g(g), b(b) {}
+    explicit constexpr Colour(double r, double g, double b) noexcept : r(r), g(g), b(b) {}
 
     /* Construct a colour from its byte RGB components */
-    constexpr static Colour rgb(uint8_t red, uint8_t green, uint8_t blue) {
+    constexpr static Colour rgb(uint8_t red, uint8_t green, uint8_t blue) noexcept {
         return Colour(double(red) / 255.0, double(green) / 255.0, double(blue) / 255.0);
     }
     /* Red component */
@@ -350,15 +352,15 @@ class Vec3 {
     }
     /// Division
     /* Divide two vectors componentwise */
-    constexpr Vec3 operator/(const Vec3 & other) const {
+    constexpr Vec3 operator/(const Vec3 & other) const noexcept {
         return Vec3(x / other.x, y / other.y, z / other.z);
     }
     /* Divide a vector by a scalar value */
-    constexpr Vec3 operator/(const double f) const {
+    constexpr Vec3 operator/(const double f) const noexcept {
         return Vec3(x / f, y / f, z / f);
     }
     /* Divide a scalar by a vector, returning a new vector */
-    constexpr friend Vec3 operator/(const double f, const Vec3 & self) {
+    constexpr friend Vec3 operator/(const double f, const Vec3 & self) noexcept {
         return Vec3(f / self.x, f / self.y, f / self.z);
     }
     /* Divide-assign a vector componentwise */
@@ -384,11 +386,11 @@ class Vec3 {
         return sqrt(squared_norm());
     }
     /* Normalize the vector */
-    inline Vec3 unit_vector() const {
+    inline Vec3 unit_vector() const noexcept {
         return *this / norm();
     }
     /* Normalize the vector. Modifies the original vector. */
-    inline void normalize() {
+    inline void normalize() noexcept {
         *this /= norm();
     }
     /* Get the distance between two points */
