@@ -29,7 +29,7 @@ struct AspectRatio {
     }
 
     /* Get the inner value */
-    constexpr long double value() noexcept { return aspect_ratio; }
+    constexpr long double value() const noexcept { return aspect_ratio; }
 };
 
 /* Main camera class */
