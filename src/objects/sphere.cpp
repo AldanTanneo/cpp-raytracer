@@ -18,10 +18,11 @@ bool Sphere::hit(const Ray & ray_in, double tmin, double tmax, HitRecord & hit_r
         time = (time > tmin) ? time : (-b + sqrt(delta)) / (2.0 * a); // smallest positive solution
     }
 
-    if (tmin < tmax && time < tmax) {
+    if (tmin < time && time < tmax) {
         hit_record.time = time;
         hit_record.hit_point = ray_in.at(time);
-        hit_record.surface_normal = (hit_record.hit_point - centre) / radius;
+        Vec3 outward_normal = (hit_record.hit_point - centre) / radius;
+        hit_record.set_face_normal(ray_in, outward_normal);
         return true;
     } else {
         return false;
