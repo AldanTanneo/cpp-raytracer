@@ -6,8 +6,11 @@
 #include <vector>
 
 // From src/include
+// #include <material.hpp>
 #include <ray.hpp>
 #include <utils/vec3.hpp>
+
+class Material;
 
 /* The returned structure if a ray hits an object */
 struct HitRecord {
@@ -19,16 +22,32 @@ struct HitRecord {
     /* Determines if the surface is hit from the front or the back */
     bool front_face;
     /* The material of the object surface */
-    // Material mat;
+    // std::shared_ptr<Material> mat;
 
     /* Construct an empty hit record */
-    constexpr HitRecord() noexcept : time(0.0), hit_point(point3::ZEROS), surface_normal(point3::ZEROS), front_face(false) {}
+    inline HitRecord() noexcept
+        : time(0.0),
+          hit_point(point3::ZEROS),
+          surface_normal(point3::ZEROS),
+          front_face(false) {}
 
     /* Set the correct orientation of the normal */
     constexpr void set_face_normal(const Ray & r, const Vec3 & outward_normal) noexcept {
         front_face = r.direction.dot(outward_normal) < 0;
         surface_normal = front_face ? outward_normal : -outward_normal;
     }
+};
+
+class Material {
+  public:
+    /* Define how a ray should interact with the material */
+    virtual bool scatter(const Ray & ray_in, const HitRecord & hit_record, Ray & scattered, Color & attenuation) const noexcept = 0;
+
+    /* Get the material's colour */
+    virtual Colour colour() const noexcept = 0;
+
+    /* Virtual destructor */
+    virtual ~Material() noexcept = default;
 };
 
 /* Abstract class of a hittable object */
@@ -38,7 +57,7 @@ class Hittable {
     virtual bool hit(const Ray & ray_in, double tmin, double tmax, HitRecord & hit_record) const noexcept = 0;
 
     /* Virtual destructor */
-    virtual ~Hittable() {}
+    virtual ~Hittable() noexcept = default;
 };
 
 /* A dynamic list of hittable objects */
@@ -58,7 +77,7 @@ class HittableList : public Hittable {
     }
 
     /* Indexing operator overloading */
-    const std::unique_ptr<Hittable> & operator[](int index) const {
+    constexpr const std::unique_ptr<Hittable> & operator[](int index) const {
         return objects[index];
     }
 
