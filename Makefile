@@ -34,9 +34,9 @@ DEPS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.d,$(SRCS))
 
 # Compiler and compile flags
 CC          := clang++
-CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors -MMD -MP
+CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors -MMD -MP -std=c++17
 OPT_DEBUG   := -O0
-OPT_RELEASE := -Ofast -mavx2
+OPT_RELEASE := -Ofast -mavx2 -march=native
 
 MODE_DEBUG   := [debug]
 MODE_RELEASE := [release]
