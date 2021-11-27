@@ -4,10 +4,13 @@
 
 // From src/include
 #include <camera.hpp>
-#include <common.hpp>
-#include <image.hpp>
 #include <objects/sphere.hpp>
 #include <utils.hpp>
+#include <utils/image.hpp>
+
+// add define to get the error handling macro
+#define ERROR_HANDLER_MACRO
+#include <common.hpp>
 
 int main(int argc, char * argv[]) {
 
