@@ -62,20 +62,17 @@ public:
                                u * horizontal_vector + v * vertical_vector);
     }
 
-    template <const uint32_t max_rec>
     inline Colour cast_ray(const Hittable & world,
-                           Colour background_colour,
+                           const Colour & background_colour,
+                           const uint32_t max_rec,
                            double u,
                            double v) const noexcept {
         Ray r = get_ray(u, v);
         Colour ray_colour = background_colour;
         HitRecord h;
-        uint32_t iter = 0;
-        while (iter != max_rec) {
-            if (world.hit(r, utils::EPSILON, utils::INF, h)) {
-                iter++;
-                h.material->scatter(h, r, ray_colour);
-            } else {
+        for (uint32_t iter = 0; iter != max_rec; iter++) {
+            if (!world.hit(r, utils::EPSILON, utils::INF, h) ||
+                !h.scatter(r, ray_colour)) {
                 break;
             }
         }

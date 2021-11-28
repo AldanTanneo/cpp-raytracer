@@ -9,6 +9,7 @@
 #include <ray.hpp>
 #include <utils/vec3.hpp>
 
+
 struct HitRecord; // Forward declaration of HitRecord
 
 /* Abstract interface of a material */
@@ -20,11 +21,22 @@ public:
     false */
     virtual bool scatter(const HitRecord & hit_record,
                          Ray & ray,
-                         Color & ray_colour) const noexcept = 0;
+                         Colour & ray_colour) const noexcept = 0;
 
     /* Virtual destructor */
     virtual ~Material() noexcept = default;
 };
+
+class DummyMaterial : public Material {
+public:
+    constexpr DummyMaterial() noexcept = default;
+    virtual bool
+    scatter(const HitRecord &, Ray &, Colour &) const noexcept override {
+        return false;
+    }
+};
+
+// static const DummyMaterial dummy;
 
 /* The returned structure if a ray hits an object */
 struct HitRecord {
@@ -36,7 +48,7 @@ struct HitRecord {
     /* Determines if the surface is hit from the front or the back */
     bool front_face;
     /* The material of the object surface */
-    std::shared_ptr<Material> material;
+    Material * material;
 
     /* Construct an empty hit record */
     inline HitRecord() noexcept

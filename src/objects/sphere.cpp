@@ -1,3 +1,4 @@
+// From src/include
 #include <hittable.hpp>
 #include <objects/sphere.hpp>
 #include <utils/vec3.hpp>
@@ -29,7 +30,7 @@ bool Sphere::hit(const Ray & ray_in,
         hit_record.hit_point = ray_in.at(time);
         Vec3 outward_normal = (hit_record.hit_point - centre) / radius;
         hit_record.set_face_normal(ray_in, outward_normal);
-        hit_record.material = material;
+        hit_record.material = material.get();
         return true;
     } else {
         return false;
