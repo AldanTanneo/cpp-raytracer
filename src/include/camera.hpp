@@ -69,10 +69,10 @@ public:
                            double v) const noexcept {
         Ray r = get_ray(u, v);
         Colour ray_colour = background_colour;
-        HitRecord h;
+        HitRecord record;
         for (uint32_t iter = 0; iter < max_rec; iter++) {
-            if (!world.hit(r, utils::EPSILON, utils::INF, h) ||
-                !h.scatter(r, ray_colour)) {
+            if (!world.hit(r, utils::EPSILON, utils::INF, record) ||
+                !record.scatter(r, ray_colour)) {
                 break;
             }
         }
