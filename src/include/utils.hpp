@@ -141,9 +141,9 @@ namespace utils {
         /* Writes the empty progress bar to stdout and returns to line start */
         inline void start() const noexcept {
             size_t chars_to_write = subdiv * utf8len(bchar);
-            for (int i = 0; i < subdiv; i++)
+            for (size_t i = 0; i < subdiv; i++)
                 fputs(bchar, stdout);
-            for (int i = 0; i <= chars_to_write; i++)
+            for (size_t i = 0; i <= chars_to_write; i++)
                 fputc('\b', stdout);
         }
 
