@@ -1,39 +1,50 @@
+// C libs
 #include <cmath>
+#include <cstdint>
+#include <cstdio>
 #include <ctime>
+// C++ headers
+#include <chrono>
 #include <iostream>
 #include <memory>
+// Parallelization lib
+#include <omp_llvm.h>
 
 // From src/include
 #include <camera.hpp>
+#include <main.hpp>
 #include <materials/diffuse.hpp>
 #include <objects/sphere.hpp>
-#include <stdint.h>
-#include <stdlib.h>
-#include <utils.hpp>
 #include <utils/image.hpp>
 
-// add define to get the error handling macro
-#define ERROR_HANDLER_MACRO
-#include <common.hpp>
+constexpr AspectRatio aspect_ratio(16, 9);
+constexpr uint32_t height = 1080;
+constexpr uint32_t width = height * aspect_ratio.value();
+constexpr double height_scale = 1.0 / double(height - 1);
+constexpr double width_scale = 1.0 / double(width - 1);
+
+constexpr int spp = 100;
+constexpr double colour_scale = 1.0 / double(spp);
+constexpr int max_bounces = 10;
 
 int main(int argc, char * noalias argv[]) {
+    rng::seed(time(0));
 
-    const AspectRatio aspect_ratio(3, 2);
-    const uint32_t height = 500;
-    const uint32_t width = height * aspect_ratio.value();
+    image::Image img = image::Image::black(width, height);
 
-    image::Image img(width, height);
+    const Camera cam(0.5 * point3::Z, -point3::Z, vec3::Y, 60, aspect_ratio);
 
-    Camera cam(0.5 * point3::Z, -point3::Z, vec3::Y, 60, aspect_ratio);
-
-    std::shared_ptr<Diffuse> grey = std::make_shared<Diffuse>(Diffuse(0.5 * colour::WHITE));
-    std::shared_ptr<Diffuse> red = std::make_shared<Diffuse>(Diffuse(0.75 * colour::RED));
-    std::shared_ptr<Diffuse> purple = std::make_shared<Diffuse>(Diffuse(Colour(0x800080)));
+    std::shared_ptr<Diffuse> grey =
+        std::make_shared<Diffuse>(Diffuse(0.5 * colour::WHITE));
+    std::shared_ptr<Diffuse> red =
+        std::make_shared<Diffuse>(Diffuse(0.75 * colour::RED));
+    std::shared_ptr<Diffuse> purple =
+        std::make_shared<Diffuse>(Diffuse(0.5 * colour::MAGENTA));
 
     /* Define scene objects */
-    Sphere ball(-point3::Z, 0.5, grey);
-    Sphere ball2(Vec3(0.5, 0.1, -1.5), 0.5, red);
-    Sphere ground(Vec3(0, -100, 0), 99.5, purple);
+    const Sphere ball(-point3::Z, 0.5, grey);
+    const Sphere ball2(Vec3(0.5, 0.1, -1.5), 0.5, red);
+    const Sphere ground(Vec3(0, -100, 0), 99.5, purple);
 
     /* Create world and add objects to it */
     HittableList world;
@@ -41,39 +52,37 @@ int main(int argc, char * noalias argv[]) {
     world.add(ball2);
     world.add(ground);
 
-    constexpr int spp = 100;
-    constexpr double scale = 1.0 / double(spp);
-    constexpr int max_bounces = 10;
+    utils::ProgressBar pb(width * height, 20);
+    std::cout << term_colours::BOLD << "Rendering image..." << std::endl;
+    pb.start(term_colours::CYAN);
 
-    constexpr int height_by_ten = height / 10;
+    /* Measure calculations */
+    auto clock = std::chrono::system_clock();
+    auto time0 = clock.now();
 
-    for (int j = height; j != 0; j--) {
-        for (int i = 0; i != width; i++) {
-            Colour c;
-            for (int k = 0; k < spp; k++) {
-                double u = (double(i) + rng::gen()) / double(width - 1);
-                double v = (double(j - 1) + rng::gen()) / double(height - 1);
-                Ray r = cam.get_ray(u, v);
-                Colour ray_color = 0.75 * colour::WHITE;
-                HitRecord h;
-                int iter = 0;
-                while (iter < max_bounces) {
-                    if (world.hit(r, utils::EPSILON, utils::INF, h)) {
-                        iter++;
-                        h.material->scatter(h, r, ray_color);
-                    } else {
-                        break;
-                    }
-                }
-
-                c += ray_color;
-            }
-            img.push(c * scale);
+#pragma omp parallel for
+    for (size_t index = 0; index != width * height; index++) {
+        Colour c;
+        uint32_t i = index % width;
+        uint32_t j = height - 1 - index / width;
+        double u, v;
+        for (int k = 0; k < spp; k++) {
+            u = (double(i) + rng::gen()) * width_scale;
+            v = (double(j) + rng::gen()) * height_scale;
+            c += cam.cast_ray<max_bounces>(world, 0.75 * colour::WHITE, u, v);
         }
-        if (!(j % height_by_ten))
-            std::cout << 100 * (height - j) / height << "%" << std::endl;
+        img[(height - 1 - j) * width + i] = c * colour_scale;
+        pb.advance();
     }
-    std::cout << "100% complete" << std::endl;
+
+    pb.stop();
+    auto duration = clock.now() - time0;
+
+    auto millis =
+        std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+    std::cout << "Image rendered in " << millis / 1000 << "s " << millis % 1000
+              << "ms" << std::endl;
 
     img.save("image.ppm");
 
