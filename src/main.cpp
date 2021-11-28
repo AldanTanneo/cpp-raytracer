@@ -52,13 +52,10 @@ int main(int argc, char * noalias argv[]) {
     world.add(ball2);
     world.add(ground);
 
-    utils::ProgressBar pb(width * height, 20);
+    utils::ProgressBar pb(width * height);
     std::cout << term_colours::BOLD << "Rendering image..." << std::endl;
-    pb.start(term_colours::CYAN);
 
-    /* Measure calculations */
-    auto clock = std::chrono::system_clock();
-    auto time0 = clock.now();
+    pb.start(term_colours::CYAN);
 
 #pragma omp parallel for
     for (size_t index = 0; index != width * height; index++) {
@@ -75,14 +72,7 @@ int main(int argc, char * noalias argv[]) {
         pb.advance();
     }
 
-    pb.stop();
-    auto duration = clock.now() - time0;
-
-    auto millis =
-        std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-
-    std::cout << "Image rendered in " << millis / 1000 << "s " << millis % 1000
-              << "ms" << std::endl;
+    pb.stop("Image rendered");
 
     img.save("image.ppm");
 
