@@ -57,7 +57,7 @@ int main(int argc, char * noalias argv[]) {
     pb.start(term_colours::CYAN);
 
 #pragma omp parallel for
-    for (size_t index = 0; index != width * height; index++) {
+    for (size_t index = 0; index < width * height; index++) {
         Colour c;
         const size_t i = index % width;
         const size_t j = height - 1 - (index / width);
