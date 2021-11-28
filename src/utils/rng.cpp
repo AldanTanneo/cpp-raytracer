@@ -26,7 +26,8 @@ struct FastRng {
         return z ^ (z >> 31);
     }
 
-    /* Fetch the next 64-bit integer and cast it to a double in the [0, 1) range */
+    /* Fetch the next 64-bit integer and cast it to a
+    double in the [0, 1) range */
     constexpr double next_f64() noexcept {
         const uint64_t z = next_u64() >> (DOUBLE_SIZE - PRECISION);
         return SCALE * static_cast<double>(z);
@@ -39,19 +40,11 @@ thread_local FastRng glob_rng(0x193a6754ULL);
 /* Export a limited number of functions to the external library,
 users cannot see the inside of the beast */
 namespace rng {
-void seed(uint64_t seed) noexcept {
-    glob_rng.value = seed;
-}
+    void seed(uint64_t seed) noexcept { glob_rng.value = seed; }
 
-double gen() noexcept {
-    return glob_rng.next_f64();
-}
+    double gen() noexcept { return glob_rng.next_f64(); }
 
-uint64_t gen_u64() noexcept {
-    return glob_rng.next_u64();
-}
+    uint64_t gen_u64() noexcept { return glob_rng.next_u64(); }
 
-uint32_t gen_u32() noexcept {
-    return glob_rng.next_u64() >> 32;
-}
+    uint32_t gen_u32() noexcept { return glob_rng.next_u64() >> 32; }
 } // namespace rng

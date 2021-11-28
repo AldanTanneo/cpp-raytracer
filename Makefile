@@ -34,7 +34,7 @@ DEPS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.d,$(SRCS))
 
 # Compiler and compile flags
 CC          := clang++
-CFLAGS      := -I$(SRC)/include -Wall -Werror -Wfatal-errors -MMD -MP -std=c++17
+CFLAGS      := -I$(INCLUDE) -Wall -Werror -Wfatal-errors -MMD -MP -fopenmp=libomp
 OPT_DEBUG   := -O0
 OPT_RELEASE := -Ofast -mavx2 -march=native
 
@@ -112,6 +112,9 @@ ifneq ("$(wildcard $(OBJ))","")
 	@echo $(BOLD)$(RED)Cleaning up $(NC)$(OBJ)$(RED)...$(NC)
 	@$(RMDIR) $(OBJ)
 endif
+
+format: $(SRCS) $(INCLUDES)
+	@clang-format --style=file -i $(SRCS) $(INCLUDES)
 
 .PHONY: build debug run release bench benchmark clean
 
