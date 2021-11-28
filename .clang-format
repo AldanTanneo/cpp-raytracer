@@ -3,6 +3,8 @@
     IndentWidth: 4,
     NamespaceIndentation: All,
     IndentCaseLabels: true,
+    IndentAccessModifiers: false,
+    AccessModifierOffset: -4,
     UseTab: Never,
     KeepEmptyLinesAtTheStartOfBlocks: false,
     IncludeBlocks: Regroup,
@@ -25,5 +27,4 @@
     DerivePointerAlignment: false,
     BinPackArguments: true,
     IndentPPDirectives: BeforeHash,
-    AccessModifierOffset: -4,
 }
