@@ -8,7 +8,7 @@
 #include <iostream>
 #include <memory>
 // Parallelization lib
-#include <omp_llvm.h>
+#include <omp.h>
 
 // From src/include
 #include <camera.hpp>
