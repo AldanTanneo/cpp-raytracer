@@ -70,7 +70,7 @@ public:
         Ray r = get_ray(u, v);
         Colour ray_colour = background_colour;
         HitRecord h;
-        for (uint32_t iter = 0; iter != max_rec; iter++) {
+        for (uint32_t iter = 0; iter < max_rec; iter++) {
             if (!world.hit(r, utils::EPSILON, utils::INF, h) ||
                 !h.scatter(r, ray_colour)) {
                 break;
