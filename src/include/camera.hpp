@@ -5,25 +5,29 @@
 #include <numeric>
 
 // From src/include
+#include <hittable.hpp>
 #include <ray.hpp>
 #include <utils/vec3.hpp>
 
 /* Aspect ratio wrapper class */
 struct AspectRatio {
-  private:
+private:
     /* The wrapped aspect ratio */
     double aspect_ratio;
 
-  public:
+public:
     /* Construct an aspect ratio from two integers */
-    constexpr AspectRatio(unsigned int width, unsigned int height) : aspect_ratio(double(width) / double(height)) {
-        if (aspect_ratio < utils::EPSILON || !std::isfinite(aspect_ratio)) {
+    constexpr AspectRatio(unsigned int width, unsigned int height)
+        : aspect_ratio(double(width) / double(height)) {
+        if (aspect_ratio < utils::EPSILON || aspect_ratio == utils::INF ||
+            aspect_ratio != aspect_ratio) {
             throw "Could not construct AspectRatio: value must be positive";
         }
     }
     /* Construct an aspect ratio from a double */
     constexpr AspectRatio(double value) : aspect_ratio(value) {
-        if (aspect_ratio < utils::EPSILON || !std::isfinite(aspect_ratio)) {
+        if (aspect_ratio < utils::EPSILON || aspect_ratio == utils::INF ||
+            aspect_ratio != aspect_ratio) {
             throw "Could not construct AspectRatio: value must be positive";
         }
     }
@@ -34,7 +38,7 @@ struct AspectRatio {
 
 /* Main camera class */
 class Camera {
-  private:
+private:
     /* Origin point */
     Point3 origin;
     /* Vector from the origin to the bottom left corner of the screen */
@@ -44,13 +48,38 @@ class Camera {
     /* Horizontal vector of the screen space */
     Vec3 horizontal_vector;
 
-  public:
+public:
     /* Construct a camera */
-    Camera(Point3 origin, Point3 look_at, Vec3 up_vector, double vertical_fov, AspectRatio aspect_ratio);
+    Camera(Point3 origin,
+           Point3 look_at,
+           Vec3 up_vector,
+           double vertical_fov,
+           AspectRatio aspect_ratio);
 
     /* Get a ray from normalized coordinates in the virtual screen space */
     constexpr Ray get_ray(double u, double v) const noexcept {
-        return Ray(origin, origin_to_bottom_left_corner + u * horizontal_vector + v * vertical_vector);
+        return Ray(origin, origin_to_bottom_left_corner +
+                               u * horizontal_vector + v * vertical_vector);
+    }
+
+    template <const uint32_t max_rec>
+    inline Colour cast_ray(const Hittable & world,
+                           Colour background_colour,
+                           double u,
+                           double v) const noexcept {
+        Ray r = get_ray(u, v);
+        Colour ray_colour = background_colour;
+        HitRecord h;
+        uint32_t iter = 0;
+        while (iter != max_rec) {
+            if (world.hit(r, utils::EPSILON, utils::INF, h)) {
+                iter++;
+                h.material->scatter(h, r, ray_colour);
+            } else {
+                break;
+            }
+        }
+        return ray_colour;
     }
 };
 
