@@ -34,7 +34,8 @@ DEPS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.d,$(SRCS))
 
 # Compiler and compile flags
 CC          := clang++
-CFLAGS      := -I$(INCLUDE) -Wall -Werror -Wfatal-errors -MMD -MP -fopenmp=libomp -std=c++17
+CFLAGS      := -I$(INCLUDE) -Wall -Werror -Wfatal-errors \
+               -MMD -MP -fopenmp=libomp -std=c++17
 OPT_DEBUG   := -O0
 OPT_RELEASE := -Ofast -mavx2 -march=native
 
