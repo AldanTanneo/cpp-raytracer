@@ -394,9 +394,21 @@ namespace vec3 {
         The current vector and the normal MUST BE unit vectors */
         inline Vec3 refract(const Vec3 & normal,
                             double refraction_ratio) const noexcept {
-            double cos_theta = -dot(normal);
-            Vec3 orth_out = refraction_ratio * (*this + normal * cos_theta);
-            Vec3 parr_out = -sqrt(fabs((1 - orth_out.squared_norm()))) * normal;
+            /* n est la normale, t la tangente à la surface
+                (la normale est à l'envers par rapport au rayon)
+            r = ||r_i|| (r_i est le rayon incident)
+            r_i = -rcos_i * n + rsin_i * t = n_i + t_i
+            r_o = -rcos_o * n + rsin_o * t = n_o + t_o
+
+            sin_o = (n1 / n2) * sin_i, et rcos_i = - r_i . n
+            donc rsin_i * t = r_i - (r_i . n) * n
+            ORTH_OUT = rsin_o * t = (n1 / n2) * (r_i - (r_i . n) * n) = t_o
+            (rcos_o)^2 = r^2 * (1 - sin_o^2) = r^2 - (rsin_o)^2 = r^2 - t_o^2
+            PARR_OUT = -rcos_o * n = -sqrt(r^2 - t_o^2) * n */
+            double rcos_theta = -dot(normal);
+            Vec3 orth_out = refraction_ratio * (*this + normal * rcos_theta);
+            Vec3 parr_out =
+                -sqrt(squared_norm() - orth_out.squared_norm()) * normal;
             return orth_out + parr_out;
         }
 
