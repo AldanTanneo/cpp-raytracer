@@ -13,21 +13,21 @@
 struct AspectRatio {
 private:
     /* The wrapped aspect ratio */
-    double aspect_ratio;
+    const double aspect_ratio;
 
 public:
     /* Construct an aspect ratio from two integers */
     constexpr AspectRatio(unsigned int width, unsigned int height)
         : aspect_ratio(double(width) / double(height)) {
-        if (aspect_ratio < utils::EPSILON || aspect_ratio == utils::INF ||
-            aspect_ratio != aspect_ratio) {
+        if (aspect_ratio < utils::EPSILON || aspect_ratio == utils::INF
+            || aspect_ratio != aspect_ratio) {
             throw "Could not construct AspectRatio: value must be positive";
         }
     }
     /* Construct an aspect ratio from a double */
     constexpr AspectRatio(double value) : aspect_ratio(value) {
-        if (aspect_ratio < utils::EPSILON || aspect_ratio == utils::INF ||
-            aspect_ratio != aspect_ratio) {
+        if (aspect_ratio < utils::EPSILON || aspect_ratio == utils::INF
+            || aspect_ratio != aspect_ratio) {
             throw "Could not construct AspectRatio: value must be positive";
         }
     }
@@ -58,8 +58,8 @@ public:
 
     /* Get a ray from normalized coordinates in the virtual screen space */
     constexpr Ray get_ray(double u, double v) const noexcept {
-        return Ray(origin, origin_to_bottom_left_corner +
-                               u * horizontal_vector + v * vertical_vector);
+        return Ray(origin, origin_to_bottom_left_corner + u * horizontal_vector
+                               + v * vertical_vector);
     }
 
     /* Cast a ray into the world with the given parameters
@@ -72,9 +72,9 @@ public:
         Ray r = get_ray(u, v);
         Colour ray_colour = background_colour;
         HitRecord record;
-        for (uint32_t iter = 0; iter < max_bounces; iter++) {
-            if (!world.hit(r, utils::EPSILON, utils::INF, record) ||
-                !record.scatter(r, ray_colour)) {
+        for (uint32_t iter = 0; iter < max_bounces; ++iter) {
+            if (!world.hit(r, utils::EPSILON, utils::INF, record)
+                || !record.scatter(r, ray_colour)) {
                 break;
             }
         }
