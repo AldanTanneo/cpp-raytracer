@@ -56,7 +56,7 @@ int main(int argc, char * argv[]) {
 
     pb.start(term_colours::CYAN);
 
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for default(none) shared(cam, img, pb, world) schedule(dynamic)
     for (size_t index = 0; index < width * height; index++) {
         Colour c;
         const size_t i = index % width;
