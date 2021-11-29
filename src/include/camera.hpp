@@ -62,6 +62,8 @@ public:
                                u * horizontal_vector + v * vertical_vector);
     }
 
+    /* Cast a ray into the world with the given parameters
+    and at the given screen space coordinates */
     inline Colour cast_ray(const Hittable & world,
                            const Colour & background_colour,
                            const uint32_t max_bounces,
