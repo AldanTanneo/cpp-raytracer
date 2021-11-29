@@ -26,6 +26,11 @@ namespace rng {
         const uint64_t z = gen_u64() >> (_DOUBLE_SIZE - _DOUBLE_PRECISION);
         return _SCALE * double(z);
     }
+
+    /* Return a random double in the range [a, b) */
+    inline double gen(const double a, const double b) noexcept {
+        return a + gen() * (b - a);
+    }
 } // namespace rng
 
 #endif
