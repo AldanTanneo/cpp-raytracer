@@ -31,15 +31,17 @@ class _DummyMaterial : public Material {
 public:
     /* Construct a const DummyMaterial instance */
     constexpr _DummyMaterial() noexcept {}
+
+    /* Static DummyMaterial instance */
+    static const _DummyMaterial d;
+
+private:
     /* Never scatter */
     virtual bool
     scatter(const HitRecord &, Ray &, Colour &) const noexcept override {
         return false;
     }
 };
-
-/* Static DummyMaterial instance */
-static const _DummyMaterial _dummy;
 
 /* The returned structure if a ray hits an object */
 class HitRecord {
@@ -57,7 +59,7 @@ public:
     /* Construct an empty hit record */
     inline HitRecord() noexcept
         : time(0.0), hit_point(point3::ZEROS), surface_normal(point3::ZEROS),
-          front_face(false), material(std::cref(_dummy)) {}
+          front_face(false), material(std::cref(_DummyMaterial::d)) {}
 
     /* Set the correct orientation of the normal */
     constexpr void set_face_normal(const Ray & r,
