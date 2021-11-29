@@ -3,5 +3,5 @@ compile_flags.txt
 *.ppm
 main
 xtrem-raytracer
-.vscode
+*.log
 obj
