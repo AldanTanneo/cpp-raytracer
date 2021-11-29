@@ -14,6 +14,7 @@
 #include <camera.hpp>
 #include <main.hpp>
 #include <materials/diffuse.hpp>
+#include <materials/metal.hpp>
 #include <objects/sphere.hpp>
 #include <utils/image.hpp>
 
@@ -31,16 +32,18 @@ int main(int argc, char * argv[]) {
     /* Initialize the RNG */
     rng::seed(time(0));
 
-    const Camera cam(0.5 * point3::Z, -point3::Z, vec3::Y, 60, aspect_ratio);
+    const Camera cam(Vec3(-0.3, 1, 2), Vec3(0, 0.5, -1.0), vec3::Y, 60,
+                     aspect_ratio);
 
     /* Define scene materials */
-    const Diffuse grey = Diffuse(0.5 * colour::WHITE);
-    const Diffuse red = Diffuse(0.75 * colour::RED);
-    const Diffuse purple = Diffuse(0.5 * colour::MAGENTA);
+    const Metal grey = Metal(Colour(0xC0C0C0), 0.1);
+    const Metal gold = Metal(Colour(0xFFD700));
+    const Diffuse green = Diffuse(0.1 * colour::MAGENTA + 0.6 * colour::GREEN);
 
-    const Sphere ball(-point3::Z, 0.5, grey);
-    const Sphere ball2(Vec3(0.5, 0.1, -1.5), 0.5, red);
-    const Sphere ground(Vec3(0, -100, 0), 99.5, purple);
+    /* Define scene objects */
+    const Sphere ball(Vec3(0, 0.5, -1.0), 0.5, grey);
+    const Sphere ball2(Vec3(0.5, 0.3, 0), 0.3, gold);
+    const Sphere ground(Vec3(0, -2000, 0), 2000, green);
 
     /* Create world and add objects to it */
     HittableList world;
@@ -52,21 +55,21 @@ int main(int argc, char * argv[]) {
     image::Image img = image::Image::black(width, height);
 
     utils::ProgressBar pb(width * height);
-    std::cout << term_colours::BOLD << "Rendering image..." << std::endl;
+    std::cout << term_colours::ITALIC << "Rendering image..." << std::endl;
 
     pb.start(term_colours::CYAN);
 
 #pragma omp parallel for default(none) shared(cam, img, pb, world)             \
     schedule(dynamic)
-    for (size_t index = 0; index < width * height; index++) {
+    for (size_t index = 0; index < width * height; ++index) {
         Colour c;
         const size_t i = index % width;
         const size_t j = height - 1 - (index / width);
         double u, v;
-        for (int k = 0; k < spp; k++) {
+        for (int k = 0; k < spp; ++k) {
             u = (static_cast<double>(i) + rng::gen()) * width_scale;
             v = (static_cast<double>(j) + rng::gen()) * height_scale;
-            c += cam.cast_ray(world, 0.75 * colour::WHITE, max_bounces, u, v);
+            c += cam.cast_ray(world, colour::WHITE, max_bounces, u, v);
         }
         img[index] = c * colour_scale;
         pb.advance();
