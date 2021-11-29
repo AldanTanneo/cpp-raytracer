@@ -12,7 +12,6 @@ public:
     /* The direction of the ray */
     Vec3 direction;
 
-    constexpr Ray() noexcept = default;
     /* Construct a ray from its origin and direction */
     constexpr Ray(Point3 origin, Vec3 direction) noexcept
         : origin(origin), direction(direction) {}

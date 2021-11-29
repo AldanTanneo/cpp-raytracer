@@ -62,20 +62,19 @@ public:
                                u * horizontal_vector + v * vertical_vector);
     }
 
-    template <const uint32_t max_rec>
+    /* Cast a ray into the world with the given parameters
+    and at the given screen space coordinates */
     inline Colour cast_ray(const Hittable & world,
-                           Colour background_colour,
+                           const Colour & background_colour,
+                           const uint32_t max_bounces,
                            double u,
                            double v) const noexcept {
         Ray r = get_ray(u, v);
         Colour ray_colour = background_colour;
-        HitRecord h;
-        uint32_t iter = 0;
-        while (iter != max_rec) {
-            if (world.hit(r, utils::EPSILON, utils::INF, h)) {
-                iter++;
-                h.material->scatter(h, r, ray_colour);
-            } else {
+        HitRecord record;
+        for (uint32_t iter = 0; iter < max_bounces; iter++) {
+            if (!world.hit(r, utils::EPSILON, utils::INF, record) ||
+                !record.scatter(r, ray_colour)) {
                 break;
             }
         }

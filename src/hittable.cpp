@@ -5,6 +5,8 @@
 #include <ray.hpp>
 #include <utils/vec3.hpp>
 
+const _DummyMaterial _DummyMaterial::d;
+
 bool HittableList::hit(const Ray & ray_in,
                        double tmin,
                        double tmax,

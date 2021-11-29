@@ -5,10 +5,6 @@
 #include <float.h>
 #include <utils/rng.hpp>
 
-constexpr uint64_t DOUBLE_SIZE = sizeof(double) * 8;
-constexpr uint64_t PRECISION = DBL_MANT_DIG;
-constexpr double SCALE = 1.0 / static_cast<double>(1ULL << PRECISION);
-
 /* Private random number generator based on SplitMix64. */
 struct FastRng {
     /* The inner 64-bit value */
@@ -25,13 +21,6 @@ struct FastRng {
         z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
         return z ^ (z >> 31);
     }
-
-    /* Fetch the next 64-bit integer and cast it to a
-    double in the [0, 1) range */
-    constexpr double next_f64() noexcept {
-        const uint64_t z = next_u64() >> (DOUBLE_SIZE - PRECISION);
-        return SCALE * static_cast<double>(z);
-    }
 };
 
 /* Global, thread-local RNG instance */
@@ -42,9 +31,5 @@ users cannot see the inside of the beast */
 namespace rng {
     void seed(uint64_t seed) noexcept { glob_rng.value = seed; }
 
-    double gen() noexcept { return glob_rng.next_f64(); }
-
     uint64_t gen_u64() noexcept { return glob_rng.next_u64(); }
-
-    uint32_t gen_u32() noexcept { return glob_rng.next_u64() >> 32; }
 } // namespace rng

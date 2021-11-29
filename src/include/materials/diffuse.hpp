@@ -14,7 +14,7 @@ public:
 
     virtual bool scatter(const HitRecord & hit_record,
                          Ray & ray_out,
-                         Colour & attenuation) const noexcept override;
+                         Colour & ray_colour) const noexcept override;
 };
 
 #endif

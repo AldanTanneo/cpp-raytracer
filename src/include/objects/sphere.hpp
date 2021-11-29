@@ -8,20 +8,23 @@
 class Sphere : public Hittable {
 private:
     /* Centre of the sphere */
-    Point3 centre;
+    const Point3 centre;
     /* Radius of the sphere */
-    double radius;
+    const double radius;
     /* Material of the sphere */
-    std::shared_ptr<Material> material;
+    const Material & material;
 
 public:
-    /* Construct sphere from its centre and its radius */
-    inline Sphere(Point3 centre,
-                  double radius,
-                  std::shared_ptr<Material> material) noexcept
+    /* Construct sphere from its centre, radius and material */
+    template <class T>
+    constexpr Sphere(const Point3 & centre,
+                     const double radius,
+                     const T & material,
+                     std::enable_if_t<std::is_convertible_v<T *, Material *>,
+                                      void *> = nullptr) noexcept
         : centre(centre), radius(radius), material(material) {}
 
-    /* define behaviour of ray when hitting sphere */
+    /* Virtual function override */
     virtual bool hit(const Ray & ray_in,
                      double tmin,
                      double tmax,
