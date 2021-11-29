@@ -57,8 +57,8 @@ int main(int argc, char * noalias argv[]) {
 
     pb.start(term_colours::CYAN);
 
-#pragma omp parallel for
-    for (size_t index = 0; index != width * height; index++) {
+#pragma omp parallel for schedule(dynamic)
+    for (size_t index = 0; index < width * height; index++) {
         Colour c;
         uint32_t i = index % width;
         uint32_t j = height - 1 - index / width;
