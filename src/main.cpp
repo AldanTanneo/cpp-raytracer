@@ -25,9 +25,9 @@ constexpr double width_scale = 1.0 / double(width - 1);
 
 constexpr int spp = 100;
 constexpr double colour_scale = 1.0 / double(spp);
-constexpr int max_bounces = 10;
+constexpr int max_bounces = 25;
 
-int main(int argc, char * noalias argv[]) {
+int main(int argc, char * argv[]) {
     /* Initialize the RNG */
     rng::seed(time(0));
 

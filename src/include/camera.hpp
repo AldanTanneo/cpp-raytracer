@@ -64,13 +64,13 @@ public:
 
     inline Colour cast_ray(const Hittable & world,
                            const Colour & background_colour,
-                           const uint32_t max_rec,
+                           const uint32_t max_bounces,
                            double u,
                            double v) const noexcept {
         Ray r = get_ray(u, v);
         Colour ray_colour = background_colour;
         HitRecord record;
-        for (uint32_t iter = 0; iter < max_rec; iter++) {
+        for (uint32_t iter = 0; iter < max_bounces; iter++) {
             if (!world.hit(r, utils::EPSILON, utils::INF, record) ||
                 !record.scatter(r, ray_colour)) {
                 break;
