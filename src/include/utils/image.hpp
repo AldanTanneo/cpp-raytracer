@@ -84,9 +84,11 @@ namespace image {
                     g = is.get();
                     b = is.get();
                     if (is.good()) {
-                        pixels.push_back(Colour(double(r) / maxval,
-                                                double(g) / maxval,
-                                                double(b) / maxval));
+                        pixels.push_back(Colour(
+                            utils::reverse_gamma_correction(double(r) / maxval),
+                            utils::reverse_gamma_correction(double(g) / maxval),
+                            utils::reverse_gamma_correction(double(b)
+                                                            / maxval)));
                     } else {
                         break;
                     }
@@ -97,9 +99,11 @@ namespace image {
                     g = (is.get() << 8) + is.get();
                     b = (is.get() << 8) + is.get();
                     if (is.good()) {
-                        pixels.push_back(Colour(double(r) / maxval,
-                                                double(g) / maxval,
-                                                double(b) / maxval));
+                        pixels.push_back(Colour(
+                            utils::reverse_gamma_correction(double(r) / maxval),
+                            utils::reverse_gamma_correction(double(g) / maxval),
+                            utils::reverse_gamma_correction(double(b)
+                                                            / maxval)));
                     } else {
                         break;
                     }
@@ -108,10 +112,10 @@ namespace image {
 
             /* Check that the right amount of pixels was read */
             if (pixels.size() != width * height) {
-                throw "Could not load PPM image: data size mismatch: found " +
-                    std::to_string(pixels.size()) +
-                    " pixels where there should be " +
-                    std::to_string(width * height) + ".";
+                throw "Could not load PPM image: data size mismatch: found "
+                    + std::to_string(pixels.size())
+                    + " pixels where there should be "
+                    + std::to_string(width * height) + ".";
             }
 
             return Image(pixels, width, height);
@@ -181,8 +185,8 @@ namespace image {
 
         /* Save the image under the given filename */
         inline void save(const std::string & filename) const {
-            std::ofstream output_file(filename, std::ios_base::out |
-                                                    std::ios_base::binary);
+            std::ofstream output_file(filename, std::ios_base::out
+                                                    | std::ios_base::binary);
             if (!output_file) {
                 throw "Could not open file!";
             }
@@ -192,13 +196,13 @@ namespace image {
 
         /* Compare two images for equality */
         inline bool operator==(const Image & other) const noexcept {
-            if (width != other.width || height != other.height ||
-                size() != other.size()) {
+            if (width != other.width || height != other.height
+                || size() != other.size()) {
                 return false;
             }
 
             uint64_t data_size = size();
-            for (uint64_t i = 0; i < data_size; i++) {
+            for (uint64_t i = 0; i < data_size; ++i) {
                 if (data[i] != other.data[i]) {
                     return false;
                 }
