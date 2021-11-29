@@ -115,7 +115,6 @@ ifneq ("$(wildcard $(OBJ))","")
 endif
 
 format: $(SRCS) $(INCLUDES)
-	@echo $(SRCS)
 	@-clang-format --style=file -i $(SRCS) $(INCLUDES)
 
 .PHONY: build debug run release bench benchmark clean
