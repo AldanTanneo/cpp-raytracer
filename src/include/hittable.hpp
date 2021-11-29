@@ -29,13 +29,13 @@ public:
 /* Dummy material class for HitRecord empty initialization */
 class _DummyMaterial : public Material {
 public:
-    /* Construct a const DummyMaterial instance */
-    constexpr _DummyMaterial() noexcept {}
-
     /* Static DummyMaterial instance */
     static const _DummyMaterial d;
 
 private:
+    /* Construct a const DummyMaterial instance */
+    constexpr _DummyMaterial() noexcept {}
+
     /* Never scatter */
     virtual bool
     scatter(const HitRecord &, Ray &, Colour &) const noexcept override {
