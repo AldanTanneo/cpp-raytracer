@@ -32,20 +32,20 @@ namespace colour {
             return Colour(double(red) / 255.0, double(green) / 255.0,
                           double(blue) / 255.0);
         }
-        /* Red component */
+        /* Gamma corrected red component */
         inline uint8_t red() const noexcept {
-            return static_cast<uint8_t>(utils::gamma_correction(r) *
-                                        utils::MAX_COLOUR);
+            return static_cast<uint8_t>(utils::gamma_correction(r)
+                                        * utils::MAX_COLOUR);
         }
-        /* Green component */
+        /* Gamma corrected green component */
         inline uint8_t green() const noexcept {
-            return static_cast<uint8_t>(utils::gamma_correction(g) *
-                                        utils::MAX_COLOUR);
+            return static_cast<uint8_t>(utils::gamma_correction(g)
+                                        * utils::MAX_COLOUR);
         }
-        /* Blue component */
+        /* Gamma corrected blue component */
         inline uint8_t blue() const noexcept {
-            return static_cast<uint8_t>(utils::gamma_correction(b) *
-                                        utils::MAX_COLOUR);
+            return static_cast<uint8_t>(utils::gamma_correction(b)
+                                        * utils::MAX_COLOUR);
         }
         /* Get the hexadecimal representation of the colour */
         inline uint32_t to_hex() const noexcept {
@@ -158,14 +158,14 @@ namespace colour {
 
         /* Compare two colours for equality */
         inline bool operator==(const Colour & other) const noexcept {
-            return red() == other.red() && green() == other.green() &&
-                   blue() == other.blue();
+            return red() == other.red() && green() == other.green()
+                   && blue() == other.blue();
         }
 
         /* Compare two colours for inequality */
         inline bool operator!=(const Colour & other) const noexcept {
-            return red() != other.red() || green() != other.green() ||
-                   blue() != other.blue();
+            return red() != other.red() || green() != other.green()
+                   || blue() != other.blue();
         }
 
         /* Print the color for debugging purposes */
@@ -371,8 +371,8 @@ namespace vec3 {
         }
         /* Check if the vector is near zero */
         inline bool near_zero() const noexcept {
-            return fabs(x) < utils::EPSILON && fabs(y) < utils::EPSILON &&
-                   fabs(z) < utils::EPSILON;
+            return fabs(x) < utils::EPSILON && fabs(y) < utils::EPSILON
+                   && fabs(z) < utils::EPSILON;
         }
 
         /// Geometric operations
@@ -390,8 +390,7 @@ namespace vec3 {
             return *this - 2.0 * dot(normal) * normal;
         }
         /* Refract a vector against a plane defined by its normal, with a given
-        refraction ratio.
-        The current vector and the normal MUST BE unit vectors */
+        refraction ratio. */
         inline Vec3 refract(const Vec3 & normal,
                             double refraction_ratio) const noexcept {
             /* DEMO:
@@ -437,10 +436,11 @@ namespace vec3 {
          */
         inline static Vec3 random_in_hemisphere(const Vec3 & u) noexcept {
             Vec3 res = Vec3::random();
-            while (res.dot(u) < 0.0) {
-                res = Vec3::random();
+            if (res.dot(u) < 0.0) {
+                return -res;
+            } else {
+                return res;
             }
-            return res;
         }
 
         /* Print the vector for debugging purposes */
