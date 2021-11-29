@@ -9,8 +9,7 @@
 #include <ray.hpp>
 #include <utils/vec3.hpp>
 
-
-struct HitRecord; // Forward declaration of HitRecord
+class HitRecord; // Forward declaration of HitRecord
 
 /* Abstract interface of a material */
 class Material {
@@ -27,19 +26,24 @@ public:
     virtual ~Material() noexcept = default;
 };
 
-class DummyMaterial : public Material {
+/* Dummy material class for HitRecord empty initialization */
+class _DummyMaterial : public Material {
 public:
-    constexpr DummyMaterial() noexcept = default;
+    /* Construct a const DummyMaterial instance */
+    constexpr _DummyMaterial() noexcept {}
+    /* Never scatter */
     virtual bool
     scatter(const HitRecord &, Ray &, Colour &) const noexcept override {
         return false;
     }
 };
 
-// static const DummyMaterial dummy;
+/* Static DummyMaterial instance */
+static const _DummyMaterial _dummy;
 
 /* The returned structure if a ray hits an object */
-struct HitRecord {
+class HitRecord {
+public:
     double time;
     /* The point of intersection between the ray and the object */
     Point3 hit_point;
@@ -48,12 +52,12 @@ struct HitRecord {
     /* Determines if the surface is hit from the front or the back */
     bool front_face;
     /* The material of the object surface */
-    Material * material;
+    std::reference_wrapper<const Material> material;
 
     /* Construct an empty hit record */
     inline HitRecord() noexcept
         : time(0.0), hit_point(point3::ZEROS), surface_normal(point3::ZEROS),
-          front_face(false), material(nullptr) {}
+          front_face(false), material(std::cref(_dummy)) {}
 
     /* Set the correct orientation of the normal */
     constexpr void set_face_normal(const Ray & r,
@@ -64,15 +68,15 @@ struct HitRecord {
 
     /* Scatter the ray according to the hit material */
     inline bool scatter(Ray & ray, Colour & ray_colour) const noexcept {
-        return material->scatter((const HitRecord &)*this, ray, ray_colour);
+        return material.get().scatter(*this, ray, ray_colour);
     }
 };
 
 /* Abstract interface of a hittable object */
 class Hittable {
 public:
-    /* Check if a ray hits the hittable object. If there is a hit, return a hit
-     * record */
+    /* Check if a ray hits the hittable object.
+    If there is a hit, return a hit record */
     virtual bool hit(const Ray & ray_in,
                      double tmin,
                      double tmax,
@@ -85,8 +89,11 @@ public:
 /* A dynamic list of hittable objects */
 class HittableList : public Hittable {
 public:
+    /* The inner value type */
     using value_type = std::unique_ptr<Hittable>;
+    /* The inner container for the hittable objects */
     using container = std::vector<value_type>;
+    /* Iterator type */
     using const_iterator = container::const_iterator;
 
 private:
@@ -100,10 +107,11 @@ public:
     /* Add an object inheriting from the Hittable class */
     template <class T>
     inline std::enable_if_t<std::is_convertible_v<T *, Hittable *>>
-    add(T object) noexcept {
+    add(const T & object) noexcept {
         objects.push_back(std::make_unique<T>(object));
     }
 
+    /* Add an already allocated unique_ptr to the hittable list */
     inline void add(std::unique_ptr<Hittable> object) noexcept {
         objects.push_back(std::move(object));
     }

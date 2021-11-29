@@ -12,24 +12,19 @@ private:
     /* Radius of the sphere */
     const double radius;
     /* Material of the sphere */
-    std::unique_ptr<Material> material;
+    const Material & material;
 
 public:
-    /* Construct sphere from its centre and its radius */
+    /* Construct sphere from its centre, radius and material */
     template <class T>
-    inline Sphere(const Point3 & centre,
-                  const double radius,
-                  const T material,
-                  std::enable_if_t<std::is_convertible_v<T *, Material *>,
-                                   void *> = nullptr) noexcept
-        : centre(centre), radius(radius),
-          material(std::make_unique<T>(material)) {}
+    constexpr Sphere(const Point3 & centre,
+                     const double radius,
+                     const T & material,
+                     std::enable_if_t<std::is_convertible_v<T *, Material *>,
+                                      void *> = nullptr) noexcept
+        : centre(centre), radius(radius), material(material) {}
 
-    inline Sphere(Sphere & other) noexcept
-        : centre(other.centre), radius(other.radius),
-          material(std::move(other.material)) {}
-
-    /* define behaviour of ray when hitting sphere */
+    /* Virtual function override */
     virtual bool hit(const Ray & ray_in,
                      double tmin,
                      double tmax,
