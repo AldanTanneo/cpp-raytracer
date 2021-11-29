@@ -2,7 +2,8 @@
 #define DIFFUSE_HPP
 
 #include <hittable.hpp>
-#include <utils.hpp>
+#include <ray.hpp>
+#include <utils/vec3.hpp>
 
 /* Diffuse material: randomly scatters around the surface normal */
 class Diffuse : public Material {
