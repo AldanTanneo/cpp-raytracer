@@ -9,13 +9,51 @@
 #include <limits>
 #include <type_traits>
 
-
 namespace term_colours {
-    constexpr char ESC = 27;
-    constexpr char CYAN[6] = {ESC, '[', '3', '6', 'm', '\0'};
-    constexpr char GREEN[6] = {ESC, '[', '3', '2', 'm', '\0'};
-    constexpr char NO_COLOUR[5] = {ESC, '[', '0', 'm', '\0'};
-    constexpr char BOLD[5] = {ESC, '[', '1', 'm', '\0'};
+    constexpr char const * RESET = "\x1B[0m";
+
+    /* Font styles */
+    constexpr char const * BOLD = "\x1B[1m";
+    constexpr char const * DIM = "\x1B[2m";
+    constexpr char const * ITALIC = "\x1B[3m";
+    constexpr char const * UNDERLINE = "\x1B[4m";
+    constexpr char const * BLINKING = "\x1B[5m";
+    constexpr char const * INVERSE = "\x1B[7m";
+    constexpr char const * HIDDEN = "\x1B[8m";
+    constexpr char const * STRIKETHROUGH = "\x1B[9m";
+    constexpr char const * DOUBLE_UNDERLINE = "\x1B[21m";
+
+    /* Font styles reset */
+    constexpr char const * NO_BOLD = "\x1B[22m";
+    constexpr char const * NO_DIM = "\x1B[22m";
+    constexpr char const * NO_ITALIC = "\x1B[23m";
+    constexpr char const * NO_UNDERLINE = "\x1B[24m";
+    constexpr char const * NO_BLINKING = "\x1B[25m";
+    constexpr char const * NO_INVERSE = "\x1B[27m";
+    constexpr char const * NO_HIDDEN = "\x1B[28m";
+    constexpr char const * NO_STRIKETHROUGH = "\x1B[29m";
+
+    /* Foreground colours */
+    constexpr char const * BLACK = "\x1B[30m";
+    constexpr char const * RED = "\x1B[31m";
+    constexpr char const * GREEN = "\x1B[32m";
+    constexpr char const * YELLOW = "\x1B[33m";
+    constexpr char const * BLUE = "\x1B[34m";
+    constexpr char const * MAGENTA = "\x1B[35m";
+    constexpr char const * CYAN = "\x1B[36m";
+    constexpr char const * WHITE = "\x1B[37";
+    constexpr char const * DEFAULT_FOREGROUND = "\x1B[39m";
+
+    /* Background colours */
+    constexpr char const * BLACK_BACKGROUND = "\x1B[40m";
+    constexpr char const * RED_BACKGROUND = "\x1B[41m";
+    constexpr char const * GREEN_BACKGROUND = "\x1B[42m";
+    constexpr char const * YELLOW_BACKGROUND = "\x1B[43m";
+    constexpr char const * BLUE_BACKGROUND = "\x1B[44m";
+    constexpr char const * MAGENTA_BACKGROUND = "\x1B[45m";
+    constexpr char const * CYAN_BACKGROUND = "\x1B[46m";
+    constexpr char const * WHITE_BACKGROUND = "\x1B[47";
+    constexpr char const * DEFAULT_BACKGROUND = "\x1B[49m";
 } // namespace term_colours
 
 #define _DBG_COUT_IDENT                                                        \
@@ -28,13 +66,14 @@ namespace term_colours {
 #else
     /* Debugging macro */
     #define DEBUG(args, ...)                                                   \
-        __VA_OPT__(std::cout << term_colours::CYAN << term_colours::BOLD       \
-                             << _DBG_COUT_IDENT << term_colours::NO_COLOUR     \
-                             << term_colours::BOLD << __VA_ARGS__              \
-                             << term_colours::NO_COLOUR << std::endl;)         \
+        __VA_OPT__(std::cout                                                   \
+                       << term_colours::CYAN << term_colours::BOLD             \
+                       << _DBG_COUT_IDENT << term_colours::DEFAULT_FOREGROUND  \
+                       << __VA_ARGS__ << term_colours::NO_BOLD << std::endl;)  \
         std::cout << term_colours::CYAN << term_colours::BOLD                  \
-                  << _DBG_COUT_IDENT << term_colours::NO_COLOUR << (#args)     \
-                  << " = " << (args) << std::endl;
+                  << _DBG_COUT_IDENT << term_colours::DEFAULT_FOREGROUND       \
+                  << term_colours::NO_BOLD << (#args) << " = " << (args)       \
+                  << std::endl;
 #endif
 
 namespace utils {
@@ -92,9 +131,14 @@ namespace utils {
         return value;
     }
 
-    /* Gamma corrects the colour for writing to a file */
+    /* Gamma corrects the colour sample for writing to a file */
     inline double gamma_correction(double sample) noexcept {
         return sqrt(clamp(sample));
+    }
+
+    /* Reverse gamma correction for reading an external colour */
+    constexpr double reverse_gamma_correction(double sample) noexcept {
+        return sample * sample;
     }
 
     /* Progress bar class */
