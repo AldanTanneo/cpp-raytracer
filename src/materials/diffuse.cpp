@@ -1,8 +1,7 @@
-
-// From src/include
 #include <hittable.hpp>
 #include <materials/diffuse.hpp>
-#include <utils.hpp>
+#include <ray.hpp>
+#include <utils/vec3.hpp>
 
 bool Diffuse::scatter(const HitRecord & hit_record,
                       Ray & ray_out,
