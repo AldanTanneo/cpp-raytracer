@@ -49,7 +49,8 @@ public:
     double time;
     /* The point of intersection between the ray and the object */
     Point3 hit_point;
-    /* The normal of the object surface at the intersection point */
+    /* The normal of the object surface at the intersection point.
+    Must be a unit vector. */
     Vec3 surface_normal;
     /* Determines if the surface is hit from the front or the back */
     bool front_face;
