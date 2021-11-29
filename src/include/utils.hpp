@@ -102,9 +102,13 @@ namespace utils {
     private:
         /* Clock used to measure total elapsed time */
         using clock = std::chrono::system_clock;
+        /* Time point type */
+        using time_point = std::chrono::time_point<clock>;
         /* Default bar subdivision */
         static constexpr size_t default_subdiv = 80;
 
+        /* The total size of the progress bar */
+        const size_t size;
         /* The current position of the progress bar */
         std::atomic<size_t> progress;
         /* The foreground character */
@@ -113,22 +117,19 @@ namespace utils {
         const char * bchar;
         /* Subdivisions of the progress bar */
         const size_t subdiv;
-        /* Draw interval */
-        const size_t delta;
         /* Start time */
-        const std::chrono::time_point<std::chrono::system_clock> start_time;
+        const time_point start_time;
 
     public:
-        /* Construct a default progress bar with 100 subdivisions */
+        /* Construct a default progress bar with 80 subdivisions */
         inline ProgressBar(size_t size) noexcept
-            : fchar("▓"), bchar("░"), subdiv(default_subdiv),
-              delta(size / default_subdiv), start_time(clock::now()) {
+            : size(size), fchar("▓"), bchar("░"), subdiv(default_subdiv),
+              start_time(clock::now()) {
             progress.store(0);
         }
-        /* Constructs a progress bar, specify the number of subdivisions. Draws
-        two characters for each subdivision */
+        /* Constructs a progress bar, specify the number of subdivisions. */
         inline ProgressBar(size_t size, size_t subdiv) noexcept
-            : fchar("▓▓"), bchar("░░"), subdiv(subdiv), delta(size / subdiv),
+            : size(size), fchar("▓"), bchar("░"), subdiv(subdiv),
               start_time(clock::now()) {
             progress.store(0);
         }
@@ -139,7 +140,7 @@ namespace utils {
                            size_t subdiv,
                            const char * fchar,
                            const char * bchar)
-            : fchar(fchar), bchar(bchar), subdiv(subdiv), delta(size / subdiv),
+            : size(size), fchar(fchar), bchar(bchar), subdiv(subdiv),
               start_time(clock::now()) {
             if (utf8len(fchar) != utf8len(bchar)) {
                 throw "Foreground and background characters must have the same "
@@ -147,6 +148,7 @@ namespace utils {
             }
             progress.store(0);
         }
+
         /* Delete the copy constructor */
         ProgressBar(const ProgressBar &) = delete;
 
@@ -156,36 +158,76 @@ namespace utils {
         /* Writes the empty progress bar to stdout and returns to line start.
         Does not reset the terminal style. */
         inline void start() const noexcept {
-            for (size_t i = 0; i < subdiv; i++)
+            for (size_t i = 0; i < subdiv; ++i)
                 fputs(bchar, stdout);
-            fputc('\r', stdout);
+            size_t bchar_width = utf8len(bchar);
+            for (size_t i = 0; i < subdiv * bchar_width; ++i)
+                fputc('\b', stdout);
             fflush(stdout);
         }
 
         /* Writes the empty progress bar to stdout, with the given style. */
         inline void start(const char * style) const noexcept {
-            fputs(term_colours::NO_COLOUR, stdout);
+            fputs(term_colours::RESET, stdout);
             fputs(style, stdout);
             start();
         }
 
         /* Advance the progress bar by one, redraw if needed */
         inline void advance() noexcept {
-            if (++progress % delta == 0) {
+            if ((subdiv * progress.fetch_add(1)) % size == 0) {
                 fputs(fchar, stdout);
                 fflush(stdout);
             }
         }
 
-        /* Postfix ++ operator to advance the bar */
-        inline void operator++(int) noexcept { advance(); }
+        /* Advance the progress bar by n, redraw if needed */
+        inline void advance(size_t n) noexcept {
+            const size_t old_value = progress.fetch_add(n);
+            const size_t redraws =
+                subdiv * (n + (subdiv * old_value % size)) / size;
+            for (size_t i = 0; i < redraws; ++i)
+                fputs(fchar, stdout);
+            fflush(stdout);
+        }
+
+        /* Set back the progress bar by one, redraw if needed */
+        inline void setback() noexcept {
+            const size_t fchar_width = utf8len(fchar);
+            const size_t bchar_width = utf8len(bchar);
+            if ((subdiv * progress.fetch_sub(1)) % size == 0) {
+                for (size_t i = 0; i < fchar_width; ++i)
+                    fputc('\b', stdout);
+                fputs(bchar, stdout);
+                for (size_t i = 0; i < bchar_width; ++i)
+                    fputc('\b', stdout);
+                fflush(stdout);
+            }
+        }
+
+        /* Set back the progress bar by n, redraw if needed */
+        inline void setback(size_t n) noexcept {
+            const size_t fchar_width = utf8len(fchar);
+            const size_t bchar_width = utf8len(bchar);
+            const size_t old_value = progress.fetch_sub(n);
+            const size_t redraws =
+                (subdiv * n + size - old_value % size) / size;
+            for (size_t i = 0; i < redraws; ++i) {
+                for (size_t j = 0; j < fchar_width; ++j)
+                    fputc('\b', stdout);
+                fputs(bchar, stdout);
+                for (size_t j = 0; j < bchar_width; ++j)
+                    fputc('\b', stdout);
+            }
+            fflush(stdout);
+        }
 
         /* Stop the progress bar, print a message with the total elapsed time */
         inline void stop(const char * message = "Done") const noexcept {
             using namespace std::chrono;
             int64_t millis =
                 duration_cast<milliseconds>(clock::now() - start_time).count();
-            std::cout << term_colours::NO_COLOUR << std::endl
+            std::cout << term_colours::RESET << std::endl
                       << message << " in " << millis / 1000 << "s "
                       << millis % 1000 << "ms" << std::endl;
             fflush(stdout);
@@ -193,7 +235,7 @@ namespace utils {
 
         /* Stop the progress bar, do not print a message */
         inline void stop_and_leave() const noexcept {
-            puts(term_colours::NO_COLOUR);
+            puts(term_colours::RESET);
             fflush(stdout);
         }
     };
