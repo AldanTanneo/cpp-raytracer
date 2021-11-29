@@ -17,14 +17,13 @@ namespace colour {
         double r, g, b;
 
         /* Construct a colour from its hexadecimal representation */
-        explicit constexpr Colour(uint32_t value) noexcept
+        constexpr Colour(uint32_t value) noexcept
             : r(((value >> 16) & 0xff) / 255.0),
               g(((value >> 8) & 0xff) / 255.0), b((value & 0xff) / 255.0) {}
         /* Construct an empty (black) colour */
-        explicit constexpr Colour() noexcept : r(0.0), g(0.0), b(0.0) {}
-        /* Construct a colour from its normalized floating point RGB components
-         */
-        explicit constexpr Colour(double r, double g, double b) noexcept
+        constexpr Colour() noexcept : r(0.0), g(0.0), b(0.0) {}
+        /* Construct a colour from its linear floating point RGB components */
+        constexpr Colour(double r, double g, double b) noexcept
             : r(r), g(g), b(b) {}
 
         /* Construct a colour from its byte RGB components */
@@ -236,10 +235,9 @@ namespace vec3 {
         /* Default Constructor */
         constexpr Vec3() noexcept : x(0), y(0), z(0) {}
         /* Two dimensional constructor */
-        explicit constexpr Vec3(double x, double y) noexcept
-            : x(x), y(y), z(0) {}
+        constexpr Vec3(double x, double y) noexcept : x(x), y(y), z(0) {}
         /* Three dimensional constructor */
-        explicit constexpr Vec3(double x, double y, double z) noexcept
+        constexpr Vec3(double x, double y, double z) noexcept
             : x(x), y(y), z(z) {}
         /* Convert a Vec3 to a Colour */
         explicit constexpr operator Colour() noexcept {
