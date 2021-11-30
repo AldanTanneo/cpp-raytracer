@@ -14,7 +14,7 @@ public:
     constexpr Diffuse(Colour albedo) noexcept : albedo(albedo) {}
 
     virtual bool scatter(const HitRecord & hit_record,
-                         Ray & ray_out,
+                         Ray & ray,
                          Colour & ray_colour) const noexcept override;
 };
 
