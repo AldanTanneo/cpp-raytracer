@@ -8,6 +8,7 @@
 /* Diffuse material: randomly scatters around the surface normal */
 class Diffuse : public Material {
 private:
+    /* The colour of the diffuse material */
     Colour albedo;
 
 public:
