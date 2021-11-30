@@ -2,6 +2,7 @@
 #define VEC3_HPP
 
 #include <cmath>
+#include <cstdint>
 #include <ostream>
 
 // From src/include
