@@ -32,7 +32,7 @@ const Camera
     cam(Vec3(-0.3, 1, 2), Vec3(0.25, 0.4, -0.5), vec3::Y, 40, aspect_ratio);
 
 /* Define scene materials */
-const Metal grey = Metal(Colour(0xC0C0C0), 0.1);
+const Metal grey = Metal(Colour(0xC0C0C0), 0);
 const Diffuse cyan = Diffuse(Colour(0x0015D7));
 const Diffuse green = Diffuse(0.1 * colour::MAGENTA + 0.6 * colour::GREEN);
 
@@ -67,8 +67,8 @@ int main(int argc, char * argv[]) {
         const size_t j = height - 1 - (index / width);
         double u, v;
         for (int k = 0; k < spp; ++k) {
-            u = (static_cast<double>(i) + rng::gen()) * width_scale;
-            v = (static_cast<double>(j) + rng::gen()) * height_scale;
+            u = (static_cast<double>(i) + rng::gen(-0.1, 1.1)) * width_scale;
+            v = (static_cast<double>(j) + rng::gen(-0.1, 1.1)) * height_scale;
             c += cam.cast_ray(world, colour::WHITE, max_bounces, u, v);
         }
         img[index] = c * colour_scale;
