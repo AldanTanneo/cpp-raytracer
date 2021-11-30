@@ -1,6 +1,8 @@
 #ifndef SPHERE_HPP
 #define SPHERE_HPP
 
+#include <type_traits>
+
 // From src/include
 #include <hittable.hpp>
 #include <utils/vec3.hpp>

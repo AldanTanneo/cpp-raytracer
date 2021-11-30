@@ -11,7 +11,6 @@
 
 /* PPM images */
 namespace image {
-    using colour::Colour;
 
     // Class for writing and reading PPM images. See the PPM specification at
     // http://netpbm.sourceforge.net/doc/ppm.html
