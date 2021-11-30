@@ -9,7 +9,9 @@
 fuzziness component */
 class Metal : public Material {
 private:
+    /* The metallic colour */
     Colour albedo;
+    /* Fuzziness parameter: distorts the reflection */
     double fuzziness;
 
 public:
