@@ -9,6 +9,22 @@
 // From src/include
 #include <utils/vec3.hpp>
 
+namespace kernels {
+    /* Identity kernel */
+    constexpr double identity[9] = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+    /* Uniform blur kernel */
+    constexpr double box_blur[9] = {1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+                                    1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+                                    1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0};
+    /* Gaussian blur kernel */
+    constexpr double gaussian_blur[9] = {0.0625, 0.125,  0.0625, 0.125, 0.25,
+                                         0.125,  0.0625, 0.125,  0.0625};
+    /* Sharpening kernel */
+    constexpr double sharpen[9] = {0, -1, 0, -1, 5, -1, 0, -1, 0};
+    /* Embossing kernel */
+    constexpr double emboss[9] = {-2, -1, 0, -1, 1, 1, 0, 1, 2};
+} // namespace kernels
+
 /* PPM images */
 namespace image {
 
@@ -214,6 +230,119 @@ namespace image {
         inline bool operator!=(const Image & other) const noexcept {
             return !(*this == other);
         }
+
+        /* Apply a 3x3 kernel filter to the given image */
+        template <const double kernel[9]>
+        Image filter() const {
+            if (data.size() != width * height) {
+                throw "Could not apply filter to incomplete image";
+            }
+
+            if (width < 2 || height < 2) {
+                throw "Cannot apply filter: insufficient image size";
+            }
+
+            Image new_image = black(width, height);
+
+            /* Top left corner */
+            new_image[0] =
+                (kernel[0] + kernel[1] + kernel[3] + kernel[4]) * data[0]
+                + (kernel[2] + kernel[5]) * data[1]
+                + (kernel[6] + kernel[7]) * data[width]
+                + kernel[8] * data[width + 1];
+            /* Top right corner */
+            new_image[width - 1] =
+                (kernel[0] + kernel[3]) * data[width - 2]
+                + (kernel[1] + kernel[2] + kernel[4] + kernel[5])
+                      * data[width - 1]
+                + kernel[6] * data[2 * width - 2]
+                + (kernel[7] + kernel[8]) * data[2 * width - 1];
+            /* Bottom left corner */
+            new_image[(height - 1) * width] =
+                (kernel[0] + kernel[1]) * data[(height - 2) * width]
+                + kernel[2] * data[(height - 2) * width + 1]
+                + (kernel[3] + kernel[4] + kernel[6] + kernel[7])
+                      * data[(height - 1) * width]
+                + (kernel[5] + kernel[8]) * data[(height - 1) * width + 1];
+            /* Bottom right corner */
+            new_image[height * width - 1] =
+                kernel[0] * data[(height - 1) * width - 2]
+                + (kernel[1] + kernel[2]) * data[(height - 1) * width - 1]
+                + (kernel[3] + kernel[6]) * data[height * width - 2]
+                + (kernel[4] + kernel[5] + kernel[7] + kernel[8])
+                      * data[height * width - 1];
+
+            for (size_t i = 1; i < width - 1; ++i) {
+                /* Top row */
+                new_image[i] = (kernel[0] + kernel[3]) * data[i - 1]
+                               + (kernel[1] + kernel[4]) * data[i]
+                               + (kernel[2] + kernel[5]) * data[i + 1]
+                               + kernel[6] * data[width + i - 1]
+                               + kernel[7] * data[width + i]
+                               + kernel[8] * data[width + i + 1];
+                /* Bottom row */
+                new_image[(height - 1) * width + i] =
+                    kernel[0] * data[(height - 2) * width + i - 1]
+                    + kernel[1] * data[(height - 2) * width + i]
+                    + kernel[2] * data[(height - 2) * width + i + 1]
+                    + (kernel[3] + kernel[6])
+                          * data[(height - 1) * width + i - 1]
+                    + (kernel[4] + kernel[7]) * data[(height - 1) * width + i]
+                    + (kernel[5] + kernel[8])
+                          * data[(height - 1) * width + i + 1];
+            }
+
+            for (size_t j = 1; j < height - 1; ++j) {
+                /* Left column */
+                new_image[j * width] =
+                    (kernel[0] + kernel[1]) * data[(j - 1) * width]
+                    + kernel[2] * data[(j - 1) * width + 1]
+                    + (kernel[3] + kernel[4]) * data[j * width]
+                    + kernel[5] * data[j * width + 1]
+                    + (kernel[6] + kernel[7]) * data[(j + 1) * width]
+                    + kernel[8] * data[(j + 1) * width + 1];
+                /* Right column */
+                new_image[(j + 1) * width - 1] =
+                    kernel[0] * data[j * width - 2]
+                    + (kernel[1] + kernel[2]) * data[j * width - 1]
+                    + kernel[3] * data[(j + 1) * width - 2]
+                    + (kernel[4] + kernel[5]) * data[(j + 1) * width - 1]
+                    + kernel[6] * data[(j + 2) * width - 2]
+                    + (kernel[7] + kernel[8]) * data[(j + 2) * width - 1];
+            }
+
+            /* Rest of the pixels */
+            for (size_t i = 1; i < width - 1; ++i) {
+                for (size_t j = 1; j < height - 1; ++j) {
+                    new_image[j * width + i] =
+                        kernel[0] * data[(j - 1) * width + i - 1]
+                        + kernel[1] * data[(j - 1) * width + i]
+                        + kernel[2] * data[(j - 1) * width + i + 1]
+                        + kernel[3] * data[j * width + i - 1]
+                        + kernel[4] * data[j * width + i]
+                        + kernel[5] * data[j * width + i + 1]
+                        + kernel[6] * data[(j + 1) * width + i - 1]
+                        + kernel[7] * data[(j + 1) * width + i]
+                        + kernel[8] * data[(j + 1) * width + i + 1];
+                }
+            }
+
+            return new_image;
+        }
+
+        /* Apply the box blur kernel filter in place */
+        inline void box_blur() { *this = filter<kernels::box_blur>(); }
+
+        /* Apply the gaussian blur kernel filter in place */
+        inline void gaussian_blur() {
+            *this = filter<kernels::gaussian_blur>();
+        }
+
+        /* Apply the sharpen kernel filter in place */
+        inline void sharpen() { *this = filter<kernels::sharpen>(); }
+
+        /* Apply the emboss kernel filter in place */
+        inline void emboss() { *this = filter<kernels::emboss>(); }
     };
 } // namespace image
 
