@@ -14,13 +14,18 @@ class HitRecord; // Forward declaration of HitRecord
 /* Abstract interface of a material */
 class Material {
 public:
+    enum ScatterType {
+        None = 0,
+        Bounce = 1,
+        Emit = 2,
+    };
     /* Define how a ray should interact with the material.
     The "ray" object is modified, as well as the "ray_colour" object.
     If no ray is emitted after hitting the material, this function returns
     false */
-    virtual bool scatter(const HitRecord & hit_record,
-                         Ray & ray,
-                         Colour & ray_colour) const noexcept = 0;
+    virtual ScatterType scatter(const HitRecord & hit_record,
+                                Ray & ray,
+                                Colour & ray_colour) const noexcept = 0;
 
     /* Virtual destructor */
     virtual ~Material() noexcept = default;
@@ -37,9 +42,9 @@ private:
     constexpr _DummyMaterial() noexcept {}
 
     /* Never scatter */
-    virtual bool
+    virtual ScatterType
     scatter(const HitRecord &, Ray &, Colour &) const noexcept override {
-        return false;
+        return None;
     }
 };
 
@@ -70,7 +75,8 @@ public:
     }
 
     /* Scatter the ray according to the hit material */
-    inline bool scatter(Ray & ray, Colour & ray_colour) const noexcept {
+    inline Material::ScatterType scatter(Ray & ray,
+                                         Colour & ray_colour) const noexcept {
         return material.get().scatter(*this, ray, ray_colour);
     }
 };

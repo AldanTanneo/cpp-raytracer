@@ -70,15 +70,22 @@ public:
                            double u,
                            double v) const noexcept {
         Ray r = get_ray(u, v);
-        Colour ray_colour = background_colour;
+        Colour ray_colour = colour::WHITE;
         HitRecord record;
+        Material::ScatterType scatter;
         for (uint32_t iter = 0; iter < max_bounces; ++iter) {
-            if (!world.hit(r, utils::EPSILON, utils::INF, record)
-                || !record.scatter(r, ray_colour)) {
+            if (!world.hit(r, utils::EPSILON, utils::INF, record)) {
+                ray_colour *= background_colour;
+                break;
+            }
+            scatter = record.scatter(r, ray_colour);
+            if (scatter != Material::ScatterType::Bounce) {
                 break;
             }
         }
-        return ray_colour;
+        return (scatter == Material::ScatterType::Bounce)
+                   ? ray_colour * background_colour
+                   : ray_colour;
     }
 };
 

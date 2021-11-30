@@ -15,12 +15,14 @@ private:
     double fuzziness;
 
 public:
+    /* Construct a new metal material */
     constexpr Metal(Colour albedo, double fuzziness = 0.0) noexcept
         : albedo(albedo), fuzziness(fuzziness) {}
 
-    virtual bool scatter(const HitRecord & hit_record,
-                         Ray & ray,
-                         Colour & ray_colour) const noexcept override;
+    /* Virtual function override */
+    virtual ScatterType scatter(const HitRecord & hit_record,
+                                Ray & ray,
+                                Colour & ray_colour) const noexcept override;
 };
 
 #endif

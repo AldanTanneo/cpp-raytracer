@@ -12,11 +12,13 @@ private:
     Colour albedo;
 
 public:
+    /* Construct a new diffuse material */
     constexpr Diffuse(Colour albedo) noexcept : albedo(albedo) {}
 
-    virtual bool scatter(const HitRecord & hit_record,
-                         Ray & ray,
-                         Colour & ray_colour) const noexcept override;
+    /* Virtual function override */
+    virtual ScatterType scatter(const HitRecord & hit_record,
+                                Ray & ray,
+                                Colour & ray_colour) const noexcept override;
 };
 
 #endif

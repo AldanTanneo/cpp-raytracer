@@ -141,6 +141,14 @@ namespace utils {
         return sample * sample;
     }
 
+    /* Compute reflectance according to Schlick's approximation */
+    inline double reflectance(double cos_theta,
+                              double refraction_ratio) noexcept {
+        double r0 = (1.0 - refraction_ratio) / (1.0 + refraction_ratio);
+        r0 = r0 * r0;
+        return r0 + (1.0 - r0) * pow(1.0 - cos_theta, 5);
+    }
+
     /* Progress bar class */
     class ProgressBar {
     private:
