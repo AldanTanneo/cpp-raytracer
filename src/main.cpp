@@ -19,31 +19,31 @@
 #include <utils/image.hpp>
 
 constexpr AspectRatio aspect_ratio(16, 9);
-constexpr size_t height = 1080;
+constexpr size_t height = 720;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 
-constexpr int spp = 100;
+constexpr int spp = 200;
 constexpr double colour_scale = 1.0 / double(spp);
 constexpr int max_bounces = 25;
+
+const Camera
+    cam(Vec3(-0.3, 1, 2), Vec3(0.25, 0.4, -0.5), vec3::Y, 40, aspect_ratio);
+
+/* Define scene materials */
+const Metal grey = Metal(Colour(0xC0C0C0), 0.1);
+const Diffuse cyan = Diffuse(Colour(0x0015D7));
+const Diffuse green = Diffuse(0.1 * colour::MAGENTA + 0.6 * colour::GREEN);
+
+/* Define scene objects */
+const Sphere ball(Vec3(0, 0.5, -1.0), 0.5, grey);
+const Sphere ball2(Vec3(0.5, 0.3, 0), 0.3, cyan);
+const Sphere ground(Vec3(0, -2000, 0), 2000, green);
 
 int main(int argc, char * argv[]) {
     /* Initialize the RNG */
     rng::seed(time(0));
-
-    const Camera cam(Vec3(-0.3, 1, 2), Vec3(0, 0.5, -1.0), vec3::Y, 60,
-                     aspect_ratio);
-
-    /* Define scene materials */
-    const Metal grey = Metal(Colour(0xC0C0C0), 0.1);
-    const Metal gold = Metal(Colour(0xFFD700));
-    const Diffuse green = Diffuse(0.1 * colour::MAGENTA + 0.6 * colour::GREEN);
-
-    /* Define scene objects */
-    const Sphere ball(Vec3(0, 0.5, -1.0), 0.5, grey);
-    const Sphere ball2(Vec3(0.5, 0.3, 0), 0.3, gold);
-    const Sphere ground(Vec3(0, -2000, 0), 2000, green);
 
     /* Create world and add objects to it */
     HittableList world;
