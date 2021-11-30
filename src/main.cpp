@@ -13,6 +13,7 @@
 // From src/include
 #include <camera.hpp>
 #include <main.hpp>
+#include <materials/dielectric.hpp>
 #include <materials/diffuse.hpp>
 #include <materials/metal.hpp>
 #include <objects/sphere.hpp>
@@ -32,13 +33,13 @@ const Camera
     cam(Vec3(-0.3, 1, 2), Vec3(0.25, 0.4, -0.5), vec3::Y, 40, aspect_ratio);
 
 /* Define scene materials */
-const Metal grey = Metal(Colour(0xC0C0C0), 0.1);
+const Dielectric grey = Dielectric(Colour(0xffffff), 1.9);
 const Diffuse cyan = Diffuse(Colour(0x0015D7));
 const Diffuse green = Diffuse(0.1 * colour::MAGENTA + 0.6 * colour::GREEN);
 
 /* Define scene objects */
 const Sphere ball(Vec3(0, 0.5, -1.0), 0.5, grey);
-const Sphere ball2(Vec3(0.5, 0.3, 0), 0.3, cyan);
+const Sphere ball2(Vec3(-0.5, 0.5, -2.0), 0.3, cyan);
 const Sphere ground(Vec3(0, -2000, 0), 2000, green);
 
 int main(int argc, char * argv[]) {
