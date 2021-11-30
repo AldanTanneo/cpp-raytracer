@@ -102,10 +102,34 @@ namespace utils {
     /* Geometric PI constant */
     constexpr double PI = 3.14159265358979323846264338327950288;
 
+    /* Convert a value in degrees to radians */
     template <class T>
     constexpr std::enable_if_t<std::is_floating_point_v<T>, T>
     to_radians(T value) noexcept {
         return value * static_cast<T>(PI) / 180.0;
+    }
+
+    /* Compute the absolute value of a number */
+    template <class T>
+    constexpr T abs(const T value) {
+        if (value < 0) {
+            return -value;
+        }
+        return value;
+    }
+
+    /* Compute a square root at compile time. Very inefficient. */
+    template <class T>
+    consteval std::enable_if_t<std::is_floating_point_v<T>, T>
+    const_sqrt(const T value) {
+        if (value < 0) {
+            throw "Cannot compute the square root of a negative number";
+        }
+        T x = value;
+        while (abs((x * x) / value - 1) > utils::EPSILON) {
+            x = (x + value / x) / 2;
+        }
+        return x;
     }
 
     /* Clamps a floating point value to the [0.0, 1.0] range */
