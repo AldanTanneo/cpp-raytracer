@@ -22,40 +22,37 @@
 #include <utils/image.hpp>
 
 constexpr AspectRatio aspect_ratio(16, 9);
-constexpr size_t height = 720;
+constexpr size_t height = 1080;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 
-constexpr int spp = 500;
+constexpr int spp = 200;
 constexpr double colour_scale = 1.0 / double(spp);
 constexpr int max_bounces = 25;
 
-/* Constants to have a kernel weight of (1/3) * extern + (2/3) * intern */
-constexpr double kernel_offset = 0.112372435695794; // = (sqrt(6) - 2) / 4
-constexpr double kernel_weight = 0.5;
-constexpr double kernel_min = 0.0 - kernel_offset;
-constexpr double kernel_max = 1.0 + kernel_offset;
+/* In-processing kernel parameters */
+constexpr double processing_kernel_weight = 2;
+constexpr double processing_kernel_offset =
+    (utils::const_sqrt(1 + processing_kernel_weight) - 1) / 2;
+constexpr double processing_kernel_min = 0.0 - processing_kernel_offset;
+constexpr double processing_kernel_max = 1.0 + processing_kernel_offset;
 
 const Camera
     cam(Vec3(-0.3, 1, 2), Vec3(-0.25, 0.5, -1.5), vec3::Y, 30, aspect_ratio);
 
 /* Define scene materials */
-const Plastic glass = Plastic(Colour(0x0015D7), 1.5);
-const Emissive blue = Emissive(colour::WHITE);
-const Plastic green = Plastic(0.1 * colour::MAGENTA + 0.9 * colour::GREEN);
+const Plastic blue = Plastic(Colour(0x0015D7), 1.5);
+const BlackBody light = BlackBody(colour::CYAN + 0.05 * colour::MAGENTA, 3.0);
+const Plastic ground_material = Plastic(colour::WHITE);
 
 /* Define scene objects */
-const Sphere ball(Vec3(0, 0.5, -1.0), 0.25, blue);
-const Sphere ball2(Vec3(-0.5, 0.5, -2.0), 0.5, glass);
-const Sphere ground(Vec3(0, -100, 0), 100, green);
+const Sphere ball(Vec3(0, 0.5, -1.0), 0.25, light);
+const Sphere ball2(Vec3(-0.5, 0.5, -2.0), 0.5, blue);
+const Sphere ground(Vec3(0, -100, 0), 100, ground_material);
 
 int main(int argc, char * argv[]) {
-    if (double w = 4.0 * (1.0 + kernel_offset) * kernel_offset;
-        fabs(w - kernel_weight) > utils::EPSILON) {
-        DEBUG(w, "ERROR: wrong kernel offset");
-    }
-
+    DEBUG(processing_kernel_offset);
     /* Initialize the RNG */
     rng::seed(time(0));
 
@@ -81,17 +78,25 @@ int main(int argc, char * argv[]) {
         const size_t j = height - 1 - (index / width);
         double u, v;
         for (int k = 0; k < spp; ++k) {
-            u = (static_cast<double>(i) + rng::gen(kernel_min, kernel_max))
+            u = (static_cast<double>(i)
+                 + rng::gen(processing_kernel_min, processing_kernel_max))
                 * width_scale;
-            v = (static_cast<double>(j) + rng::gen(kernel_min, kernel_max))
+            v = (static_cast<double>(j)
+                 + rng::gen(processing_kernel_min, processing_kernel_max))
                 * height_scale;
             c += cam.cast_ray(world, 0.1 * colour::WHITE, max_bounces, u, v);
         }
-        img[index] = c * colour_scale;
+        img[index] += c * colour_scale;
         pb.advance();
     }
 
     pb.stop("Image rendered");
+
+    std::cout << "Applying blur filter..." << std::endl;
+
+    img.gaussian_blur();
+
+    std::cout << "Saving image..." << std::endl;
 
     img.save("image.ppm");
 
