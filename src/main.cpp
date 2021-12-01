@@ -9,6 +9,7 @@
 #include <memory>
 // Parallelization lib
 #include <omp.h>
+#include <thread>
 
 // From src/include
 #include <camera.hpp>
@@ -20,16 +21,17 @@
 #include <materials/plastic.hpp>
 #include <objects/sphere.hpp>
 #include <utils/image.hpp>
+#include <utils/progress_bar.hpp>
 
 constexpr AspectRatio aspect_ratio(16, 9);
-constexpr size_t height = 1080;
+constexpr size_t height = 720;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 
 constexpr int spp = 200;
 constexpr double colour_scale = 1.0 / double(spp);
-constexpr int max_bounces = 25;
+constexpr int max_bounces = 10;
 
 /* In-processing kernel parameters */
 constexpr double processing_kernel_weight = 2;
@@ -65,8 +67,8 @@ int main(int argc, char * argv[]) {
     /* Create a black image to fill with pixels */
     image::Image img = image::Image::black(width, height);
 
-    utils::ProgressBar pb(width * height);
-    std::cout << term_colours::ITALIC << "Rendering image..." << std::endl;
+    ProgressBar pb(width * height);
+    std::cout << "Rendering image..." << std::endl;
 
     pb.start(term_colours::CYAN);
 
