@@ -30,7 +30,7 @@ bool Cylinder::hit(const Ray & ray,
         time = (-b - sqrt_delta) / a;
         lambda = origin_minus_base_dot_axis + time * direction_dot_axis;
 
-        if (lambda < 0 || height < lambda || time <= tmin) {
+        if (lambda < 0 || height < lambda || time < tmin) {
             time = (-b + sqrt_delta) / a;
             // Store the old lambda value, for disk checks
             old_lambda = lambda;
@@ -39,22 +39,22 @@ bool Cylinder::hit(const Ray & ray,
     }
 
     Vec3 outward_normal = (ray.at(time) - (base + lambda * axis)) / radius;
-    // If the hit is inside the cylinder but the first possible hit was above or
-    // below it, a disk was hit
+
+    // If lambda is in the cylinder but old_lambda is not, a disk was hit
     if (lambda <= height && old_lambda > height) {
         // Upper disk
         const double t0 =
             (height - origin_minus_base_dot_axis) / direction_dot_axis;
-        if (tmin < t0) {
+        if (t0 > tmin) {
             time = t0;
             outward_normal = axis;
             lambda = height;
         }
     }
-    if (0 <= lambda && old_lambda < 0) {
+    if (lambda >= 0 && old_lambda < 0) {
         // Lower disk
         const double t0 = -origin_minus_base_dot_axis / direction_dot_axis;
-        if (tmin < t0) {
+        if (t0 > tmin) {
             time = t0;
             outward_normal = -axis;
             lambda = 0;
