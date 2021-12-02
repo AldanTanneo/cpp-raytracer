@@ -36,11 +36,40 @@ public:
     constexpr long double value() const noexcept { return aspect_ratio; }
 };
 
+/* Light type */
+enum LightType {
+    /* Ambient lights: illuminate from everywhere at once */
+    Ambient = 0,
+    /* Infinite lights: illuminate from a fixed direction in space */
+    Infinite = 1,
+    /* Point lights: illuminate from a fixed point in space */
+    Point = 2
+};
+
+/* Global light */
+struct GlobalIllumination {
+    /* The global light type */
+    const LightType type;
+    /* For point lights, the position of the light; for infinite lights, the
+    direction of the light */
+    const Point3 position;
+    /* The colour of the light */
+    const Colour colour;
+
+    /* Construct a global light instance */
+    constexpr GlobalIllumination(const Colour colour,
+                                 const LightType type = LightType::Ambient,
+                                 const Point3 position = point3::ZEROS)
+        : type(type),
+          position(type == Infinite ? position.unit_vector() : position),
+          colour(colour) {}
+};
+
 /* Main camera class */
 class Camera {
 private:
     /* Origin point */
-    Point3 origin;
+    const Point3 origin;
     /* Vector from the origin to the bottom left corner of the screen */
     Vec3 origin_to_bottom_left_corner;
     /* Vertical vector of the screen space */
@@ -64,29 +93,11 @@ public:
 
     /* Cast a ray into the world with the given parameters
     and at the given screen space coordinates */
-    inline Colour cast_ray(const Hittable & world,
-                           const Colour & background_colour,
-                           const uint32_t max_bounces,
-                           double u,
-                           double v) const noexcept {
-        Ray r = get_ray(u, v);
-        Colour ray_colour = colour::WHITE;
-        HitRecord record;
-        Material::ScatterType scatter;
-        for (uint32_t iter = 0; iter < max_bounces; ++iter) {
-            if (!world.hit(r, utils::EPSILON, utils::INF, record)) {
-                ray_colour *= background_colour;
-                break;
-            }
-            scatter = record.scatter(r, ray_colour);
-            if (scatter != Material::ScatterType::Bounce) {
-                break;
-            }
-        }
-        return (scatter == Material::ScatterType::Bounce)
-                   ? ray_colour * background_colour
-                   : ray_colour;
-    }
+    Colour cast_ray(const Hittable & world,
+                    const std::vector<GlobalIllumination> & lights,
+                    const uint32_t max_bounces,
+                    double u,
+                    double v) const noexcept;
 };
 
 #endif
