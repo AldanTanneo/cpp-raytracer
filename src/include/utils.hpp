@@ -56,14 +56,13 @@ namespace term_colours {
     constexpr char const * DEFAULT_BACKGROUND = "\x1B[49m";
 } // namespace term_colours
 
-#define _DBG_COUT_IDENT                                                        \
-    "[" __FILE__ ":" << __FUNCTION__ << ":" << __LINE__ << "] "
-
 #define STRINGIFY(args) #args
 
-#ifdef _DISABLE_DEBUGGING
+#ifdef DISABLE_DEBUGGING
     #define DEBUG(...) ;
 #else
+    #define _DBG_COUT_IDENT                                                    \
+        "[" __FILE__ ":" << __FUNCTION__ << ":" << __LINE__ << "] "
     /* Debugging macro */
     #define DEBUG(args, ...)                                                   \
         __VA_OPT__(std::cout                                                   \
@@ -74,6 +73,8 @@ namespace term_colours {
                   << _DBG_COUT_IDENT << term_colours::DEFAULT_FOREGROUND       \
                   << term_colours::NO_BOLD << (#args) << " = " << (args)       \
                   << std::endl;
+
+    #undef _DBG_COUT_IDENT
 #endif
 
 namespace utils {
@@ -96,7 +97,7 @@ namespace utils {
      * point and integer color. */
     constexpr double MAX_COLOUR = 255.999999;
     /* Common epsilon for floating point uses */
-    constexpr double EPSILON = 1e-9;
+    constexpr double EPSILON = 1e-5;
     /* Infinity */
     constexpr double INF = std::numeric_limits<double>::infinity();
     /* Geometric PI constant */
