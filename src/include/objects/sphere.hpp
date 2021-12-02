@@ -7,6 +7,7 @@
 #include <hittable.hpp>
 #include <utils/vec3.hpp>
 
+/* Sphere object */
 class Sphere : public Hittable {
 private:
     /* Centre of the sphere */
@@ -19,11 +20,11 @@ private:
 public:
     /* Construct sphere from its centre, radius and material */
     template <class T>
-    constexpr Sphere(const Point3 & centre,
-                     const double radius,
-                     const T & material,
-                     std::enable_if_t<std::is_convertible_v<T *, Material *>,
-                                      void *> = nullptr) noexcept
+    inline Sphere(const Point3 & centre,
+                  const double radius,
+                  const T & material,
+                  std::enable_if_t<std::is_convertible_v<T *, Material *>,
+                                   void *> = nullptr) noexcept
         : centre(centre), radius(radius), material(material) {}
 
     /* Virtual function override */

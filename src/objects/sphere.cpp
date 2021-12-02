@@ -13,13 +13,13 @@ bool Sphere::hit(const Ray & ray,
     const double c = (ray.origin - centre).squared_norm() - radius * radius;
     const double delta = b * b - a * c;
 
-    double time = tmin;
+    double time = tmin - utils::EPSILON;
 
     if (delta >= 0) { // sphere hit
         const double sqrt_delta = sqrt(delta);
         time = (-b - sqrt_delta) / a;
 
-        if (time < tmin) {
+        if (time <= tmin) {
             time = (-b + sqrt_delta) / a; // smallest positive solution
         }
     }
