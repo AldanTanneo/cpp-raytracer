@@ -11,18 +11,18 @@
 
 namespace kernels {
     /* Identity kernel */
-    constexpr double identity[9] = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+    constexpr double const identity[9] = {0, 0, 0, 0, 1, 0, 0, 0, 0};
     /* Uniform blur kernel */
-    constexpr double box_blur[9] = {1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
-                                    1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
-                                    1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0};
+    constexpr double const box_blur[9] = {1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+                                          1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+                                          1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0};
     /* Gaussian blur kernel */
-    constexpr double gaussian_blur[9] = {0.0625, 0.125,  0.0625, 0.125, 0.25,
-                                         0.125,  0.0625, 0.125,  0.0625};
+    constexpr double const gaussian_blur[9] = {
+        0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625};
     /* Sharpening kernel */
-    constexpr double sharpen[9] = {0, -0.5, 0, -0.5, 3, -0.5, 0, -0.5, 0};
+    constexpr double const sharpen[9] = {0, -0.5, 0, -0.5, 3, -0.5, 0, -0.5, 0};
     /* Embossing kernel */
-    constexpr double emboss[9] = {-2, -1, 0, -1, 1, 1, 0, 1, 2};
+    constexpr double const emboss[9] = {-2, -1, 0, -1, 1, 1, 0, 1, 2};
 } // namespace kernels
 
 /* PPM images */
