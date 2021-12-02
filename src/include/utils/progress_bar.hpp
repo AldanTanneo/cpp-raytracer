@@ -20,14 +20,14 @@ private:
     /* Time point type */
     using time_point = std::chrono::time_point<clock>;
     /* Default bar subdivision */
-    static constexpr size_t default_subdiv = 80;
+    static constexpr double default_subdiv = 80.0;
 
     /* The current position of the progress bar */
     std::atomic<size_t> progress;
-    /* The total size of the progress bar */
-    const size_t size;
-    /* Subdivisions of the progress bar */
-    const size_t subdiv;
+    /* Inverse of the total size of the progress bar */
+    const double size_scale;
+    /* Width of the progress bar */
+    const double width;
     /* The foreground character */
     const char * fchar;
     /* The background character */
@@ -38,25 +38,25 @@ private:
 public:
     /* Construct a default progress bar with 80 subdivisions */
     inline ProgressBar(size_t size) noexcept
-        : size(size), subdiv(default_subdiv), fchar("▓"), bchar("░"),
-          start_time(clock::now()) {
+        : size_scale(1.0 / double(size)), width(default_subdiv), fchar("▓"),
+          bchar("░"), start_time(clock::now()) {
         progress.store(0);
     }
     /* Constructs a progress bar, specify the number of subdivisions. */
-    inline ProgressBar(size_t size, size_t subdiv) noexcept
-        : size(size), subdiv(subdiv), fchar("▓"), bchar("░"),
-          start_time(clock::now()) {
+    inline ProgressBar(size_t size, size_t width) noexcept
+        : size_scale(1.0 / double(size)), width(double(width)), fchar("▓"),
+          bchar("░"), start_time(clock::now()) {
         progress.store(0);
     }
     /* Construct a custom progress bar. Specify the number of subdivisions
     and the drawn characters. The "bchar" and "fchar" strings must have the
     same UTF-8 length */
     inline ProgressBar(size_t size,
-                       size_t subdiv,
+                       size_t width,
                        const char * fchar,
                        const char * bchar)
-        : size(size), subdiv(subdiv), fchar(fchar), bchar(bchar),
-          start_time(clock::now()) {
+        : size_scale(1.0 / double(size)), width(double(width)), fchar(fchar),
+          bchar(bchar), start_time(clock::now()) {
         if (utils::utf8len(fchar) != utils::utf8len(bchar)) {
             throw "Foreground and background characters must have the same "
                   "UTF-8 length";
@@ -73,10 +73,10 @@ public:
     /* Writes the empty progress bar to stdout and returns to line start.
     Does not reset the terminal style. */
     inline void start() const noexcept {
-        for (size_t i = 0; i < subdiv; ++i)
+        for (size_t i = 0; i < width; ++i)
             fputs(bchar, stdout);
         size_t bchar_width = utils::utf8len(bchar);
-        for (size_t i = 0; i < subdiv * bchar_width; ++i)
+        for (size_t i = 0; i < width * bchar_width; ++i)
             fputc('\b', stdout);
         fflush(stdout);
     }
@@ -92,22 +92,21 @@ public:
     inline void advance(size_t n = 1) noexcept {
         const size_t prog = progress.fetch_add(n);
         const int draw =
-            static_cast<int>(subdiv * static_cast<double>(prog + n) / size)
-            - static_cast<int>(subdiv * static_cast<double>(prog) / size);
+            static_cast<int>(width * static_cast<double>(prog + n) * size_scale)
+            - static_cast<int>(width * static_cast<double>(prog) * size_scale);
         if (draw) {
-            flockfile(stdout);
             for (int i = 0; i < draw; ++i)
                 fputs(fchar, stdout);
             fflush(stdout);
-            funlockfile(stdout);
         }
     }
 
     inline void setback(size_t n = 1) noexcept {
         const size_t prog = progress.fetch_sub(n);
         const int draw =
-            static_cast<int>(subdiv * static_cast<double>(prog) / size)
-            - static_cast<int>(subdiv * static_cast<double>(prog - n) / size);
+            static_cast<int>(width * static_cast<double>(prog) * size_scale)
+            - static_cast<int>(width * static_cast<double>(prog - n)
+                               * size_scale);
         if (draw) {
             const size_t bchar_w = utils::utf8len(bchar);
             flockfile(stdout);
