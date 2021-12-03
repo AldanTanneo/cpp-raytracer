@@ -64,7 +64,7 @@ Colour Camera::cast_ray(const Hittable & world,
                     light_coeff =
                         (iter ? fmax(record.surface_normal.dot(light_direction),
                                      0)
-                              : 1)
+                              : light.type != Point)
                         * fmax(ray.direction.unit_vector().dot(light_direction),
                                0);
                 }
