@@ -24,13 +24,16 @@
 #include <utils/image.hpp>
 #include <utils/progress_bar.hpp>
 
+using namespace std;
+using namespace colour;
+
 constexpr AspectRatio aspect_ratio(16, 9);
 constexpr size_t height = 1080;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 
-constexpr int spp = 1000;
+constexpr int spp = 200;
 constexpr double colour_scale = 1.0 / double(spp);
 constexpr int max_bounces = 15;
 
@@ -44,9 +47,9 @@ constexpr double processing_kernel_max = 1.0 + processing_kernel_offset;
 const Camera cam(Vec3(1, 1.4, 3.4), Vec3(0, 0.4, 0), vec3::Y, 30, aspect_ratio);
 
 /* Define scene materials */
-const Dielectric glass = Dielectric(Colour(0.9 * colour::WHITE), 1.2);
-const Diffuse ground_material = Diffuse(0.3 * colour::WHITE);
-const Plastic pen_material = Plastic(0.7 * colour::WHITE, 0.05);
+const Dielectric glass = Dielectric(Colour(0.9 * WHITE), 1.2);
+const Diffuse ground_material = Diffuse(0.3 * WHITE);
+const Diffuse pen_material = Diffuse(0.7 * WHITE);
 
 /* Define scene objects */
 const Sphere ground(Point3(0, -2000, 0), 2000, ground_material);
@@ -54,11 +57,10 @@ const Cylinder cyl(Point3(0, 0, 0), vec3::Y, 0.5, 0.65, glass);
 const Cylinder pen(Point3(0.75, 1, 0), Vec3(-1, -1, 0), 0.05, 3, pen_material);
 const Cylinder test(Point3(-0.7, 0, 0.7), vec3::Y, 0.2, 1, pen_material);
 
-const std::vector<GlobalIllumination> global_light = {
-    GlobalIllumination(
-        Colour(0.8, 0, 0.8), LightType::Infinite, Vec3(-1, -0.05, 1)),
-    GlobalIllumination(2.0 * colour::BLUE, LightType::Point, Vec3(1, 1, 1)),
-    GlobalIllumination(0.05 * colour::WHITE)};
+const vector<GlobalIllumination> global_light = {
+    GlobalIllumination(0.8 * MAGENTA, LightType::Infinite, Vec3(-1, 0.2, 1)),
+    GlobalIllumination(2.0 * BLUE, LightType::Point, Point3(1, 1, -1)),
+};
 
 int main(int argc, char * argv[]) {
     /* Initialize the RNG */
@@ -73,10 +75,10 @@ int main(int argc, char * argv[]) {
     world.add(test);
 
     /* Create a black image to fill with pixels */
-    image::Image img = image::Image::black(width, height);
+    Image img = Image::black(width, height);
 
     ProgressBar pb(width * height);
-    std::cout << "Rendering image..." << std::endl;
+    cout << "Rendering image..." << endl;
 
     pb.start(term_colours::CYAN);
 
@@ -103,15 +105,15 @@ int main(int argc, char * argv[]) {
 
     pb.stop("Image rendered");
 
-    std::cout << "Applying blur filter..." << std::endl;
+    cout << "Applying blur filter..." << endl;
 
-    /*img.gaussian_blur();*/
+    img.gaussian_blur();
 
-    std::cout << "Saving image...";
+    cout << "Saving image...";
 
     img.save("image.ppm");
 
-    std::cout << " Done!" << std::endl;
+    cout << " Done!" << endl;
 
     return EXIT_SUCCESS;
 }
