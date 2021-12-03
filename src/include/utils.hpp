@@ -61,20 +61,18 @@ namespace term_colours {
 #ifdef DISABLE_DEBUGGING
     #define DEBUG(...) ;
 #else
-    #define _DBG_COUT_IDENT                                                    \
-        "[" __FILE__ ":" << __FUNCTION__ << ":" << __LINE__ << "] "
     /* Debugging macro */
     #define DEBUG(args, ...)                                                   \
         __VA_OPT__(std::cout                                                   \
                        << term_colours::CYAN << term_colours::BOLD             \
-                       << _DBG_COUT_IDENT << term_colours::DEFAULT_FOREGROUND  \
+                       << "[" __FILE__ ":" << __FUNCTION__ << ":" << __LINE__  \
+                       << "] " << term_colours::DEFAULT_FOREGROUND             \
                        << __VA_ARGS__ << term_colours::NO_BOLD << std::endl;)  \
         std::cout << term_colours::CYAN << term_colours::BOLD                  \
-                  << _DBG_COUT_IDENT << term_colours::DEFAULT_FOREGROUND       \
+                  << "[" __FILE__ ":" << __FUNCTION__ << ":" << __LINE__       \
+                  << "] " << term_colours::DEFAULT_FOREGROUND                  \
                   << term_colours::NO_BOLD << (#args) << " = " << (args)       \
                   << std::endl;
-
-    #undef _DBG_COUT_IDENT
 #endif
 
 namespace utils {
