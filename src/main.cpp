@@ -21,6 +21,7 @@
 #include <materials/plastic.hpp>
 #include <objects/cylinder.hpp>
 #include <objects/sphere.hpp>
+#include <objects/triangle.hpp>
 #include <utils/image.hpp>
 #include <utils/progress_bar.hpp>
 
@@ -28,12 +29,12 @@ using namespace std;
 using namespace colour;
 
 constexpr AspectRatio aspect_ratio(16, 9);
-constexpr size_t height = 1080;
+constexpr size_t height = 540;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 
-constexpr int spp = 200;
+constexpr int spp = 100;
 constexpr double colour_scale = 1.0 / double(spp);
 constexpr int max_bounces = 15;
 
@@ -57,6 +58,8 @@ const Cylinder cyl(Point3(0, 0, 0), vec3::Y, 0.5, 0.65, glass);
 const Cylinder pen(Point3(0.75, 1, 0), Vec3(-1, -1, 0), 0.05, 3, pen_material);
 const Cylinder test(Point3(-0.7, 0, 0.7), vec3::Y, 0.2, 1, pen_material);
 
+const Triangle tri_test(Point3(0, 0, 0), Point3(0.75, 1, 0), Point3(-0.7, 1, 0.7), pen_material);
+
 const vector<GlobalIllumination> global_light = {
     GlobalIllumination(0.8 * MAGENTA, LightType::Infinite, Vec3(-1, 0.2, 1)),
     GlobalIllumination(2.0 * BLUE, LightType::Point, Point3(1, 1, -1)),
@@ -70,9 +73,11 @@ int main(int argc, char * argv[]) {
     HittableList world;
     // world.add(ball);
     world.add(ground);
-    world.add(cyl);
+    //world.add(cyl);
     world.add(pen);
     world.add(test);
+
+    world.add(tri_test);
 
     /* Create a black image to fill with pixels */
     Image img = Image::black(width, height);
