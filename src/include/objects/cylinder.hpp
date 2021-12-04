@@ -25,13 +25,12 @@ private:
 public:
     /* Construct cylinder from its base, axis, radius and height */
     template <class T>
+    requires Material::is_material<T>
     inline Cylinder(const Point3 & base,
                     const Vec3 axis,
                     const double radius,
                     const double height,
-                    const T & material,
-                    std::enable_if_t<std::is_convertible_v<T *, Material *>,
-                                     void *> = nullptr) noexcept
+                    const T & material) noexcept
         : base(base), axis(axis.unit_vector()), radius(radius), height(height),
           material(material) {}
 

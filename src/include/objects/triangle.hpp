@@ -9,27 +9,30 @@
 
 class Triangle : public Hittable {
 private:
+    /* First vertex of the triangle */
     const Point3 vertex;
+    /* First edge of the triangle */
     const Vec3 edge1;
+    /* Second edge of the triangle */
     const Vec3 edge2;
 
-    /* normal */
+    /* Normal of the triangle */
     const Vec3 normal;
 
     /* Material of the triangle */
     const Material & material;
 
-
 public:
     /* Construct triangle from its three vertices */
     template <class T>
-    constexpr Triangle(const Point3 & point1,
-                     const Point3 & point2,
-                     const Point3 & point3,
-                     const T & material,
-                     std::enable_if_t<std::is_convertible_v<T *, Material *>,
-                                      void *> = nullptr) noexcept
-        : vertex(point1), edge1(point2-point1), edge2(point3-point1), normal((point2-point1).cross(point3-point1).unit_vector()), material(material) {}
+    requires Material::is_material<T>
+    inline Triangle(const Point3 & point1,
+                    const Point3 & point2,
+                    const Point3 & point3,
+                    const T & material) noexcept
+        : vertex(point1), edge1(point2 - point1), edge2(point3 - point1),
+          normal((point2 - point1).cross(point3 - point1).unit_vector()),
+          material(material) {}
 
     /* Virtual function override */
     virtual bool hit(const Ray & ray_in,

@@ -14,6 +14,9 @@ class HitRecord; // Forward declaration of HitRecord
 /* Abstract interface of a material */
 class Material {
 public:
+    template <class T>
+    constexpr static bool is_material = std::is_convertible_v<T *, Material *>;
+
     enum ScatterType {
         None = 0,
         Bounce = 1,

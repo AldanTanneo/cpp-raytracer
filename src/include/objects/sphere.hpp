@@ -20,11 +20,10 @@ private:
 public:
     /* Construct sphere from its centre, radius and material */
     template <class T>
+    requires Material::is_material<T>
     inline Sphere(const Point3 & centre,
                   const double radius,
-                  const T & material,
-                  std::enable_if_t<std::is_convertible_v<T *, Material *>,
-                                   void *> = nullptr) noexcept
+                  const T & material) noexcept
         : centre(centre), radius(radius), material(material) {}
 
     /* Virtual function override */
