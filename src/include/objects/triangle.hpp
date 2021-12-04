@@ -7,23 +7,25 @@
 #include <hittable.hpp>
 #include <utils/vec3.hpp>
 
+// Triangle class
 class Triangle : public Hittable {
 private:
-    /* First vertex of the triangle */
+    // First vertex of the triangle
     const Point3 vertex;
-    /* First edge of the triangle */
+    // First edge of the triangle
     const Vec3 edge1;
-    /* Second edge of the triangle */
+    // Second edge of the triangle
     const Vec3 edge2;
 
-    /* Normal of the triangle */
+    // Normal of the triangle
     const Vec3 normal;
 
-    /* Material of the triangle */
+    // Material of the triangle
     const Material & material;
 
 public:
-    /* Construct triangle from its three vertices */
+    // Construct a triangle from its three vertices.
+    // The order of the vertices defines the orientation of the triangle.
     template <class T>
     requires Material::is_material<T>
     inline Triangle(const Point3 & point1,
@@ -34,7 +36,7 @@ public:
           normal((point2 - point1).cross(point3 - point1).unit_vector()),
           material(material) {}
 
-    /* Virtual function override */
+    // Virtual function override
     virtual bool hit(const Ray & ray_in,
                      double tmin,
                      double tmax,

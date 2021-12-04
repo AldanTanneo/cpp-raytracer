@@ -12,7 +12,7 @@
 namespace term_colours {
     constexpr char const * RESET = "\x1B[0m";
 
-    /* Font styles */
+    // Font styles
     constexpr char const * BOLD = "\x1B[1m";
     constexpr char const * DIM = "\x1B[2m";
     constexpr char const * ITALIC = "\x1B[3m";
@@ -23,7 +23,7 @@ namespace term_colours {
     constexpr char const * STRIKETHROUGH = "\x1B[9m";
     constexpr char const * DOUBLE_UNDERLINE = "\x1B[21m";
 
-    /* Font styles reset */
+    // Font styles reset
     constexpr char const * NO_BOLD = "\x1B[22m";
     constexpr char const * NO_DIM = "\x1B[22m";
     constexpr char const * NO_ITALIC = "\x1B[23m";
@@ -33,7 +33,7 @@ namespace term_colours {
     constexpr char const * NO_HIDDEN = "\x1B[28m";
     constexpr char const * NO_STRIKETHROUGH = "\x1B[29m";
 
-    /* Foreground colours */
+    // Foreground colours
     constexpr char const * BLACK = "\x1B[30m";
     constexpr char const * RED = "\x1B[31m";
     constexpr char const * GREEN = "\x1B[32m";
@@ -44,7 +44,7 @@ namespace term_colours {
     constexpr char const * WHITE = "\x1B[37";
     constexpr char const * DEFAULT_FOREGROUND = "\x1B[39m";
 
-    /* Background colours */
+    // Background colours
     constexpr char const * BLACK_BACKGROUND = "\x1B[40m";
     constexpr char const * RED_BACKGROUND = "\x1B[41m";
     constexpr char const * GREEN_BACKGROUND = "\x1B[42m";
@@ -61,7 +61,7 @@ namespace term_colours {
 #ifdef DISABLE_DEBUGGING
     #define DEBUG(...) ;
 #else
-    /* Debugging macro */
+  // Debugging macro
     #define DEBUG(args, ...)                                                   \
         __VA_OPT__(std::cout                                                   \
                        << term_colours::CYAN << term_colours::BOLD             \
@@ -76,13 +76,13 @@ namespace term_colours {
 #endif
 
 namespace utils {
-    /* Outputs a newline */
+    // Outputs a newline
     inline void newline() {
         fputc('\n', stdout);
         fflush(stdout);
     }
 
-    /* Returns the number of utf8 code points in the buffer at s */
+    // Returns the number of utf8 code points in the buffer at s
     constexpr size_t utf8len(const char * s) {
         size_t len = 0;
         for (; *s; ++s)
@@ -91,24 +91,24 @@ namespace utils {
         return len;
     }
 
-    /* Maximum floating point color value. Used for conversion between floating
-     * point and integer color. */
+    // Maximum floating point color value. Used for conversion between floating
+    // point and integer color.
     constexpr double MAX_COLOUR = 255.999999;
-    /* Common epsilon for floating point uses */
+    // Common epsilon for floating point uses
     constexpr double EPSILON = 1e-5;
-    /* Infinity */
+    // Infinity
     constexpr double INF = std::numeric_limits<double>::infinity();
-    /* Geometric PI constant */
+    // Geometric PI constant
     constexpr double PI = 3.14159265358979323846264338327950288;
 
-    /* Convert a value in degrees to radians */
+    // Convert a value in degrees to radians
     template <class T>
     requires std::is_floating_point_v<T>
     constexpr T to_radians(T value) noexcept {
         return value * static_cast<T>(PI) / 180.0;
     }
 
-    /* Compute the absolute value of a number */
+    // Compute the absolute value of a number
     template <class T>
     constexpr T abs(const T value) {
         if (value < 0) {
@@ -117,7 +117,7 @@ namespace utils {
         return value;
     }
 
-    /* Compute a square root at compile time. Very inefficient. */
+    // Compute a square root at compile time. Very inefficient.
     template <class T>
     requires std::is_floating_point_v<T>
     consteval T const_sqrt(const T value) {
@@ -131,7 +131,7 @@ namespace utils {
         return x;
     }
 
-    /* Clamps a floating point value to the [0.0, 1.0] range */
+    // Clamps a floating point value to the [0.0, 1.0] range
     template <class T>
     requires std::is_floating_point_v<T>
     constexpr T clamp(const T value) noexcept {
@@ -142,7 +142,7 @@ namespace utils {
         return value;
     }
 
-    /* Clamps an ordered value to the [min, max] range. */
+    // Clamps an ordered value to the [min, max] range.
     template <class T>
     constexpr T clamp(const T value, const T min, const T max) noexcept {
         if (value < min) {
@@ -154,17 +154,17 @@ namespace utils {
         return value;
     }
 
-    /* Gamma corrects the colour sample for writing to a file */
+    // Gamma corrects the colour sample for writing to a file
     inline double gamma_correction(double sample) noexcept {
         return sqrt(clamp(sample));
     }
 
-    /* Reverse gamma correction for reading an external colour */
+    // Reverse gamma correction for reading an external colour
     constexpr double reverse_gamma_correction(double sample) noexcept {
         return sample * sample;
     }
 
-    /* Compute reflectance according to Schlick's approximation */
+    // Compute reflectance according to Schlick's approximation
     inline double reflectance(double cos_theta,
                               double refraction_ratio) noexcept {
         double r0 = (1.0 - refraction_ratio) / (1.0 + refraction_ratio);

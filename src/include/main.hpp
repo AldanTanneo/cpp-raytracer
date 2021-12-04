@@ -8,7 +8,7 @@
 #include <utils.hpp>
 
 #ifndef _NO_ERROR_HANDLER_MACRO
-    /* Error handling macro that wraps main() */
+    // Error handling macro that wraps main()
     #define main(...)                                                          \
         _main(int _argc, char * _argv[]);                                      \
         int main(int _argc, char * _argv[]) {                                  \

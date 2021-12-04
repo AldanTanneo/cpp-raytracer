@@ -7,18 +7,18 @@
 #include <hittable.hpp>
 #include <utils/vec3.hpp>
 
-/* Sphere object */
+// Sphere object
 class Sphere : public Hittable {
 private:
-    /* Centre of the sphere */
+    // Centre of the sphere
     const Point3 centre;
-    /* Radius of the sphere */
+    // Radius of the sphere
     const double radius;
-    /* Material of the sphere */
+    // Material of the sphere
     const Material & material;
 
 public:
-    /* Construct sphere from its centre, radius and material */
+    // Construct sphere from its centre, radius and material
     template <class T>
     requires Material::is_material<T>
     inline Sphere(const Point3 & centre,
@@ -26,7 +26,7 @@ public:
                   const T & material) noexcept
         : centre(centre), radius(radius), material(material) {}
 
-    /* Virtual function override */
+    // Virtual function override
     virtual bool hit(const Ray & ray_in,
                      double tmin,
                      double tmax,
