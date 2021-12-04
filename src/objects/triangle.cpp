@@ -29,7 +29,7 @@ bool Triangle::hit(const Ray & ray,
         ray.direction.cross(origin_to_vertex);
 
     const double lambda = scale * direction_cross_origin_to_vertex.dot(edge1);
-    if (lambda < 0.0) {
+    if (lambda < 0.0 || lambda > 1.0) {
         return false;
     }
 
