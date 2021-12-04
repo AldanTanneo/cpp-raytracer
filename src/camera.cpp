@@ -43,39 +43,46 @@ Camera::Camera(Point3 origin,
         x - horizontal_vector / 2 - vertical_vector / 2;
 }
 
+using namespace std;
+
 Colour Camera::cast_ray(const Hittable & world,
-                        const std::vector<GlobalIllumination> & lights,
+                        const vector<GlobalIllumination> & lights,
                         const uint32_t max_bounces,
                         double u,
                         double v) const noexcept {
     Ray ray = get_ray(u, v);
     Colour ray_colour = colour::WHITE;
     HitRecord record;
-    for (uint32_t iter = 0; iter < max_bounces; ++iter) {
+    uint32_t iter;
+    for (iter = 0; iter < max_bounces; ++iter) {
         if (!world.hit(ray, utils::EPSILON, utils::INF, record)) {
-            Colour exit_colour;
-            for (const GlobalIllumination & light : lights) {
-                double light_coeff = 1;
-                const Vec3 light_direction =
-                    (light.type == LightType::Point)
-                        ? (light.position - ray.origin).unit_vector()
-                        : light.position;
-                if (light.type != LightType::Ambient) {
-                    light_coeff =
-                        (iter ? fmax(record.surface_normal.dot(light_direction),
-                                     0)
-                              : light.type != Point)
-                        * fmax(ray.direction.unit_vector().dot(light_direction),
-                               0);
-                }
-                exit_colour += ray_colour * light_coeff * light.colour;
-            }
-
-            return exit_colour;
+            break;
         }
+
+        // Display normals
+        // return Colour(0.5 + 0.5 * record.surface_normal);
+
         if (record.scatter(ray, ray_colour) != Material::ScatterType::Bounce) {
             return ray_colour;
         }
     }
-    return ray_colour;
+
+    Colour exit_colour;
+    for (const GlobalIllumination & light : lights) {
+        double light_coeff = 1.0;
+        Vec3 light_direction = light.position;
+        if (light.type == LightType::Point) {
+            light_direction = light.position - ray.origin;
+            light_direction /= light_direction.squared_norm();
+        }
+        if (light.type != LightType::Ambient) {
+            light_coeff =
+                (iter ? fmax(record.surface_normal.dot(light_direction), 0.0)
+                      : light.type != LightType::Point)
+                * fmax(ray.direction.unit_vector().dot(light_direction), 0.0);
+        }
+        exit_colour += ray_colour * light_coeff * light.colour;
+    }
+
+    return exit_colour;
 }
