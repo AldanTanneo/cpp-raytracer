@@ -103,8 +103,8 @@ namespace utils {
 
     /* Convert a value in degrees to radians */
     template <class T>
-    constexpr std::enable_if_t<std::is_floating_point_v<T>, T>
-    to_radians(T value) noexcept {
+    requires std::is_floating_point_v<T>
+    constexpr T to_radians(T value) noexcept {
         return value * static_cast<T>(PI) / 180.0;
     }
 
@@ -119,8 +119,8 @@ namespace utils {
 
     /* Compute a square root at compile time. Very inefficient. */
     template <class T>
-    consteval std::enable_if_t<std::is_floating_point_v<T>, T>
-    const_sqrt(const T value) {
+    requires std::is_floating_point_v<T>
+    consteval T const_sqrt(const T value) {
         if (value < 0) {
             throw "Cannot compute the square root of a negative number";
         }
@@ -133,8 +133,8 @@ namespace utils {
 
     /* Clamps a floating point value to the [0.0, 1.0] range */
     template <class T>
-    constexpr std::enable_if_t<std::is_floating_point_v<T>, T>
-    clamp(const T value) noexcept {
+    requires std::is_floating_point_v<T>
+    constexpr T clamp(const T value) noexcept {
         if (value < 0.0)
             return static_cast<T>(0.0);
         if (value > 1.0)
