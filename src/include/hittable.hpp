@@ -67,7 +67,7 @@ public:
 
     /* Construct an empty hit record */
     inline HitRecord() noexcept
-        : time(0.0), hit_point(point3::ZEROS), surface_normal(point3::ZEROS),
+        : time(0), hit_point(point3::ZEROS), surface_normal(vec3::ZEROS),
           front_face(false), material(std::cref(_DummyMaterial::d)) {}
 
     /* Set the correct orientation of the normal */
@@ -99,7 +99,8 @@ public:
 };
 
 /* A dynamic list of hittable objects */
-class HittableList : public Hittable {
+class HittableList : public Hittable,
+                     protected std::vector<std::unique_ptr<Hittable>> {
 public:
     /* The inner value type */
     using value_type = std::unique_ptr<Hittable>;
@@ -108,36 +109,21 @@ public:
     /* Iterator type */
     using const_iterator = container::const_iterator;
 
-private:
-    /* The inner container */
-    container objects;
-
 public:
     /* Construct an empty hittable list */
-    inline HittableList() noexcept : objects(container()) {}
+    inline HittableList() noexcept {}
 
     /* Add an object inheriting from the Hittable class */
     template <class T>
-    inline std::enable_if_t<std::is_convertible_v<T *, Hittable *>>
-    add(const T & object) noexcept {
-        objects.push_back(std::make_unique<T>(object));
+    requires std::is_convertible_v<T *, Hittable *>
+    inline void add(const T & object) noexcept {
+        push_back(std::make_unique<T>(object));
     }
 
     /* Add an already allocated unique_ptr to the hittable list */
     inline void add(std::unique_ptr<Hittable> object) noexcept {
-        objects.push_back(std::move(object));
+        push_back(std::move(object));
     }
-
-    /* Indexing operator overloading */
-    inline const value_type & operator[](int index) const {
-        return objects[index];
-    }
-
-    /* const iterator begin definition */
-    inline const_iterator begin() const noexcept { return objects.begin(); }
-
-    /* Const iterator end definition */
-    inline const_iterator end() const noexcept { return objects.end(); }
 
     /* Hit method override */
     virtual bool hit(const Ray & ray_in,
