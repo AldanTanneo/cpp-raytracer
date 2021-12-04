@@ -58,12 +58,15 @@ const Cylinder cyl(Point3(0, 0, 0), vec3::Y, 0.5, 0.65, glass);
 const Cylinder pen(Point3(0.75, 1, 0), Vec3(-1, -1, 0), 0.05, 3, pen_material);
 const Cylinder test(Point3(-0.7, 0, 0.7), vec3::Y, 0.2, 1, pen_material);
 
-const Triangle tri_test(Point3(0, 0, 0), Point3(0.75, 1, 0), Point3(-0.7, 1, 0.7), pen_material);
+const Triangle tri_test(Point3(0, 0, 0),
+                        Point3(0.75, 1, 0),
+                        Point3(-0.7, 1, 0.7),
+                        pen_material);
 
 const vector<GlobalIllumination> global_light = {
     GlobalIllumination(0.8 * MAGENTA, LightType::Infinite, Vec3(-1, 0.2, 1)),
-    GlobalIllumination(2.0 * BLUE, LightType::Point, Point3(1, 1, -1)),
-};
+    GlobalIllumination(3.0 * BLUE, LightType::Point, Point3(1, 1, -1)),
+    GlobalIllumination(0.05 * WHITE)};
 
 int main(int argc, char * argv[]) {
     /* Initialize the RNG */
@@ -73,7 +76,7 @@ int main(int argc, char * argv[]) {
     HittableList world;
     // world.add(ball);
     world.add(ground);
-    //world.add(cyl);
+    // world.add(cyl);
     world.add(pen);
     world.add(test);
 
