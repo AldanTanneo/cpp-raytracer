@@ -40,7 +40,7 @@ bool Triangle::hit(const Ray & ray,
 
     hit_record.time = time;
     hit_record.hit_point = ray.at(time);
-    Vec3 outward_normal = normal;
+    Vec3 outward_normal = normal.unit_vector();
     hit_record.set_face_normal(ray, outward_normal);
     hit_record.material = material;
     return true;

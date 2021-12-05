@@ -34,8 +34,8 @@ public:
                          const Point3 & point3,
                          const T & material) noexcept
         : vertex(point1), edge1(point2 - point1), edge2(point3 - point1),
-          normal((point2 - point1).cross(point3 - point1).unit_vector()),
-          material(material) {}
+          normal((point2 - point1).cross(point3 - point1)), material(material) {
+    }
 
     // Virtual function override
     virtual bool hit(const Ray & ray_in,
