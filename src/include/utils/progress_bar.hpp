@@ -55,8 +55,8 @@ public:
                        size_t width,
                        const char * fchar,
                        const char * bchar)
-        : size_scale(1.0 / double(size)), width(double(width)), fchar(fchar),
-          bchar(bchar), start_time(clock::now()) {
+        : size_scale(1.0 / double(size - 1)), width(double(width)),
+          fchar(fchar), bchar(bchar), start_time(clock::now()) {
         if (utils::utf8len(fchar) != utils::utf8len(bchar)) {
             throw "Foreground and background characters must have the same "
                   "UTF-8 length";
@@ -88,19 +88,22 @@ public:
         start();
     }
 
-    // Advance the progress bar by one, redraw if needed
+    // Advance the progress bar, redraw if needed
     inline void advance(size_t n = 1) noexcept {
         const size_t prog = progress.fetch_add(n);
         const int draw =
             static_cast<int>(width * static_cast<double>(prog + n) * size_scale)
             - static_cast<int>(width * static_cast<double>(prog) * size_scale);
         if (draw) {
+            flockfile(stdout);
             for (int i = 0; i < draw; ++i)
                 fputs(fchar, stdout);
             fflush(stdout);
+            funlockfile(stdout);
         }
     }
 
+    // Setback the progress bar, redraw if needed
     inline void setback(size_t n = 1) noexcept {
         const size_t prog = progress.fetch_sub(n);
         const int draw =
