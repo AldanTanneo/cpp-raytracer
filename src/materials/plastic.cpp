@@ -5,31 +5,21 @@
 #include <utils/rng.hpp>
 #include <utils/vec3.hpp>
 
-constexpr double plastic_refraction_index = 1.5;
-constexpr double refraction_ratio = 1.0 / plastic_refraction_index;
-constexpr double sr0 = (1.0 - refraction_ratio) / (1.0 + refraction_ratio);
-constexpr double r0 = sr0 * sr0;
-
 constexpr double plastic_reflectance(const double cos_theta) noexcept {
-    const double one_minus_cos = 1.0 - cos_theta;
-    const double squared = one_minus_cos * one_minus_cos;
-    return r0 + (1.0 - r0) * squared * squared * one_minus_cos;
+    return 0.04 + 0.96 * pow(1.0 - cos_theta, 5);
 }
 
 Plastic::ScatterType Plastic::scatter(const HitRecord & hit_record,
                                       Ray & ray,
                                       Colour & ray_colour) const noexcept {
-    ray.origin = hit_record.hit_point;
-    const double r_cos_theta = -ray.direction.dot(hit_record.surface_normal);
-    const double cos_theta = fmin(r_cos_theta / ray.direction.norm(), 1.0);
+    const double rcos_theta = -ray.direction.dot(hit_record.surface_normal);
+    const double cos_theta = rcos_theta / ray.direction.norm();
 
     if (plastic_reflectance(cos_theta) > rng::gen()) {
         // Reflexion
-        ray.direction =
-            ray.direction
-            + r_cos_theta
-                  * (roughness * Vec3::random_in_unit_sphere()
-                     - 2.0 * r_cos_theta * hit_record.surface_normal);
+        ray.direction += rcos_theta
+                         * (2.0 * (hit_record.surface_normal)
+                            + roughness * Vec3::random_in_unit_sphere());
     } else {
         // Diffusion
         ray.direction =
@@ -38,6 +28,7 @@ Plastic::ScatterType Plastic::scatter(const HitRecord & hit_record,
             ray.direction = hit_record.surface_normal;
         }
     }
+    ray.origin = hit_record.hit_point;
     ray_colour *= colour;
     return ScatterType::Bounce;
 }

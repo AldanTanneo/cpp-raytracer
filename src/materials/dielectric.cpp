@@ -20,7 +20,7 @@ Dielectric::scatter(const HitRecord & hit_record,
     if (refraction_ratio * sin_theta > 1
         || utils::reflectance(cos_theta, refraction_ratio) > rng::gen()) {
         // Reflexion
-        ray.direction -= 2.0 * r_cos_theta * hit_record.surface_normal;
+        ray.direction += 2.0 * r_cos_theta * hit_record.surface_normal;
     } else { // Refraction
         Vec3 orth_out =
             refraction_ratio
