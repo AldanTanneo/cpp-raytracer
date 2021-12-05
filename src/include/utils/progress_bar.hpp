@@ -55,8 +55,8 @@ public:
                        size_t width,
                        const char * fchar,
                        const char * bchar)
-        : size_scale(1.0 / double(size - 1)), width(double(width)),
-          fchar(fchar), bchar(bchar), start_time(clock::now()) {
+        : size_scale(1.0 / double(size)), width(double(width)), fchar(fchar),
+          bchar(bchar), start_time(clock::now()) {
         if (utils::utf8len(fchar) != utils::utf8len(bchar)) {
             throw "Foreground and background characters must have the same "
                   "UTF-8 length";

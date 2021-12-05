@@ -1,5 +1,6 @@
 *.exe
 *.ppm
+*.png
 main
 xtrem-raytracer
 *.log
