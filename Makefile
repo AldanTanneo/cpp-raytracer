@@ -114,9 +114,6 @@ ifneq ("$(wildcard $(OBJ))","")
 	@$(RMDIR) $(OBJ)
 endif
 
-format: $(SRCS) $(INCLUDES)
-	@-clang-format --style=file -i $(SRCS) $(INCLUDES)
-
 .PHONY: build debug run release bench benchmark clean
 
 -include $(DEPS_DEBUG)
