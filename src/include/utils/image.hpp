@@ -60,7 +60,7 @@ public:
 
     // Parse a PPM image from a stream
     template <class charT, class charTraits = std::char_traits<charT>>
-    static Image decode_stream(std::basic_istream<charT, charTraits> & is) {
+    static Image decode_ppm_stream(std::basic_istream<charT, charTraits> & is) {
         size_t width, height;
         char buffer[8];
         uint16_t maxval;
@@ -133,13 +133,13 @@ public:
         return Image(pixels, width, height);
     }
 
-    // Load an image from a filename
-    inline static Image load(const std::string & filename) {
+    // Load a PPM image from a filename
+    inline static Image load_ppm(const std::string & filename) {
         std::ifstream file(filename, std::ios_base::in | std::ios_base::binary);
         if (!file) {
             throw "Could not load PPM image: could not open file!";
         }
-        Image result = Image::decode_stream(file);
+        Image result = Image::decode_ppm_stream(file);
         file.close();
         return result;
     }
@@ -178,13 +178,13 @@ public:
 
     // Write the image to a stream
     template <class charT, class charTraits = std::char_traits<charT>>
-    void write(std::basic_ostream<charT, charTraits> & os) const {
+    void write_ppm(std::basic_ostream<charT, charTraits> & os) const {
         if (data.size() == width * height) {
             os << "P6" << std::endl
                << width << ' ' << height << std::endl
                << static_cast<uint16_t>(utils::MAX_COLOUR) << std::endl;
 
-            for (Colour const & c : data) {
+            for (const Colour & c : data) {
                 c.write(os);
             }
         } else {
@@ -192,16 +192,19 @@ public:
         }
     }
 
-    // Save the image under the given filename
-    inline void save(const std::string & filename) const {
+    // Save the image as PPM
+    inline void save_ppm(const std::string & filename) const {
         std::ofstream output_file(filename,
                                   std::ios_base::out | std::ios_base::binary);
         if (!output_file) {
             throw "Could not open file!";
         }
-        write(output_file);
+        write_ppm(output_file);
         output_file.close();
     }
+
+    // Save the image as PNG
+    void save_png(const char * filename) const;
 
     // Compare two images for equality
     inline bool operator==(const Image & other) const noexcept {
