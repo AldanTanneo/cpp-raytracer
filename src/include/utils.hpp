@@ -95,7 +95,7 @@ namespace utils {
     // point and integer color.
     constexpr double MAX_COLOUR = 255.999999;
     // Common epsilon for floating point uses
-    constexpr double EPSILON = 1e-5;
+    constexpr double EPSILON = 1e-8;
     // Infinity
     constexpr double INF = std::numeric_limits<double>::infinity();
     // Geometric PI constant
