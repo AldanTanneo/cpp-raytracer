@@ -28,12 +28,12 @@ bool Parallelogram::hit(const Ray & ray,
     const Vec3 direction_cross_origin_to_vertex =
         ray.direction.cross(origin_to_vertex);
 
-    const double lambda = scale * direction_cross_origin_to_vertex.dot(edge1);
+    const double lambda = -scale * direction_cross_origin_to_vertex.dot(edge2);
     if (lambda < 0.0 || lambda > 1.0) {
         return false;
     }
 
-    const double mu = -scale * direction_cross_origin_to_vertex.dot(edge2);
+    const double mu = scale * direction_cross_origin_to_vertex.dot(edge1);
     if (mu < 0.0 || mu > 1.0) {
         return false;
     }
