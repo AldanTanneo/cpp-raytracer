@@ -24,7 +24,7 @@ public:
         const double y = fabs(n.y);
         const double z = fabs(n.z);
         const Vec3 a =
-            x < y ? (x < z ? vec3::X : vec3::Z) : (z < y ? vec3::Z : vec3::Y);
+            x < y ? (x < z ? vec3::X : vec3::Z) : (y < z ? vec3::Y : vec3::Z);
         const Vec3 v = n.cross(a);
         return Onb(n.cross(v), v, n);
     }
