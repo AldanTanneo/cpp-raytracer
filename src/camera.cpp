@@ -41,6 +41,7 @@ Camera::Camera(Point3 origin,
     vertical_vector = viewport_height * y;
     origin_to_bottom_left_corner =
         x - horizontal_vector / 2 - vertical_vector / 2;
+    base = Onb::from_base_vectors(x, y, z);
 }
 
 using namespace std;

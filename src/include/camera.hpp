@@ -7,6 +7,7 @@
 // From src/include
 #include <hittable.hpp>
 #include <ray.hpp>
+#include <utils/orthonormal_bases.hpp>
 #include <utils/vec3.hpp>
 
 // Aspect ratio wrapper class
@@ -33,7 +34,7 @@ public:
     }
 
     // Get the inner value
-    constexpr long double value() const noexcept { return aspect_ratio; }
+    constexpr double value() const noexcept { return aspect_ratio; }
 };
 
 // Light type
@@ -76,6 +77,8 @@ private:
     Vec3 vertical_vector;
     // Horizontal vector of the screen space
     Vec3 horizontal_vector;
+    // Orthonormal base of the camera
+    Onb base;
 
 public:
     // Construct a camera

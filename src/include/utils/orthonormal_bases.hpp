@@ -18,6 +18,9 @@ private:
         : u(u), v(v), w(w) {}
 
 public:
+    // Default ONB: canonical base in R^3
+    constexpr Onb() noexcept : u(vec3::X), v(vec3::Y), w(vec3::Z) {}
+
     // Construct an ONB from a normal vector
     inline static Onb from_unit_normal(const Vec3 & n) noexcept {
         const double x = fabs(n.x);
@@ -27,6 +30,17 @@ public:
             x < y ? (x < z ? vec3::X : vec3::Z) : (y < z ? vec3::Y : vec3::Z);
         const Vec3 v = n.cross(a);
         return Onb(n.cross(v), v, n);
+    }
+
+    // Construct an ONB from three vectors. Checks that they form a valid ONB
+    inline static Onb
+    from_base_vectors(const Vec3 u, const Vec3 v, const Vec3 w) {
+        if (u.cross(v).distance(w) > utils::EPSILON
+            || v.cross(w).distance(u) > utils::EPSILON
+            || w.cross(u).distance(v) > utils::EPSILON) {
+            throw "Not an orthonormal base!";
+        }
+        return Onb(u, v, w);
     }
 
     // Get the local expression of a vector, given its coordinates
