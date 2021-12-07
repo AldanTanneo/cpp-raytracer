@@ -35,7 +35,13 @@ public:
     // Construct an ONB from three vectors. Checks that they form a valid ONB
     inline static Onb
     from_base_vectors(const Vec3 u, const Vec3 v, const Vec3 w) {
-        if (u.cross(v).distance(w) > utils::EPSILON
+        if (fabs(u.squared_norm() - 1) > utils::EPSILON
+            || fabs(v.squared_norm() - 1) > utils::EPSILON
+            || fabs(w.squared_norm() - 1) > utils::EPSILON
+            || fabs(u.dot(v)) > utils::EPSILON
+            || fabs(v.dot(w)) > utils::EPSILON
+            || fabs(w.dot(u)) > utils::EPSILON
+            || u.cross(v).distance(w) > utils::EPSILON
             || v.cross(w).distance(u) > utils::EPSILON
             || w.cross(u).distance(v) > utils::EPSILON) {
             throw "Not an orthonormal base!";
