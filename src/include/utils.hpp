@@ -100,6 +100,8 @@ namespace utils {
     constexpr double INF = std::numeric_limits<double>::infinity();
     // Geometric PI constant
     constexpr double PI = 3.14159265358979323846264338327950288;
+    // Geometric TAU constant, TAU = 2.0 * PI
+    constexpr double TAU = 6.28318530717958647692528676655900577;
 
     // Convert a value in degrees to radians
     template <class T>
