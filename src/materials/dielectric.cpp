@@ -7,11 +7,13 @@
 
 Dielectric::ScatterType
 Dielectric::scatter(const HitRecord & hit_record,
-                    Ray & ray,
-                    Colour & ray_colour) const noexcept {
-    ray.origin = hit_record.hit_point;
-    const double r2 = ray.direction.squared_norm();
-    const double r_cos_theta = -ray.direction.dot(hit_record.surface_normal);
+                    const Ray & ray_in,
+                    ScatterRecord & scatter) const noexcept {
+    scatter.attenuation = colour;
+    scatter.is_specular = true;
+
+    const double r2 = ray_in.direction.squared_norm();
+    const double r_cos_theta = -ray_in.direction.dot(hit_record.surface_normal);
     const double cos_theta = fmin(r_cos_theta / sqrt(r2), 1.0);
     const double sin_theta = sqrt(1 - cos_theta * cos_theta);
     const double refraction_ratio =
@@ -20,15 +22,16 @@ Dielectric::scatter(const HitRecord & hit_record,
     if (refraction_ratio * sin_theta > 1
         || utils::reflectance(cos_theta, refraction_ratio) > rng::gen()) {
         // Reflexion
-        ray.direction += 2.0 * r_cos_theta * hit_record.surface_normal;
-    } else { // Refraction
+        scatter.specular_direction =
+            ray_in.direction + 2.0 * r_cos_theta * hit_record.surface_normal;
+    } else {
+        // Refraction
         Vec3 orth_out =
             refraction_ratio
-            * (ray.direction + r_cos_theta * hit_record.surface_normal);
+            * (ray_in.direction + r_cos_theta * hit_record.surface_normal);
         Vec3 parr_out =
             -sqrt(r2 - orth_out.squared_norm()) * hit_record.surface_normal;
-        ray.direction = orth_out + parr_out;
+        scatter.specular_direction = orth_out + parr_out;
     }
-    ray_colour *= colour;
     return ScatterType::Bounce;
 }

@@ -20,9 +20,10 @@ public:
         : colour(colour), refraction_index(refraction_index) {}
 
     // Virtual function override
-    virtual ScatterType scatter(const HitRecord & hit_record,
-                                Ray & ray,
-                                Colour & ray_colour) const noexcept override;
+    virtual ScatterType
+    scatter(const HitRecord & hit_record,
+            const Ray & ray_in,
+            ScatterRecord & scatter) const noexcept override;
 };
 
 #endif

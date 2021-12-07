@@ -7,9 +7,26 @@
 
 // From src/include
 #include <ray.hpp>
+#include <utils/pdf.hpp>
 #include <utils/vec3.hpp>
 
 class HitRecord; // Forward declaration of HitRecord
+
+// The returned structure when a material scatters an object
+class ScatterRecord {
+public:
+    // The colour of the material
+    Colour attenuation;
+    // Wether the scattered ray is specular
+    bool is_specular;
+    // If it is specular, the direction of the new ray
+    Vec3 specular_direction;
+    // If it's diffuse, the corresponding PDF
+    std::unique_ptr<Pdf> pdf;
+
+    // Default constructor
+    constexpr ScatterRecord() noexcept = default;
+};
 
 // Abstract interface of a material
 class Material {
@@ -17,18 +34,19 @@ public:
     template <class T>
     constexpr static bool is_material = std::is_convertible_v<T *, Material *>;
 
-    enum ScatterType {
-        None = 0,
-        Bounce = 1,
-        Emit = 2,
-    };
+    enum ScatterType { None = 0, Emit = 1, Bounce = 2 };
+
     // Define how a ray should interact with the material.
-    // The "ray" object is modified as well as the "ray_colour" object.
-    // If no ray is emitted after hitting the material, this function returns
-    // false
+    // Modifies the scatter record object accordingly
     virtual ScatterType scatter(const HitRecord & hit_record,
-                                Ray & ray,
-                                Colour & ray_colour) const noexcept = 0;
+                                const Ray & ray_in,
+                                ScatterRecord & scatter) const noexcept = 0;
+
+    // Samples the material along the newly emitted ray
+    virtual double scattering_pdf(const HitRecord & hit_record,
+                                  const Ray & scattered_ray) const noexcept {
+        return 0.0;
+    }
 
     // Virtual destructor
     virtual ~Material() noexcept = default;
@@ -46,8 +64,16 @@ private:
 
     // Never scatter
     virtual ScatterType
-    scatter(const HitRecord &, Ray &, Colour &) const noexcept override {
-        return None;
+    scatter(const HitRecord & hit_record,
+            const Ray & ray_in,
+            ScatterRecord & scatter) const noexcept override {
+        return ScatterType::None;
+    }
+
+    // Never scatter
+    virtual double scattering_pdf(const HitRecord &,
+                                  const Ray &) const noexcept override {
+        return 0.0;
     }
 };
 
@@ -78,9 +104,9 @@ public:
     }
 
     // Scatter the ray according to the hit material
-    inline Material::ScatterType scatter(Ray & ray,
-                                         Colour & ray_colour) const noexcept {
-        return material.get().scatter(*this, ray, ray_colour);
+    inline Material::ScatterType
+    scatter(const Ray & ray_in, ScatterRecord & scatter) const noexcept {
+        return material.get().scatter(*this, ray_in, scatter);
     }
 };
 
@@ -93,6 +119,18 @@ public:
                      double tmin,
                      double tmax,
                      HitRecord & hit_record) const noexcept = 0;
+
+    // Sample the hittable pdf along a direction
+    virtual double pdf_value(const Point3 & origin,
+                             const Vec3 & direction) const noexcept {
+        return 0.0;
+    }
+
+    // Return a vector to a random point on the object's surface, visible from
+    // the given origin
+    virtual Vec3 random(const Vec3 & origin) const noexcept {
+        return vec3::ZEROS;
+    }
 
     // Virtual destructor
     virtual ~Hittable() noexcept = default;
@@ -130,6 +168,30 @@ public:
                      double tmin,
                      double tmax,
                      HitRecord & hit_record) const noexcept override;
+};
+
+// A PDF for sampling random points on hittable objects
+class HittablePdf : public Pdf {
+private:
+    // The hittable object
+    const Hittable & obj;
+    // The origin from which the object is sampled
+    const Point3 origin;
+
+public:
+    // Construct a new hittable PDF
+    constexpr HittablePdf(const Hittable & obj, const Point3 & origin)
+        : obj(obj), origin(origin) {}
+
+    // Virtual function override
+    virtual double value(const Vec3 & direction) const noexcept override {
+        return obj.pdf_value(origin, direction);
+    }
+
+    // Virtual function override
+    virtual Vec3 generate() const noexcept override {
+        return obj.random(origin);
+    }
 };
 
 #endif

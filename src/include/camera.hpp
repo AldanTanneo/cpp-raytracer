@@ -94,7 +94,8 @@ public:
     // Cast a ray into the world with the given parameters
     // and at the given screen space coordinates
     Colour cast_ray(const Hittable & world,
-                    const std::vector<GlobalIllumination> & lights,
+                    const std::vector<GlobalIllumination> & global_lights,
+                    const Hittable & sampled_object,
                     const uint32_t max_bounces,
                     double u,
                     double v) const noexcept;

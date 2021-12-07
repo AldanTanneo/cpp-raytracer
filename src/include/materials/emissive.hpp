@@ -18,9 +18,10 @@ public:
         : colour(intensity * colour) {}
 
     // Virtual function override
-    virtual ScatterType scatter(const HitRecord & hit_record,
-                                Ray & ray,
-                                Colour & ray_colour) const noexcept override;
+    virtual ScatterType
+    scatter(const HitRecord & hit_record,
+            const Ray & ray_in,
+            ScatterRecord & scatter) const noexcept override;
 };
 
 // Perfect light source material: always absorb the ray (black body model)
@@ -35,9 +36,10 @@ public:
         : colour(intensity * colour) {}
 
     // Virtual function override
-    virtual ScatterType scatter(const HitRecord & hit_record,
-                                Ray & ray,
-                                Colour & ray_colour) const noexcept override;
+    virtual ScatterType
+    scatter(const HitRecord & hit_record,
+            const Ray & ray_in,
+            ScatterRecord & scatter) const noexcept override;
 };
 
 #endif

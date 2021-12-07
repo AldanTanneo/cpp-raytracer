@@ -39,7 +39,7 @@ constexpr double processing_kernel_max = 1.0 + processing_kernel_offset;
 
 // Image
 constexpr AspectRatio aspect_ratio(1);
-constexpr size_t height = 1000;
+constexpr size_t height = 500;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
@@ -49,16 +49,15 @@ constexpr double colour_scale = 1.0 / double(spp);
 constexpr int max_bounces = 15;
 
 // Global lights
-const vector<GlobalIllumination> global_lights = {
-    GlobalIllumination(0.05 * WHITE)};
+const vector<GlobalIllumination> global_lights = {};
 
 // Define scene materials
-const Plastic mat_left(1.0 * RED, 10.0);
-const Plastic mat_right(0.8 * BLUE, 10.0);
+const Plastic mat_left(1.0 * RED, 1);
+const Plastic mat_right(0.8 * BLUE, 1);
 const Diffuse mat_ground(0.6 * WHITE);
 const Plastic mat_back(WHITE, 0.1);
 const BlackBody mat_light(WHITE, 15);
-const Dielectric mat_plastic(0.9 * WHITE, 1.5);
+const Dielectric mat_plastic(0.75 * WHITE, 1.5);
 
 // Define scene objects
 const Parallelogram
@@ -73,16 +72,21 @@ const Parallelogram ceiling(Point3(0, 555, 0),
                             Point3(555, 555, 0),
                             Point3(0, 555, 555),
                             mat_ground);
-const Parallelogram light(Point3(200, 554, 214),
-                          Point3(343, 554, 214),
-                          Point3(200, 554, 332),
+const Parallelogram light(Point3(200, 554, 200),
+                          Point3(355, 554, 200),
+                          Point3(200, 554, 355),
                           mat_light);
-const Sphere sphere1(Point3(400, 90, 400), 90, mat_plastic);
+const Sphere sphere1(Point3(400, 100, 400), 100, mat_plastic);
 const Sphere sphere2(Point3(150, 90, 150), 90, mat_plastic);
 
+const Hittable & sampled_hittable = light;
+
 // Camera
-const Camera cam(
-    Point3(278, 278, -800), Point3(278, 278, 0), vec3::Y, 38.5, aspect_ratio);
+const Camera cam(Point3(277.5, 277.5, -800),
+                 Point3(277.5, 277.5, 0),
+                 vec3::Y,
+                 38.15,
+                 aspect_ratio);
 
 int main(int argc, char * argv[]) {
     // Initialize the RNG
@@ -107,8 +111,7 @@ int main(int argc, char * argv[]) {
 
     pb.start(term_colours::CYAN);
 
-#pragma omp parallel for default(none)                                         \
-    shared(cam, img, pb, world, global_lights) schedule(dynamic)
+#pragma omp parallel for schedule(dynamic)
     for (size_t index = 0; index < width * height; ++index) {
         Colour c;
         const size_t i = index % width;
@@ -122,7 +125,8 @@ int main(int argc, char * argv[]) {
                 (static_cast<double>(j)
                  + rng::gen(processing_kernel_min, processing_kernel_max))
                 * height_scale;
-            c += cam.cast_ray(world, global_lights, max_bounces, u, v);
+            c += cam.cast_ray(world, global_lights, sampled_hittable,
+                              max_bounces, u, v);
         }
         img[index] += c * colour_scale;
         pb.advance();

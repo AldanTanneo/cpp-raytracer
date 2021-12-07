@@ -46,29 +46,58 @@ Camera::Camera(Point3 origin,
 using namespace std;
 
 Colour Camera::cast_ray(const Hittable & world,
-                        const vector<GlobalIllumination> & lights,
+                        const vector<GlobalIllumination> & global_lights,
+                        const Hittable & sampled_object,
                         const uint32_t max_bounces,
                         double u,
                         double v) const noexcept {
     Ray ray = get_ray(u, v);
     Colour ray_colour = colour::WHITE;
-    HitRecord record;
+    HitRecord hit_record;
+    ScatterRecord scatter;
     uint32_t iter;
+    double pdf_coeff = 1.0;
+    double pdf_value = 1.0;
     for (iter = 0; iter < max_bounces; ++iter) {
-        if (!world.hit(ray, utils::EPSILON, utils::INF, record)) {
+        if (!world.hit(ray, utils::EPSILON, utils::INF, hit_record)) {
             break;
         }
 
-        // Display normals
-        // return Colour(0.5 + 0.5 * record.surface_normal);
+// Display normals
+#if 0
+        return Colour(0.5 + 0.5 * record.surface_normal);
+#endif
 
-        if (record.scatter(ray, ray_colour) != Material::ScatterType::Bounce) {
-            return ray_colour;
+        if (hit_record.scatter(ray, scatter) != Material::ScatterType::Bounce) {
+            return (fabs(pdf_value) < utils::EPSILON
+                        ? colour::BLACK
+                        : pdf_coeff * ray_colour * scatter.attenuation
+                              / pdf_value);
+        }
+
+        ray_colour *= scatter.attenuation;
+        ray.origin = hit_record.hit_point;
+        if (scatter.is_specular) {
+            ray.direction = scatter.specular_direction;
+        } else {
+            const HittablePdf light_pdf(sampled_object, hit_record.hit_point);
+            const MixturePdf pdf(scatter.pdf.get(), &light_pdf);
+            ray_colour *= scatter.attenuation;
+            ray.direction = pdf.generate();
+            if (ray.direction.dot(hit_record.surface_normal) < utils::EPSILON) {
+                pdf_value = 0.0;
+                break;
+            } else {
+                pdf_value *= pdf.value(ray.direction);
+            }
+
+            pdf_coeff *=
+                hit_record.material.get().scattering_pdf(hit_record, ray);
         }
     }
 
-    Colour exit_colour;
-    for (const GlobalIllumination & light : lights) {
+    Colour lights_contribution;
+    for (const GlobalIllumination & light : global_lights) {
         double light_coeff = 1.0;
         Vec3 light_direction = light.position;
         if (light.type == LightType::Point) {
@@ -77,12 +106,15 @@ Colour Camera::cast_ray(const Hittable & world,
         }
         if (light.type != LightType::Ambient) {
             light_coeff =
-                (iter ? fmax(record.surface_normal.dot(light_direction), 0.0)
-                      : light.type != LightType::Point)
+                (iter
+                     ? fmax(hit_record.surface_normal.dot(light_direction), 0.0)
+                     : light.type != LightType::Point)
                 * fmax(ray.direction.unit_vector().dot(light_direction), 0.0);
         }
-        exit_colour += ray_colour * light_coeff * light.colour;
+        lights_contribution += light_coeff * light.colour;
     }
 
-    return exit_colour;
+    return (fabs(pdf_value) < utils::EPSILON)
+               ? colour::BLACK
+               : pdf_coeff * ray_colour * lights_contribution / pdf_value;
 }

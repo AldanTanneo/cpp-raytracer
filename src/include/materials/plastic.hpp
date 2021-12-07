@@ -20,9 +20,15 @@ public:
         : colour(colour), roughness(roughness) {}
 
     // Virtual function override
-    virtual ScatterType scatter(const HitRecord & hit_record,
-                                Ray & ray,
-                                Colour & ray_colour) const noexcept override;
+    virtual ScatterType
+    scatter(const HitRecord & hit_record,
+            const Ray & ray_in,
+            ScatterRecord & scatter) const noexcept override;
+
+    // Virtual function override
+    virtual double
+    scattering_pdf(const HitRecord & hit_record,
+                   const Ray & scattered_ray) const noexcept override;
 };
 
 #endif
