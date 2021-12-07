@@ -39,7 +39,7 @@ constexpr double processing_kernel_max = 1.0 + processing_kernel_offset;
 
 // Image
 constexpr AspectRatio aspect_ratio(1);
-constexpr size_t height = 500;
+constexpr size_t height = 1000;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
