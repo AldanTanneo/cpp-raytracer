@@ -13,7 +13,6 @@ public:
     /* Sample the pdf */
     virtual Vec3 generate() const noexcept = 0;
 
-protected:
     virtual ~Pdf() noexcept = default;
 };
 
