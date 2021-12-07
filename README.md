@@ -1,5 +1,7 @@
 # xtrem-raytracer
 
+![Example render](cover.png)
+
 ## Compiler le projet
 
 Le `Makefile` fourni permet d'utiliser les commandes :
