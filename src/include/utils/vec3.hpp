@@ -394,21 +394,6 @@ namespace vec3 {
         // refraction ratio.
         inline Vec3 refract(const Vec3 & normal,
                             double refraction_ratio) const noexcept {
-            /*DEMO:
-            n est la normale, t la tangente à la surface (la normale est à
-            l'envers par rapport au rayon);
-            r = ||r_i|| (r_i est le rayon incident)
-
-            r_i = -rcos_i * n + rsin_i * t = n_i + t_i;
-            r_o = -rcos_o * n + rsin_o * t = n_o + t_o;
-
-            sin_o = (n1 / n2) * sin_i, et rcos_i = - r_i . n;
-            donc rsin_i * t = r_i - (r_i . n) * n;
-            ORTH_OUT = rsin_o * t = (n1 / n2) * (r_i - (r_i . n) * n) = t_o;
-
-            (rcos_o)^2 = r^2 * (1 - sin_o^2) = r^2 - (rsin_o)^2 = r^2 - t_o^2;
-            PARR_OUT = -rcos_o * n = -sqrt(r^2 - t_o^2) * n;
-            RETURN = ORTH_OUT + PARR_OUT*/
             double rcos_theta = -dot(normal);
             Vec3 orth_out = refraction_ratio * (*this + normal * rcos_theta);
             Vec3 parr_out =
@@ -441,6 +426,19 @@ namespace vec3 {
             } else {
                 return res;
             }
+        }
+
+        inline static Vec3 random_cosine_direction() noexcept {
+            auto r1 = rng::gen();
+            auto r2 = rng::gen();
+            auto z = sqrt(1 - r2);
+            auto r = sqrt(r2);
+
+            auto phi = utils::TAU * r1;
+            auto x = cos(phi) * r;
+            auto y = sin(phi) * r;
+
+            return Vec3(x, y, z);
         }
 
         // Print the vector for debugging purposes
