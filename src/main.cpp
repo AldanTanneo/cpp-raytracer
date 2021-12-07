@@ -37,37 +37,52 @@ constexpr double processing_kernel_offset =
 constexpr double processing_kernel_min = 0.0 - processing_kernel_offset;
 constexpr double processing_kernel_max = 1.0 + processing_kernel_offset;
 
-// Image parameters
-constexpr AspectRatio aspect_ratio(16, 9);
-constexpr size_t height = 720;
+// Image
+constexpr AspectRatio aspect_ratio(1);
+constexpr size_t height = 1000;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
-
-constexpr int spp = 100;
+// Render
+constexpr int spp = 500;
 constexpr double colour_scale = 1.0 / double(spp);
 constexpr int max_bounces = 15;
 
-// Camera
-const Camera
-    cam(Point3(3, 3.4, 10.2), Point3(0, 0.4, 0), vec3::Y, 10, aspect_ratio);
-
 // Global lights
 const vector<GlobalIllumination> global_lights = {
-    GlobalIllumination(MAGENTA, LightType::Infinite, Vec3(-1, 0.2, 1)),
-    GlobalIllumination(20 * BLUE, LightType::Point, Point3(1, 3, -1)),
-    /*GlobalIllumination(0.05 * WHITE)*/};
+    GlobalIllumination(0.05 * WHITE)};
 
 // Define scene materials
-const Dielectric glass(Colour(0.9 * WHITE), 1.1);
-const Diffuse ground_material(0.3 * WHITE);
-const Plastic pen_material(0.7 * WHITE);
+const Plastic mat_left(1.0 * RED, 10.0);
+const Plastic mat_right(0.8 * BLUE, 10.0);
+const Diffuse mat_ground(0.6 * WHITE);
+const Plastic mat_back(WHITE, 0.1);
+const BlackBody mat_light(WHITE, 15);
+const Dielectric mat_plastic(0.9 * WHITE, 1.5);
 
 // Define scene objects
-const Sphere
-    ground(Point3(0, -2000, 0), 2000 - utils::EPSILON, ground_material);
-const Cylinder cyl(point3::ZEROS, vec3::Y, 0.5, 0.65, glass);
-const Cylinder pen(Point3(0.75, 1, 0), Vec3(-1, -1, 0), 0.05, 3, pen_material);
+const Parallelogram
+    back(Point3(0, 0, 555), Point3(0, 555, 555), Point3(555, 0, 555), mat_back);
+const Parallelogram
+    right(Point3(0, 0, 0), Point3(0, 555, 0), Point3(0, 0, 555), mat_right);
+const Parallelogram
+    left(Point3(555, 0, 0), Point3(555, 555, 0), Point3(555, 0, 555), mat_left);
+const Parallelogram
+    ground(Point3(0, 0, 0), Point3(555, 0, 0), Point3(0, 0, 555), mat_ground);
+const Parallelogram ceiling(Point3(0, 555, 0),
+                            Point3(555, 555, 0),
+                            Point3(0, 555, 555),
+                            mat_ground);
+const Parallelogram light(Point3(200, 554, 214),
+                          Point3(343, 554, 214),
+                          Point3(200, 554, 332),
+                          mat_light);
+const Sphere sphere1(Point3(400, 90, 400), 90, mat_plastic);
+const Sphere sphere2(Point3(150, 90, 150), 90, mat_plastic);
+
+// Camera
+const Camera cam(
+    Point3(278, 278, -800), Point3(278, 278, 0), vec3::Y, 38.5, aspect_ratio);
 
 int main(int argc, char * argv[]) {
     // Initialize the RNG
@@ -76,8 +91,13 @@ int main(int argc, char * argv[]) {
     // Create world and add objects to it
     HittableList world;
     world.add(ground);
-    world.add(cyl);
-    world.add(pen);
+    world.add(back);
+    world.add(ceiling);
+    world.add(left);
+    world.add(right);
+    world.add(sphere1);
+    world.add(sphere2);
+    world.add(light);
 
     // Create a black image to fill with pixels
     Image img = Image::black(width, height);
