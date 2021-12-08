@@ -45,3 +45,23 @@ bool Parallelogram::hit(const Ray & ray,
     hit_record.material = material;
     return true;
 }
+
+double Parallelogram::pdf_value(const Point3 & origin,
+                                const Vec3 & direction) const noexcept {
+    HitRecord rec;
+    if (!this->hit(Ray(origin, direction), utils::EPSILON, utils::INF, rec))
+        return 0.0;
+
+    const double area = normal.dot(unit_normal);
+    const double distance_squared =
+        rec.time * rec.time * direction.squared_norm();
+    const double cosine =
+        fabs(direction.dot(rec.surface_normal) / direction.norm());
+
+    return distance_squared / (cosine * area);
+}
+
+Vec3 Parallelogram::random(const Point3 & origin) const noexcept {
+    return (vertex + rng::gen() * edge1 + rng::gen() * edge2 - origin)
+        .unit_vector();
+}
