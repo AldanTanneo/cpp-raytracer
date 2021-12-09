@@ -13,6 +13,11 @@
 namespace colour {
     // RGB colour type. Uses 24-bits colour encoding for output and input.
     class Colour {
+    private:
+        constexpr static double RED_LUMINANCE = 0.2126;
+        constexpr static double GREEN_LUMINANCE = 0.7152;
+        constexpr static double BLUE_LUMINANCE = 0.0722;
+
     public:
         // RGB components
         double r, g, b;
@@ -54,7 +59,7 @@ namespace colour {
         }
         // Get the luminance of the colour
         constexpr double luminance() const noexcept {
-            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            return RED_LUMINANCE * r + GREEN_LUMINANCE * g + BLUE_LUMINANCE * b;
         }
         // Invert a colour
         constexpr Colour invert() const noexcept {
@@ -159,6 +164,17 @@ namespace colour {
             r /= f;
             g /= f;
             b /= f;
+        }
+
+        // Clamp a colour to the [0.0, 1.0] range
+        constexpr Colour clamp() const noexcept {
+            return Colour(utils::clamp(r), utils::clamp(g), utils::clamp(b));
+        }
+
+        // Clamp a colour to the [a, b] range
+        constexpr Colour clamp(const double a, const double b) const noexcept {
+            return Colour(utils::clamp(r, a, b), utils::clamp(g, a, b),
+                          utils::clamp(b, a, b));
         }
 
         // Compare two colours for equality

@@ -116,8 +116,8 @@ public:
     // Check if a ray hits the hittable object.
     // If there is a hit, return a hit record
     virtual bool hit(const Ray & ray_in,
-                     double tmin,
-                     double tmax,
+                     const double tmin,
+                     const double tmax,
                      HitRecord & hit_record) const noexcept = 0;
 
     // Sample the hittable pdf along a direction
@@ -165,8 +165,8 @@ public:
 
     // Hit method override
     virtual bool hit(const Ray & ray_in,
-                     double tmin,
-                     double tmax,
+                     const double tmin,
+                     const double tmax,
                      HitRecord & hit_record) const noexcept override;
 
     // Virtual function override

@@ -43,8 +43,8 @@ public:
 
     // Virtual function override
     virtual bool hit(const Ray & ray_in,
-                     double tmin,
-                     double tmax,
+                     const double tmin,
+                     const double tmax,
                      HitRecord & hit_record) const noexcept override;
 
     // Virtual function override

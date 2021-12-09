@@ -4,8 +4,8 @@
 #include <utils/vec3.hpp>
 
 bool Cylinder::hit(const Ray & ray,
-                   double tmin,
-                   double tmax,
+                   const double tmin,
+                   const double tmax,
                    HitRecord & hit_record) const noexcept {
     // Project the ray on the cylinder base plane to get possible intersections
     const double origin_minus_base_dot_axis = (ray.origin - base).dot(axis);

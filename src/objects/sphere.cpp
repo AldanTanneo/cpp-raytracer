@@ -4,8 +4,8 @@
 #include <utils/vec3.hpp>
 
 bool Sphere::hit(const Ray & ray,
-                 double tmin,
-                 double tmax,
+                 const double tmin,
+                 const double tmax,
                  HitRecord & hit_record) const noexcept {
     // solving (origin + t * dir - centre)^2 = R^2
     const double a = ray.direction.squared_norm();

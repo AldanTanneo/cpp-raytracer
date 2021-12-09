@@ -6,8 +6,8 @@
 #include <utils/vec3.hpp>
 
 bool Parallelogram::hit(const Ray & ray,
-                        double tmin,
-                        double tmax,
+                        const double tmin,
+                        const double tmax,
                         HitRecord & hit_record) const noexcept {
     // Test if the ray's direction is colinear to the parallelogram
     const double determinant = ray.direction.dot(normal);
