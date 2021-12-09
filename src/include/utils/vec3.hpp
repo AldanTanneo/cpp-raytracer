@@ -52,6 +52,10 @@ namespace colour {
         inline uint32_t to_hex() const noexcept {
             return (red() << 16) | (green() << 8) | blue();
         }
+        // Get the luminance of the colour
+        constexpr double luminance() const noexcept {
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
         // Invert a colour
         constexpr Colour invert() const noexcept {
             return Colour(1.0 - r, 1.0 - g, 1.0 - b);
