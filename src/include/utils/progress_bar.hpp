@@ -33,19 +33,19 @@ private:
     // The background character
     const char * bchar;
     // Start time
-    const time_point start_time;
+    time_point start_time;
 
 public:
     // Construct a default progress bar with 80 subdivisions
     inline ProgressBar(size_t size) noexcept
         : size_scale(1.0 / double(size)), width(default_subdiv), fchar("▓"),
-          bchar("░"), start_time(clock::now()) {
+          bchar("░") {
         progress.store(0);
     }
     // Constructs a progress bar, specify the number of subdivisions.
     inline ProgressBar(size_t size, size_t width) noexcept
         : size_scale(1.0 / double(size)), width(double(width)), fchar("▓"),
-          bchar("░"), start_time(clock::now()) {
+          bchar("░") {
         progress.store(0);
     }
     // Construct a custom progress bar. Specify the number of subdivisions
@@ -56,7 +56,7 @@ public:
                        const char * fchar,
                        const char * bchar)
         : size_scale(1.0 / double(size)), width(double(width)), fchar(fchar),
-          bchar(bchar), start_time(clock::now()) {
+          bchar(bchar) {
         if (utils::utf8len(fchar) != utils::utf8len(bchar)) {
             throw "Foreground and background characters must have the same "
                   "UTF-8 length";
@@ -72,7 +72,8 @@ public:
 
     // Writes the empty progress bar to stdout and returns to line start.
     // Does not reset the terminal style.
-    inline void start() const noexcept {
+    inline void start() noexcept {
+        start_time = clock::now();
         for (size_t i = 0; i < width; ++i)
             fputs(bchar, stdout);
         size_t bchar_width = utils::utf8len(bchar);
@@ -82,7 +83,7 @@ public:
     }
 
     // Writes the empty progress bar to stdout, with the given style.
-    inline void start(const char * style) const noexcept {
+    inline void start(const char * style) noexcept {
         fputs(term_colours::RESET, stdout);
         fputs(style, stdout);
         start();
