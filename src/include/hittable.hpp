@@ -168,6 +168,13 @@ public:
                      double tmin,
                      double tmax,
                      HitRecord & hit_record) const noexcept override;
+
+    // Virtual function override
+    virtual double pdf_value(const Point3 & origin,
+                             const Vec3 & direction) const noexcept override;
+
+    // Virtual function override
+    virtual Vec3 random(const Point3 & origin) const noexcept override;
 };
 
 // A PDF for sampling random points on hittable objects
