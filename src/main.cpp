@@ -1,4 +1,5 @@
 // C libs
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -44,20 +45,19 @@ constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 // Render
-constexpr int spp = 500;
-constexpr double colour_scale = 1.0 / double(spp);
-constexpr int max_bounces = 15;
+constexpr int spp = 250;
+constexpr int max_bounces = 50;
 
 // Global lights
 const vector<GlobalIllumination> global_lights = {};
 
 // Define scene materials
-const Plastic mat_left(1.0 * RED, 1);
-const Plastic mat_right(0.8 * BLUE, 1);
-const Diffuse mat_ground(0.6 * WHITE);
-const Plastic mat_back(WHITE, 0.1);
+const Plastic mat_left(0.8 * GREEN, 1);
+const Plastic mat_right(0.9 * RED, 1);
+const Lambertian mat_ground(0.6 * WHITE);
+const Plastic mat_back(0.8 * WHITE, 0.1);
 const BlackBody mat_light(WHITE, 15);
-const Dielectric mat_plastic(0.75 * WHITE, 1.5);
+const MicroFacet mat_plastic(WHITE, 45);
 
 // Define scene objects
 const Parallelogram
@@ -79,8 +79,6 @@ const Parallelogram light(Point3(200, 554, 200),
 const Sphere sphere1(Point3(400, 100, 400), 100, mat_plastic);
 const Sphere sphere2(Point3(150, 90, 150), 90, mat_plastic);
 
-const Hittable & sampled_hittable = light;
-
 // Camera
 const Camera cam(Point3(277.5, 277.5, -800),
                  Point3(277.5, 277.5, 0),
@@ -88,9 +86,32 @@ const Camera cam(Point3(277.5, 277.5, -800),
                  38.15,
                  aspect_ratio);
 
+constexpr bool compare_luminance(const Colour & a, const Colour & b) noexcept {
+    return a.luminance() < b.luminance();
+}
+
+const vector<double> compute_gaussian_coeffs(const int spp,
+                                             const double half_range) noexcept {
+    const double scale = 1.0 / double(spp - 1);
+    vector<double> coeffs(spp);
+    double sum = 0;
+    for (int k = 0; k < spp; ++k) {
+        double val = 2 * half_range * (double(k) * scale - 0.5);
+        coeffs[k] = exp(-val * val);
+        sum += coeffs[k];
+    }
+    for (int k = 0; k < spp; ++k) {
+        coeffs[k] /= sum;
+    }
+    return coeffs;
+}
+
 int main(int argc, char * argv[]) {
     // Initialize the RNG
-    rng::seed(time(0));
+#pragma omp parallel
+    { rng::seed(time(0)); }
+
+    const vector<double> gaussian_coeffs = compute_gaussian_coeffs(spp, 0.25);
 
     // Create world and add objects to it
     HittableList world;
@@ -103,6 +124,11 @@ int main(int argc, char * argv[]) {
     world.add(sphere2);
     world.add(light);
 
+    HittableList sampled_hittables;
+    sampled_hittables.add(light);
+    // sampled_hittables.add(sphere1);
+    // sampled_hittables.add(sphere2);
+
     // Create a black image to fill with pixels
     Image img = Image::black(width, height);
 
@@ -113,9 +139,11 @@ int main(int argc, char * argv[]) {
 
 #pragma omp parallel for schedule(dynamic)
     for (size_t index = 0; index < width * height; ++index) {
-        Colour c;
+        // Colour c;
         const size_t i = index % width;
         const size_t j = height - 1 - (index / width);
+
+        vector<Colour> samples(spp);
         for (int k = 0; k < spp; ++k) {
             double u =
                 (static_cast<double>(i)
@@ -125,10 +153,16 @@ int main(int argc, char * argv[]) {
                 (static_cast<double>(j)
                  + rng::gen(processing_kernel_min, processing_kernel_max))
                 * height_scale;
-            c += cam.cast_ray(world, global_lights, sampled_hittable,
-                              max_bounces, u, v);
+            samples[k] = cam.cast_ray(world, global_lights, sampled_hittables,
+                                      max_bounces, u, v);
         }
-        img[index] += c * colour_scale;
+        std::sort(samples.begin(), samples.end(),
+                  [](const Colour & a, const Colour & b) {
+                      return a.luminance() < b.luminance();
+                  });
+        for (int k = 0; k < spp; ++k) {
+            img[index] += samples[k] * gaussian_coeffs[k];
+        }
         pb.advance();
     }
 
@@ -136,6 +170,7 @@ int main(int argc, char * argv[]) {
 
     cout << "Applying blur filter..." << endl;
 
+    img.clamp();
     img.gaussian_blur();
 
     cout << "Saving image...";
