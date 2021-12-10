@@ -353,9 +353,7 @@ public:
     // Clamp the image colours in place
     inline void clamp() noexcept {
         for (Colour & c : data) {
-            c.r = utils::clamp(c.r);
-            c.g = utils::clamp(c.g);
-            c.b = utils::clamp(c.b);
+            c = c.clamp();
         }
     }
 };
