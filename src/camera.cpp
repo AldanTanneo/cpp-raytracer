@@ -82,7 +82,7 @@ Colour Camera::cast_ray(const Hittable & world,
             ray.direction = scatter.specular_direction;
         } else {
             const HittablePdf light_pdf(sampled_object, hit_record.hit_point);
-            const MixturePdf pdf(scatter.pdf.get(), &light_pdf);
+            const MixturePdf pdf((const Pdf &)*scatter.pdf.get(), light_pdf);
             ray_colour *= scatter.attenuation;
             ray.direction = pdf.generate();
             if (ray.direction.dot(hit_record.surface_normal) < utils::EPSILON) {
