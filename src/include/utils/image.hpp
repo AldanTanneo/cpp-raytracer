@@ -41,12 +41,10 @@ private:
 public:
     // Create an empty image of size width * height
     inline Image(size_t width, size_t height) noexcept
-        : data(container()), width(width), height(height) {
-        data.reserve(width * height);
-    }
+        : data(container(width * height)), width(width), height(height) {}
     // Create an image of size width * height, using the pixels in the given
     // vector
-    inline Image(container data, size_t width, size_t height)
+    inline Image(container & data, size_t width, size_t height)
         : data(data), width(width), height(height) {
         if (data.size() > width * height) {
             throw "Could not construct Image: too many pixels in the given "
@@ -55,7 +53,7 @@ public:
     }
     // Create a black image of size width * height
     inline static Image black(size_t width, size_t height) noexcept {
-        return Image(container(width * height), width, height);
+        return Image(width, height);
     }
 
     // Parse a PPM image from a stream
