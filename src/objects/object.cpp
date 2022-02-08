@@ -5,21 +5,6 @@
 #include <objects/object.hpp>
 #include <utils/vec3.hpp>
 
-/* gets the position of the vertices of the triangle from the f format */
-int vertices_index_from_f(std::string f_format)
-{
-  int compt = 0;
-  int res = 0;
-  while (f_format.at(compt) != '/') {
-    compt++;
-  }
-
-  for (size_t i = 0; i < compt; i++) {
-    res += ((int)f_format.at(compt - 1 - i) - 48) * pow(10, i);
-  }
-  return res;
-}
-
 
 
 std::vector<Triangle> Object::triangles_from_file(const std::string & obj_file_name) noexcept { 
@@ -32,39 +17,41 @@ std::vector<Triangle> Object::triangles_from_file(const std::string & obj_file_n
     std::vector<Triangle> triangles_set;
     // vector corresponding to the points in the .obj file 
     std::vector<Point3> obj_points;
-    // values of the coordinates
-    double position;
+    // current word in the file
     std::string word;
-    // contains the positions of the vertices of the triangles
-    int i1, i2, i3;
-    // Creates 3d points and corresponding triangles from .obj file
+    // positions of the vertices of the triangles
+    int vertices_index[3];
+    // used to split the words to get the vertex index in the obj (see end)
+    int slash_position;
+
+    
     while (obj_file >> word)
     {
+        // Creates 3d points and corresponding triangles from .obj file
         if (word == "v") {
             Point3 point;
-            obj_file >> position;
-            point.x = position;
-            obj_file >> position;
-            point.y = position;
-            obj_file >> position;
-            point.z = position;
+            obj_file >> word;
+            point.x = stod(word);
+            obj_file >> word;
+            point.y = stod(word);
+            obj_file >> word;
+            point.z = stod(word);
             obj_points.push_back(point);
         }
 
+        // assuming the polygon is a triangle, creates and adds the triangle to the list
         if (word == "f") {
-            // assuming the polygon is a triangle, 
-            // creates and adds the triangle to the list
-            obj_file >> word;
-            i1 = vertices_index_from_f(word) - 1;
-            obj_file >> word;
-            i2 = vertices_index_from_f(word) - 1;
-            obj_file >> word;
-            i3 = vertices_index_from_f(word) - 1;
+            for(size_t i = 0; i < 3; ++i){
+                obj_file >> word;
+                slash_position = word.find('/');
+                vertices_index[i] = stoi(word.substr(0, slash_position));
+            }
             // creates the triangle from the given points and pushes it
-            Triangle triangle(obj_points.data()[i1], obj_points.data()[i2], obj_points.data()[i3], material);
+            Triangle triangle(obj_points.data()[vertices_index[0]], obj_points.data()[vertices_index[1]], obj_points.data()[vertices_index[2]], material);
             triangles_set.push_back(triangle);
         }
     }
+
     obj_file.close();
     return triangles_set;
 }
