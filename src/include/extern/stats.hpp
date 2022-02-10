@@ -24,19 +24,14 @@
 #include "gcem.hpp"
 #include "stats_incl/misc/statslib_options.hpp"
 
-namespace stats
-{
-    #include "stats_incl/misc/misc.hpp"
-
-    #include "stats_incl/dens/dens.hpp"
-
-    #include "stats_incl/prob/prob.hpp"
-
-    #include "stats_incl/quant/quant.hpp"
-
-    #include "stats_incl/rand/rand.hpp"
+namespace stats {
+#include "stats_incl/dens/dens.hpp"
+#include "stats_incl/misc/misc.hpp"
+#include "stats_incl/prob/prob.hpp"
+#include "stats_incl/quant/quant.hpp"
+#include "stats_incl/rand/rand.hpp"
 
     // #include "stats_incl/copula/"
-}
+} // namespace stats
 
 #endif
