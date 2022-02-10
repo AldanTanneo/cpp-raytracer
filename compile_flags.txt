@@ -1,3 +1,5 @@
 -Wall
 -Isrc/include
 -std=c++20
+-fconstexpr-depth=4096
+-fconstexpr-steps=9999999
