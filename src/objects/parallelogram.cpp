@@ -49,8 +49,9 @@ bool Parallelogram::hit(const Ray & ray,
 double Parallelogram::pdf_value(const Point3 & origin,
                                 const Vec3 & direction) const noexcept {
     HitRecord rec;
-    if (!this->hit(Ray(origin, direction), utils::EPSILON, utils::INF, rec))
+    if (!this->hit(Ray(origin, direction), utils::EPSILON, utils::INF, rec)) {
         return 0.0;
+    }
 
     const double area = normal.dot(unit_normal);
     const double distance_squared =
