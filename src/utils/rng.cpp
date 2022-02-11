@@ -21,6 +21,10 @@ struct FastRng {
         z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
         return z ^ (z >> 31);
     }
+
+    constexpr void jump(const uint64_t n = 1) noexcept {
+        value += 0x9E3779B97F4A7C15ULL * (1ULL << 32) * n;
+    }
 };
 
 // Global, thread-local RNG instance
@@ -30,6 +34,8 @@ thread_local FastRng glob_rng(0x193a6754ULL);
 // users cannot see the inside of the beast
 namespace rng {
     void seed(uint64_t seed) noexcept { glob_rng.value = seed; }
+
+    void jump(uint64_t n = 1) noexcept { glob_rng.jump(n); }
 
     uint64_t gen_u64() noexcept { return glob_rng.next_u64(); }
 } // namespace rng
