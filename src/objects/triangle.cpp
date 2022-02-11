@@ -45,3 +45,25 @@ bool Triangle::hit(const Ray & ray,
     hit_record.material = material;
     return true;
 }
+
+double Triangle::pdf_value(const Point3 & origin,
+                           const Vec3 & direction) const noexcept {
+    HitRecord rec;
+    if (!this->hit(Ray(origin, direction), utils::EPSILON, utils::INF, rec)) {
+        return 0.0;
+    }
+
+    const double area = 0.5 * normal.dot(unit_normal);
+    const double distance_squared =
+        rec.time * rec.time * direction.squared_norm();
+    const double cosine =
+        fabs(direction.dot(rec.surface_normal) / direction.norm());
+
+    return distance_squared / (cosine * area);
+}
+
+Vec3 Triangle::random(const Point3 & origin) const noexcept {
+    double alpha = rng::gen();
+    double beta = rng::gen() * alpha;
+    return (vertex + alpha * edge1 + beta * edge2 - origin).unit_vector();
+}
