@@ -6,3 +6,4 @@ main
 xtrem-raytracer
 *.log
 obj
+*.pdf
