@@ -12,8 +12,8 @@ bool HittableList::hit(const Ray & ray_in,
                        double tmax,
                        HitRecord & hit_record) const noexcept {
     bool hit = false;
-    for (const value_type & obj : *this) {
-        if (obj->hit(ray_in, tmin, tmax, hit_record)) {
+    for (const Hittable & obj : *this) {
+        if (obj.hit(ray_in, tmin, tmax, hit_record)) {
             hit = true;
             tmax = hit_record.time;
         }
@@ -23,16 +23,13 @@ bool HittableList::hit(const Ray & ray_in,
 
 double HittableList::pdf_value(const Point3 & origin,
                                const Vec3 & direction) const noexcept {
-    auto weight = 1.0 / size();
-    auto sum = 0.0;
-
-    for (const value_type & obj : *this)
-        sum += weight * obj->pdf_value(origin, direction);
-
-    return sum;
+    double sum = 0.0;
+    for (const Hittable & obj : *this) {
+        sum += obj.pdf_value(origin, direction);
+    }
+    return sum / size();
 }
 
-// Virtual function override
 Vec3 HittableList::random(const Point3 & origin) const noexcept {
-    return at(rng::gen_u64() % size())->random(origin);
+    return at(rng::gen_u64() % size()).get().random(origin);
 }

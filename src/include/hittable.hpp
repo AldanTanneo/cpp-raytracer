@@ -137,11 +137,12 @@ public:
 };
 
 // A dynamic list of hittable objects
-class HittableList : public Hittable,
-                     protected std::vector<std::unique_ptr<Hittable>> {
+class HittableList
+    : public Hittable,
+      protected std::vector<std::reference_wrapper<const Hittable>> {
 public:
     // The inner value type
-    using value_type = std::unique_ptr<Hittable>;
+    using value_type = std::reference_wrapper<const Hittable>;
     // The inner container for the hittable objects
     using container = std::vector<value_type>;
     // Iterator type
@@ -152,15 +153,8 @@ public:
     inline HittableList() noexcept {}
 
     // Add an object inheriting from the Hittable class
-    template <class T>
-    requires std::is_convertible_v<T *, Hittable *>
-    inline void add(const T & object) noexcept {
-        push_back(std::make_unique<T>(object));
-    }
-
-    // Add an already allocated unique_ptr to the hittable list
-    inline void add(std::unique_ptr<Hittable> object) noexcept {
-        push_back(std::move(object));
+    inline void add(const Hittable & object) noexcept {
+        push_back(std::cref(object));
     }
 
     // Hit method override
