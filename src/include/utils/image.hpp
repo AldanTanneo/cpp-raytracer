@@ -365,6 +365,30 @@ public:
             c = c.clamp();
         }
     }
+
+    void fireflies_filter(const std::vector<double> & var1,
+                          const std::vector<double> & var2) noexcept;
+
+private:
+    constexpr int patch_size(const size_t i, const size_t j) const noexcept {
+        int w = 5, h = 5;
+        if (j < 2)
+            w -= 2 - j;
+        if (j + 3 > width)
+            w -= j + 3 - width;
+        if (i < 2)
+            h -= 2 - i;
+        if (i + 3 > height)
+            h -= i + 3 - height;
+        return w * h;
+    }
+
+    void reconstruct(const size_t index, std::vector<bool> & outliers) noexcept;
+
+public:
+    static Image from_grayscale(const std::vector<double> & values,
+                                const size_t width,
+                                const size_t height) noexcept;
 };
 
 #endif

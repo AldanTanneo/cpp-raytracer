@@ -22,6 +22,7 @@ void esd_test(const vector<double> & var,
               const size_t index,
               vector<int> & votes) noexcept {
     constexpr double MAD_TO_STD_DEV = 0.6745;
+    constexpr double THRESHOLD = 3.5;
 
     vector<IndexedValue> queue;
 
@@ -42,8 +43,8 @@ void esd_test(const vector<double> & var,
     }
 
     const int n = queue.size();
-
     std::sort(std::begin(queue), std::end(queue));
+
     double median = queue[n / 2].value;
     if (n % 2 == 0) {
         median += queue[n / 2 + 1].value;
@@ -52,12 +53,15 @@ void esd_test(const vector<double> & var,
 
     int upper_bound = 0;
     {
+        // Compute outlier upper bound using the modifed Z score
+
         vector<double> mad_vec;
         for (const IndexedValue & val : queue) {
             mad_vec.push_back(std::abs(val.value - median));
         }
         std::nth_element(mad_vec.begin(), mad_vec.begin() + n / 2,
                          mad_vec.end());
+
         double mad = mad_vec[n / 2];
         if (n % 2 == 0) {
             mad +=
@@ -66,50 +70,56 @@ void esd_test(const vector<double> & var,
         }
 
         for (const double & md : mad_vec) {
-            if (MAD_TO_STD_DEV * md / mad > 3) {
+            // count all samples with modified Z score above THRESHOLD as
+            // possible outliers
+            if (MAD_TO_STD_DEV * md / mad > THRESHOLD) {
                 upper_bound += 1;
             }
         }
     }
 
-    vector<Sums> stats;
-    Sums old_stats(0.0, 0.0);
-    for (const IndexedValue & val : queue) {
-        old_stats.sum += val.value;
-        old_stats.sum2 += val.value * val.value;
-        stats.push_back(old_stats);
+    vector<Sums> sums;
+    {
+        Sums old_sums(0.0, 0.0);
+        for (const IndexedValue & val : queue) {
+            old_sums.sum += val.value;
+            old_sums.sum2 += val.value * val.value;
+            sums.push_back(old_sums);
+        }
     }
 
     const int nprocess = std::min(n, upper_bound);
     vector<double> r_values;
-    vector<size_t> outliers;
+    vector<size_t> outlier_indexes;
 
-    r_values.reserve(nprocess);
-    outliers.reserve(nprocess);
-
-    for (int i = 0; i < nprocess; ++i) {
-        Sums s = stats.back();
-        double mean = s.sum / queue.size();
-        double std_dev = std::sqrt(s.sum2 / queue.size() - mean * mean);
-
-        IndexedValue max_val = queue.back();
-
-        r_values.push_back(std::abs(max_val.value - mean) / std_dev);
-        outliers.push_back(max_val.index);
-
-        queue.pop_back();
-        stats.pop_back();
-    }
-
+    outlier_indexes.reserve(nprocess);
     int count = 0;
-    for (int i = 0; i < nprocess; ++i) {
-        if (lambdas(n, i + 1) < r_values[i]) {
-            count += 1;
+    {
+        r_values.reserve(nprocess);
+
+        for (int i = 0; i < nprocess; ++i) {
+            Sums s = sums.back();
+            double mean = s.sum / queue.size();
+            double std_dev = std::sqrt(s.sum2 / queue.size() - mean * mean);
+
+            IndexedValue max_val = queue.back();
+
+            r_values.push_back(std::abs(max_val.value - mean) / std_dev);
+            outlier_indexes.push_back(max_val.index);
+
+            queue.pop_back();
+            sums.pop_back();
+        }
+
+        for (int i = 0; i < nprocess; ++i) {
+            if (lambdas(n, i + 1) < r_values[i]) {
+                count += 1;
+            }
         }
     }
 
     for (int i = 0; i < count; ++i) {
-        votes[outliers[i]] += 1;
+        votes[outlier_indexes[i]] += 1;
     }
 }
 

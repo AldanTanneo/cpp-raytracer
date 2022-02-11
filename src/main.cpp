@@ -14,7 +14,6 @@
 
 // From src/include
 #include <camera.hpp>
-#include <fireflies/fireflies_filter.hpp>
 #include <main.hpp>
 #include <materials/dielectric.hpp>
 #include <materials/diffuse.hpp>
@@ -47,19 +46,21 @@ constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 // Render
-constexpr int spp = 100;
-constexpr int max_bounces = 50;
+constexpr int spp = 200;
+constexpr double half_spp_scale = 2.0 / double(spp);
+constexpr int max_bounces = 20;
 
 // Global lights
 const vector<GlobalIllumination> global_lights = {};
 
 // Define scene materials
-const Plastic mat_left(0.8 * GREEN, 0.2);
-const Plastic mat_right(0.9 * RED, 0.2);
-const Lambertian mat_ground(0.4 * WHITE);
-const Plastic mat_back(0.8 * WHITE, 0.1);
+const MicroFacet mat_left(0.95 * GREEN, 20);
+const MicroFacet mat_right(0.9 * RED, 70);
+const Lambertian mat_ground(0.6 * WHITE);
+const MicroFacet mat_back(0.9 * WHITE, 45);
 const BlackBody mat_light(WHITE, 15);
-const MicroFacet mat_plastic(WHITE, 60);
+const Plastic mat_plastic1(WHITE);
+const Metal mat_plastic2(WHITE, 0.3);
 
 // Define scene objects
 const Parallelogram
@@ -78,8 +79,8 @@ const Parallelogram light(Point3(200, 554, 200),
                           Point3(355, 554, 200),
                           Point3(200, 554, 355),
                           mat_light);
-const Sphere sphere1(Point3(400, 100, 400), 100, mat_plastic);
-const Sphere sphere2(Point3(150, 90, 150), 90, mat_plastic);
+const Sphere sphere1(Point3(370, 150, 370), 150, mat_plastic1);
+const Sphere sphere2(Point3(150, 90, 150), 90, mat_plastic2);
 
 // Camera
 const Camera cam(Point3(277.5, 277.5, -800),
@@ -90,22 +91,6 @@ const Camera cam(Point3(277.5, 277.5, -800),
 
 constexpr bool compare_luminance(const Colour & a, const Colour & b) noexcept {
     return a.luminance() < b.luminance();
-}
-
-const vector<double> compute_gaussian_coeffs(const int spp,
-                                             const double half_range) noexcept {
-    const double scale = 1.0 / double(spp - 1);
-    vector<double> coeffs(spp);
-    double sum = 0;
-    for (int k = 0; k < spp; ++k) {
-        double val = 2 * half_range * (double(k) * scale - 0.5);
-        coeffs[k] = exp(-val * val);
-        sum += coeffs[k];
-    }
-    for (int k = 0; k < spp; ++k) {
-        coeffs[k] /= sum;
-    }
-    return coeffs;
 }
 
 int main(int argc, char * argv[]) {
@@ -136,7 +121,7 @@ int main(int argc, char * argv[]) {
     // sampled_hittables.add(sphere2);
 
     // Create two half buffer images to fill with pixels
-    Image img[2] = {Image(width, height), Image(width, height)};
+    Image img(width, height);
 
     vector<double> var[2] = {vector<double>(width * height),
                              vector<double>(width * height)};
@@ -152,7 +137,9 @@ int main(int argc, char * argv[]) {
         const size_t i = index % width;
         const size_t j = height - 1 - (index / width);
 
+        Colour pixel_colour[2];
         for (int k = 0; k < spp; ++k) {
+            // Compute camera coordinates
             double u =
                 (static_cast<double>(i)
                  + rng::gen(processing_kernel_min, processing_kernel_max))
@@ -161,20 +148,23 @@ int main(int argc, char * argv[]) {
                 (static_cast<double>(j)
                  + rng::gen(processing_kernel_min, processing_kernel_max))
                 * height_scale;
+            // Cast ray into scene
             Colour c = cam.cast_ray(world, global_lights, sampled_hittables,
                                     max_bounces, u, v);
+            // Add it to the pixel colour (separated in half buffers)
+            pixel_colour[k & 1] += c;
+            // Compute luminance and squared luminance
             double luminance = c.luminance();
-            img[k & 1][index] += c;
             var[k & 1][index] += luminance * luminance;
         }
-        // normalize final pixels and compute variances
-        img[0][index] /= spp;
-        double l0 = img[0][index].luminance();
-        var[0][index] = var[0][index] / spp - l0 * l0;
+        // Compute final pixel
+        img[index] = (pixel_colour[0] + pixel_colour[1]) / spp;
 
-        img[1][index] /= spp;
-        double l1 = img[1][index].luminance();
-        var[1][index] = var[1][index] / spp - l1 * l1;
+        // fill half buffers with variance
+        double l0 = pixel_colour[0].luminance() * half_spp_scale;
+        var[0][index] = var[0][index] * half_spp_scale - l0 * l0;
+        double l1 = pixel_colour[1].luminance() * half_spp_scale;
+        var[1][index] = var[1][index] * half_spp_scale - l1 * l1;
 
         pb.advance();
     }
@@ -183,11 +173,13 @@ int main(int argc, char * argv[]) {
 
     cout << "Applying firefly filter..." << endl;
 
-    Image filtered_img = fireflies_filter(img[0], var[0], img[1], var[1]);
+    img.clamp();
+    img.fireflies_filter(var[0], var[1]);
 
     cout << "Saving image...";
 
-    filtered_img.save_png("image.png");
+    img.save_png("image.png");
+    Image::from_grayscale(var[0], width, height).save_png("variance.png");
 
     cout << " Done!" << endl;
 
