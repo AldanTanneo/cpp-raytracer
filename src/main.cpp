@@ -1,11 +1,12 @@
 // C libs
-#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <ctime>
 // C++ headers
+#include <algorithm>
 #include <chrono>
+#include <functional>
 #include <iostream>
 #include <memory>
 // Parallelization lib
@@ -13,6 +14,7 @@
 
 // From src/include
 #include <camera.hpp>
+#include <fireflies/fireflies_filter.hpp>
 #include <main.hpp>
 #include <materials/dielectric.hpp>
 #include <materials/diffuse.hpp>
@@ -45,19 +47,19 @@ constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 // Render
-constexpr int spp = 250;
+constexpr int spp = 100;
 constexpr int max_bounces = 50;
 
 // Global lights
 const vector<GlobalIllumination> global_lights = {};
 
 // Define scene materials
-const Plastic mat_left(0.8 * GREEN, 1);
-const Plastic mat_right(0.9 * RED, 1);
-const Lambertian mat_ground(0.6 * WHITE);
+const Plastic mat_left(0.8 * GREEN, 0.2);
+const Plastic mat_right(0.9 * RED, 0.2);
+const Lambertian mat_ground(0.4 * WHITE);
 const Plastic mat_back(0.8 * WHITE, 0.1);
 const BlackBody mat_light(WHITE, 15);
-const MicroFacet mat_plastic(WHITE, 45);
+const MicroFacet mat_plastic(WHITE, 60);
 
 // Define scene objects
 const Parallelogram
@@ -109,9 +111,13 @@ const vector<double> compute_gaussian_coeffs(const int spp,
 int main(int argc, char * argv[]) {
     // Initialize the RNG
 #pragma omp parallel
-    { rng::seed(time(0)); }
+    {
+        rng::seed(time(0));
+        rng::jump(omp_get_thread_num());
+    }
 
-    const vector<double> gaussian_coeffs = compute_gaussian_coeffs(spp, 0.25);
+    // const vector<double> gaussian_coeffs = compute_gaussian_coeffs(spp,
+    // 0.05);
 
     // Create world and add objects to it
     HittableList world;
@@ -129,8 +135,11 @@ int main(int argc, char * argv[]) {
     // sampled_hittables.add(sphere1);
     // sampled_hittables.add(sphere2);
 
-    // Create a black image to fill with pixels
-    Image img = Image::black(width, height);
+    // Create two half buffer images to fill with pixels
+    Image img[2] = {Image(width, height), Image(width, height)};
+
+    vector<double> var[2] = {vector<double>(width * height),
+                             vector<double>(width * height)};
 
     ProgressBar pb(width * height);
     cout << "Rendering image..." << endl;
@@ -143,7 +152,6 @@ int main(int argc, char * argv[]) {
         const size_t i = index % width;
         const size_t j = height - 1 - (index / width);
 
-        vector<Colour> samples(spp);
         for (int k = 0; k < spp; ++k) {
             double u =
                 (static_cast<double>(i)
@@ -153,29 +161,33 @@ int main(int argc, char * argv[]) {
                 (static_cast<double>(j)
                  + rng::gen(processing_kernel_min, processing_kernel_max))
                 * height_scale;
-            samples[k] = cam.cast_ray(world, global_lights, sampled_hittables,
-                                      max_bounces, u, v);
+            Colour c = cam.cast_ray(world, global_lights, sampled_hittables,
+                                    max_bounces, u, v);
+            double luminance = c.luminance();
+            img[k & 1][index] += c;
+            var[k & 1][index] += luminance * luminance;
         }
-        std::sort(samples.begin(), samples.end(),
-                  [](const Colour & a, const Colour & b) {
-                      return a.luminance() < b.luminance();
-                  });
-        for (int k = 0; k < spp; ++k) {
-            img[index] += samples[k] * gaussian_coeffs[k];
-        }
+        // normalize final pixels and compute variances
+        img[0][index] /= spp;
+        double l0 = img[0][index].luminance();
+        var[0][index] = var[0][index] / spp - l0 * l0;
+
+        img[1][index] /= spp;
+        double l1 = img[1][index].luminance();
+        var[1][index] = var[1][index] / spp - l1 * l1;
+
         pb.advance();
     }
 
     pb.stop("Image rendered");
 
-    cout << "Applying blur filter..." << endl;
+    cout << "Applying firefly filter..." << endl;
 
-    img.clamp();
-    img.gaussian_blur();
+    Image filtered_img = fireflies_filter(img[0], var[0], img[1], var[1]);
 
     cout << "Saving image...";
 
-    img.save_png("image.png");
+    filtered_img.save_png("image.png");
 
     cout << " Done!" << endl;
 
