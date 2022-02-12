@@ -11,19 +11,21 @@
 
 namespace kernels {
     // Identity kernel
-    static constexpr double const identity[9] = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+    static constexpr double const identity[9] = { 0, 0, 0, 0, 1, 0, 0, 0, 0 };
     // Uniform blur kernel
     static constexpr double const box_blur[9] = {
         1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
-        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0};
+        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0
+    };
     // Gaussian blur kernel
-    static constexpr double const gaussian_blur[9] = {
-        0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625};
+    static constexpr double const gaussian_blur[9] = { 0.0625, 0.125, 0.0625,
+                                                       0.125,  0.25,  0.125,
+                                                       0.0625, 0.125, 0.0625 };
     // Sharpening kernel
-    static constexpr double const sharpen[9] = {0,    -0.5, 0,    -0.5, 3,
-                                                -0.5, 0,    -0.5, 0};
+    static constexpr double const sharpen[9] = { 0,    -0.5, 0,    -0.5, 3,
+                                                 -0.5, 0,    -0.5, 0 };
     // Embossing kernel
-    static constexpr double const emboss[9] = {-2, -1, 0, -1, 1, 1, 0, 1, 2};
+    static constexpr double const emboss[9] = { -2, -1, 0, -1, 1, 1, 0, 1, 2 };
 } // namespace kernels
 
 // Class for writing and reading PPM images. See the PPM specification at

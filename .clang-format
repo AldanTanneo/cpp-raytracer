@@ -28,4 +28,7 @@
     BinPackArguments: true,
     IndentPPDirectives: BeforeHash,
     BreakBeforeBinaryOperators: NonAssignment,
+    Cpp11BracedListStyle: false,
+    SpaceBeforeCpp11BracedList: true,
+    IndentWrappedFunctionNames: true,
 }
