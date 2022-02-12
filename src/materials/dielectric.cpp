@@ -64,7 +64,7 @@ Translucent::ScatterType
         Vec3 parr_out = -parralel_length * hit_record.surface_normal;
         scatter.specular_direction =
             orth_out + parr_out
-            + parralel_length * Vec3::random_in_unit_sphere();
+            + parralel_length * fuzziness * Vec3::random_in_unit_sphere();
     }
     return ScatterType::Bounce;
 }
