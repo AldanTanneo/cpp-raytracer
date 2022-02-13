@@ -64,9 +64,9 @@ private:
 
     // Never scatter
     virtual ScatterType
-    scatter(const HitRecord & hit_record,
-            const Ray & ray_in,
-            ScatterRecord & scatter) const noexcept override {
+        scatter(const HitRecord & hit_record,
+                const Ray & ray_in,
+                ScatterRecord & scatter) const noexcept override {
         return ScatterType::None;
     }
 
@@ -105,7 +105,7 @@ public:
 
     // Scatter the ray according to the hit material
     inline Material::ScatterType
-    scatter(const Ray & ray_in, ScatterRecord & scatter) const noexcept {
+        scatter(const Ray & ray_in, ScatterRecord & scatter) const noexcept {
         return material.get().scatter(*this, ray_in, scatter);
     }
 };

@@ -21,9 +21,9 @@ public:
 
     // Virtual function override
     virtual ScatterType
-    scatter(const HitRecord & hit_record,
-            const Ray & ray_in,
-            ScatterRecord & scatter) const noexcept override;
+        scatter(const HitRecord & hit_record,
+                const Ray & ray_in,
+                ScatterRecord & scatter) const noexcept override;
 };
 
 #endif

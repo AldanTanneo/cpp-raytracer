@@ -34,7 +34,7 @@ public:
 
     // Construct an ONB from three vectors. Checks that they form a valid ONB
     inline static Onb
-    from_base_vectors(const Vec3 u, const Vec3 v, const Vec3 w) {
+        from_base_vectors(const Vec3 u, const Vec3 v, const Vec3 w) {
         if (fabs(u.squared_norm() - 1) > utils::EPSILON
             || fabs(v.squared_norm() - 1) > utils::EPSILON
             || fabs(w.squared_norm() - 1) > utils::EPSILON
@@ -51,7 +51,7 @@ public:
 
     // Get the local expression of a vector, given its coordinates
     constexpr Vec3
-    local(const double a, const double b, const double c) const noexcept {
+        local(const double a, const double b, const double c) const noexcept {
         return a * u + b * v + c * w;
     }
 

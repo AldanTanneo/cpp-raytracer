@@ -27,7 +27,8 @@ public:
     // Print the ray for debugging purposes
     template <class charT, class charTraits = std::char_traits<charT>>
     inline friend std::basic_ostream<charT, charTraits> &
-    operator<<(std::basic_ostream<charT, charTraits> & os, const Ray & self) {
+        operator<<(std::basic_ostream<charT, charTraits> & os,
+                   const Ray & self) {
         return os << "Ray(" << self.origin << ", " << self.direction << ")";
     }
 };

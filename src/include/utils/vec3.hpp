@@ -34,7 +34,7 @@ namespace colour {
 
         // Construct a colour from its byte RGB components
         constexpr static Colour
-        rgb(uint8_t red, uint8_t green, uint8_t blue) noexcept {
+            rgb(uint8_t red, uint8_t green, uint8_t blue) noexcept {
             return Colour(double(red) / 255.0, double(green) / 255.0,
                           double(blue) / 255.0);
         }
@@ -192,8 +192,8 @@ namespace colour {
         // Print the color for debugging purposes
         template <class charT, class charTraits = std::char_traits<charT>>
         inline friend std::basic_ostream<charT, charTraits> &
-        operator<<(std::basic_ostream<charT, charTraits> & os,
-                   const Colour & self) {
+            operator<<(std::basic_ostream<charT, charTraits> & os,
+                       const Colour & self) {
             return os << "Colour(" << self.r << ", " << self.g << ", " << self.b
                       << ")";
         }
@@ -464,8 +464,8 @@ namespace vec3 {
         // Print the vector for debugging purposes
         template <class charT, class charTraits = std::char_traits<charT>>
         inline friend std::basic_ostream<charT, charTraits> &
-        operator<<(std::basic_ostream<charT, charTraits> & os,
-                   const Vec3 & self) {
+            operator<<(std::basic_ostream<charT, charTraits> & os,
+                       const Vec3 & self) {
             return os << "Vec3(" << self.x << ", " << self.y << ", " << self.z
                       << ")";
         }

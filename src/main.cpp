@@ -43,12 +43,12 @@ constexpr double processing_kernel_max = 1.0 + processing_kernel_offset;
 
 // Image
 constexpr AspectRatio aspect_ratio(1);
-constexpr size_t height = 1000;
+constexpr size_t height = 2000;
 constexpr size_t width = height * aspect_ratio.value();
 constexpr double height_scale = 1.0 / double(height - 1);
 constexpr double width_scale = 1.0 / double(width - 1);
 // Render
-constexpr int spp = 200;
+constexpr int spp = 500;
 constexpr double half_spp_scale = 2.0 / double(spp);
 constexpr int max_bounces = 20;
 
@@ -56,13 +56,13 @@ constexpr int max_bounces = 20;
 const vector<GlobalIllumination> global_lights = {};
 
 // Define scene materials
-const MicroFacet mat_left(0.95 * GREEN, 20);
-const MicroFacet mat_right(0.9 * RED, 70);
+const MicroFacet mat_left(0.95 * BLUE, 20);
+const Metal mat_right(0.9 * RED, 0.0);
 const Lambertian mat_ground(0.6 * WHITE);
-const MicroFacet mat_back(0.9 * WHITE, 45);
+const Plastic mat_back(0.9 * WHITE, 0.1);
 const BlackBody mat_light(WHITE, 15);
 const Plastic mat_plastic1(WHITE);
-const Metal mat_plastic2(WHITE, 0.3);
+const Dielectric mat_plastic2(WHITE, 1.5);
 
 // Define scene objects
 const Parallelogram
@@ -125,8 +125,8 @@ int main(int argc, char * argv[]) {
     // Create two half buffer images to fill with pixels
     Image img(width, height);
 
-    vector<double> var[2] = {vector<double>(width * height),
-                             vector<double>(width * height)};
+    vector<double> var[2] = { vector<double>(width * height),
+                              vector<double>(width * height) };
 
     ProgressBar pb(width * height);
     cout << "Rendering image..." << endl;
