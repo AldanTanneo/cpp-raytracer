@@ -13,6 +13,7 @@
 #include <omp.h>
 
 // From src/include
+
 #include <camera.hpp>
 #include <main.hpp>
 #include <materials/dielectric.hpp>
@@ -25,6 +26,7 @@
 #include <objects/sphere.hpp>
 #include <objects/triangle.hpp>
 #include <utils/image.hpp>
+#include <utils/load_json.hpp>
 #include <utils/progress_bar.hpp>
 
 using std::cout;
