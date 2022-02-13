@@ -54,17 +54,20 @@ Translucent::ScatterType
         || utils::reflectance(cos_theta, refraction_ratio) > rng::gen()) {
         // Reflexion
         scatter.specular_direction =
-            ray_in.direction + 2.0 * r_cos_theta * hit_record.surface_normal;
+            ray_in.direction
+            + r_cos_theta
+                  * (surface_fuzziness * Vec3::random_in_unit_sphere()
+                     + 2.0 * hit_record.surface_normal);
     } else {
         // Refraction
         Vec3 orth_out =
             refraction_ratio
             * (ray_in.direction + r_cos_theta * hit_record.surface_normal);
-        double parralel_length = sqrt(r2 - orth_out.squared_norm());
-        Vec3 parr_out = -parralel_length * hit_record.surface_normal;
-        scatter.specular_direction =
-            orth_out + parr_out
-            + parralel_length * fuzziness * Vec3::random_in_unit_sphere();
+        double parrallel_length = sqrt(r2 - orth_out.squared_norm());
+        Vec3 parr_out = parrallel_length
+                        * (fuzziness * Vec3::random_in_unit_sphere()
+                           - hit_record.surface_normal);
+        scatter.specular_direction = orth_out + parr_out;
     }
     return ScatterType::Bounce;
 }
