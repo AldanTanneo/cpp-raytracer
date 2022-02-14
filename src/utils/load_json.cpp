@@ -6,9 +6,12 @@
 #include <utility>
 #include <vector>
 
+// Extern JSON library
+#define JSON_DIAGNOSTICS 1
+#include <extern/json.hpp>
+
 // From src/include
 #include <camera.hpp>
-#include <extern/json.hpp>
 #include <hittable.hpp>
 #include <materials/dielectric.hpp>
 #include <materials/diffuse.hpp>
@@ -44,20 +47,23 @@ static inline AspectRatio load_aspect_ratio(const json & j) {
     }
 }
 
-static Camera load_cam(const json & j) {
-    Point3 origin = load_vec3(j.at("origin"));
-    Point3 look_at = load_vec3(j.at("look_at"));
-    Vec3 up_vector = load_vec3(j.at("look_at"));
-    double vertical_fov = j.at("vertical_fov");
+static ImageInfo load_image_info(const json & j) {
+    size_t height = j.at("height").get<size_t>();
+    int max_bounces = j.at("max_bounces").get<int>();
+    int spp = j.at("spp").get<int>();
     AspectRatio aspect_ratio = load_aspect_ratio(j.at("aspect_ratio"));
-    return Camera(origin, look_at, up_vector, vertical_fov, aspect_ratio);
+
+    return ImageInfo { height, max_bounces, spp, aspect_ratio };
 }
 
-static ImageInfo load_image_info(const json & j) {
-    size_t height = j.at("height");
-    int max_bounces = j.at("max_bounces");
-    int spp = j.at("spp");
-    return ImageInfo { height, max_bounces, spp };
+static Camera load_cam(const json & j, const ImageInfo & image_info) {
+    Point3 origin = load_vec3(j.at("origin"));
+    Point3 look_at = load_vec3(j.at("look_at"));
+    Vec3 up_vector = load_vec3(j.at("up_vector"));
+    double vertical_fov = j.at("vertical_fov").get<double>();
+
+    return Camera(origin, look_at, up_vector, vertical_fov,
+                  image_info.aspect_ratio);
 }
 
 static vector<GlobalIllumination> load_lights(const json & j) {
@@ -101,14 +107,14 @@ static vector<GlobalIllumination> load_lights(const json & j) {
     return lights;
 }
 
-static unordered_map<string, unique_ptr<Material>>
+static unordered_map<string, shared_ptr<Material>>
     load_materials(const json & j) {
     if (!j.is_object()) {
         throw "Invalid JSON: global_lights must be a map of Material "
               "objects.";
     }
 
-    unordered_map<string, unique_ptr<Material>> materials;
+    unordered_map<string, shared_ptr<Material>> materials;
     Colour colour;
     string material_type;
     double generic_double;
@@ -128,7 +134,7 @@ static unordered_map<string, unique_ptr<Material>>
         } else if (material_type == "microfacet") {
             generic_double = mat.at("sigma");
             materials.insert_or_assign(
-                key, make_unique<Dielectric>(colour, generic_double));
+                key, make_unique<MicroFacet>(colour, generic_double));
 
         } else if (material_type == "dielectric") {
             generic_double = mat.at("refraction_index");
@@ -174,14 +180,14 @@ static unordered_map<string, unique_ptr<Material>>
     return materials;
 }
 
-static pair<vector<unique_ptr<Hittable>>, vector<size_t>> load_objects(
+static pair<vector<shared_ptr<Hittable>>, vector<size_t>> load_objects(
     const json & j,
-    const unordered_map<string, unique_ptr<Material>> & materials) {
+    const unordered_map<string, shared_ptr<Material>> & materials) {
     if (!j.is_array()) {
         throw "Invalid JSON: objects must be an array of Hittable objects.";
     }
 
-    vector<unique_ptr<Hittable>> objects;
+    vector<shared_ptr<Hittable>> objects;
     vector<size_t> sampled_objects;
     string object_type;
     string material_name;
@@ -191,13 +197,9 @@ static pair<vector<unique_ptr<Hittable>>, vector<size_t>> load_objects(
         if (!obj.is_object()) {
             throw "Invalid JSON: objects must be an array of Hittable objects.";
         }
-        ++index;
 
         object_type = obj.at("object_type").get<string>();
         material_name = obj.at("material").get<string>();
-        if (obj.contains("sampled") && obj.at("sampled").get<bool>()) {
-            sampled_objects.push_back(index);
-        }
 
         if (object_type == "sphere") {
             Vec3 center = load_vec3(obj.at("center"));
@@ -238,6 +240,11 @@ static pair<vector<unique_ptr<Hittable>>, vector<size_t>> load_objects(
         } else {
             throw "Invalid object type!";
         }
+
+        if (obj.contains("sampled") && obj.at("sampled").get<bool>()) {
+            sampled_objects.push_back(index);
+        }
+        ++index;
     }
 
     return make_pair(objects, sampled_objects);
@@ -245,18 +252,21 @@ static pair<vector<unique_ptr<Hittable>>, vector<size_t>> load_objects(
 
 Params Params::load_params(const char * file_name) {
     ifstream file(file_name, ios_base::in | ios_base::binary);
-    file.open(file_name);
     if (!file) {
         throw "Could not load json file: could not open file!";
     }
 
     const json j = json::parse(file);
 
-    Camera cam = load_cam(j.at("camera"));
     ImageInfo info = load_image_info(j.at("image"));
+
+    Camera cam = load_cam(j.at("camera"), info);
+
     vector<GlobalIllumination> global_lights = load_lights(j.at("lights"));
-    unordered_map<string, unique_ptr<Material>> materials =
+
+    unordered_map<string, shared_ptr<Material>> materials =
         load_materials(j.at("materials"));
+
     auto [objects, sampled_objects] = load_objects(j.at("objects"), materials);
 
     file.close();

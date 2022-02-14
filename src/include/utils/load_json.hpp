@@ -14,14 +14,15 @@ struct ImageInfo {
     size_t height;
     int max_bounces;
     int spp;
+    AspectRatio aspect_ratio;
 };
 
 struct Params {
     Camera cam;
     ImageInfo info;
     std::vector<GlobalIllumination> global_lights;
-    std::unordered_map<std::string, std::unique_ptr<Material>> materials;
-    std::vector<std::unique_ptr<Hittable>> objects;
+    std::unordered_map<std::string, std::shared_ptr<Material>> materials;
+    std::vector<std::shared_ptr<Hittable>> objects;
     std::vector<size_t> sampled_objects;
 
     static Params load_params(const char * filename);
