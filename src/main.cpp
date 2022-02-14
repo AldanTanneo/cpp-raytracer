@@ -49,7 +49,9 @@ int main(int argc, char * argv[]) try {
     }
 
     if (argc < 2) {
-        cout << "Error: missing config file." << endl
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET << "Missing config file."
+             << endl
              << endl
              << "Usage: xtrem-raytracer.exe <json config file>" << endl;
         return -1;
@@ -59,12 +61,18 @@ int main(int argc, char * argv[]) try {
     try {
         params = Params::load_params(argv[1]);
     } catch (const std::exception & e) {
-        cout << "Error parsing config file: " << e.what() << endl;
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET
+             << "Error parsing config file: " << e.what() << endl;
         return -1;
     } catch (const std::string & s) {
-        cout << "Error parsing config file: " << s << endl;
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET
+             << "Error parsing config file: " << s << endl;
     } catch (const char * s) {
-        cout << "Error parsing config file: " << s << endl;
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET
+             << "Error parsing config file: " << s << endl;
         return -1;
     }
 
@@ -93,7 +101,18 @@ int main(int argc, char * argv[]) try {
     HittableList sampled_hittables;
     for (const size_t & index : params.sampled_objects) {
         const Hittable & obj = *params.objects[index];
+        if (!obj.is_samplable()) {
+            cout << term_colours::YELLOW << term_colours::BOLD
+                 << "[WARN]: " << term_colours::RESET
+                 << "Trying to sample an object that is not samplable." << endl;
+        }
         sampled_hittables.add(obj);
+    }
+
+    if (!sampled_hittables.is_samplable()) {
+        cout << term_colours::YELLOW << term_colours::BOLD
+             << "[WARN]: " << term_colours::RESET
+             << "Trying to sample an object that is not samplable." << endl;
     }
 
     // Create two half buffer images to fill with pixels
@@ -162,15 +181,24 @@ int main(int argc, char * argv[]) try {
     return EXIT_SUCCESS;
 
 } catch (const char * s) {
-    std::cout << "Uncaught exception: " << s << std::endl;
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::RESET
+              << "Uncaught exception: " << s << std::endl;
     return -1;
 } catch (const std::string & s) {
-    std::cout << "Uncaught exception: " << s << std::endl;
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::DEFAULT_FOREGROUND
+              << term_colours::NO_BOLD << "Uncaught exception: " << s
+              << std::endl;
     return -1;
 } catch (const std::exception & e) {
-    std::cout << "Uncaught exception: " << e.what() << std::endl;
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::RESET
+              << "Uncaught exception: " << e.what() << std::endl;
     return -1;
 } catch (...) {
-    std::cout << "Uncaught exception: unknown exception" << std::endl;
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::RESET
+              << "Uncaught exception: unknown exception" << std::endl;
     return -1;
 }
