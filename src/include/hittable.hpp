@@ -13,8 +13,7 @@
 class HitRecord; // Forward declaration of HitRecord
 
 // The returned structure when a material scatters an object
-class ScatterRecord {
-public:
+struct ScatterRecord {
     // The colour of the material
     Colour attenuation;
     // Wether the scattered ray is specular
@@ -132,6 +131,9 @@ public:
         return vec3::ZEROS;
     }
 
+    // Wether the sampling functions are implemented for the object
+    virtual bool is_samplable() const noexcept { return false; }
+
     // Virtual destructor
     virtual ~Hittable() noexcept = default;
 };
@@ -169,6 +171,9 @@ public:
 
     // Virtual function override
     virtual Vec3 random(const Point3 & origin) const noexcept override;
+
+    // Virtual function override
+    virtual bool is_samplable() const noexcept override { return size() != 0; }
 };
 
 // A PDF for sampling random points on hittable objects
