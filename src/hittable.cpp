@@ -31,5 +31,5 @@ double HittableList::pdf_value(const Point3 & origin,
 }
 
 Vec3 HittableList::random(const Point3 & origin) const noexcept {
-    return at(rng::gen_u64() % size()).get().random(origin);
+    return operator[](rng::gen_u64() % size()).get().random(origin);
 }
