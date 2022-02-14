@@ -9,6 +9,9 @@
 #include <limits>
 #include <type_traits>
 
+// From src/include
+#include <extern/gcem.hpp>
+
 namespace term_colours {
     constexpr char const * RESET = "\x1B[0m";
 
@@ -119,19 +122,8 @@ namespace utils {
         return value;
     }
 
-    // Compute a square root at compile time. Very inefficient.
-    template <class T>
-    requires std::is_floating_point_v<T>
-    consteval T const_sqrt(const T value) {
-        if (value < 0) {
-            throw "Cannot compute the square root of a negative number";
-        }
-        T x = value;
-        while (abs((x * x) / value - 1) > utils::EPSILON) {
-            x = (x + value / x) / 2;
-        }
-        return x;
-    }
+    // Compute a square root at compile time.
+    consteval double const_sqrt(const double x) { return gcem::sqrt(x); }
 
     // Clamps a floating point value to the [0.0, 1.0] range
     template <class T>
