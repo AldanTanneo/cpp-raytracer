@@ -7,9 +7,10 @@
 
 
 
-std::vector<Triangle> Object::triangles_from_file(const std::string & obj_file_name) noexcept { 
+Object(const std::string & obj_file_name, const T & material) {
 
     std::ifstream obj_file(obj_file_name);
+    
     if (!obj_file.is_open()) {
         std::cout << "/!\\ Unable to open " << obj_file_name << " /!\\" << std::endl;
     }
@@ -53,9 +54,7 @@ std::vector<Triangle> Object::triangles_from_file(const std::string & obj_file_n
     }
 
     obj_file.close();
-    return triangles_set;
 }
-
 
 
 bool Object::hit(const Ray & ray,
