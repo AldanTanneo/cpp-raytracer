@@ -78,9 +78,9 @@ namespace term_colours {
                   << std::endl;
 #endif
 
-namespace log {
+namespace console {
     // Log output to stdout
-    inline void message(const std::string & msg) noexcept {
+    inline void log(const std::string & msg) noexcept {
         std::cout << msg << std::endl;
     }
     // Log warnings to stderr
@@ -96,7 +96,7 @@ namespace log {
                   << "[ERROR]: " << term_colours::NO_BOLD
                   << term_colours::DEFAULT_FOREGROUND << msg << std::endl;
     }
-} // namespace log
+} // namespace console
 
 namespace utils {
     // Outputs a newline

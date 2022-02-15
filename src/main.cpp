@@ -34,11 +34,11 @@ int main(int argc, char * argv[]) try {
     }
 
     if (argc < 2) {
-        log::error("Missing config file.\n\n"
+        console::error("Missing config file.\n\n"
 #ifdef _WIN32
-                   "Usage: .\\xtrem-raytracer.exe <json config file>"
+                       "Usage: .\\xtrem-raytracer.exe <json config file>"
 #else
-                   "Usage: ./xtrem-raytracer <json config file>"
+                       "Usage: ./xtrem-raytracer <json config file>"
 #endif
         );
         return -1;
@@ -48,13 +48,13 @@ int main(int argc, char * argv[]) try {
     try {
         params = Params::load_params(argv[1]);
     } catch (const std::exception & e) {
-        log::error(std::string("Error parsing config file: ") + e.what());
+        console::error(std::string("Error parsing config file: ") + e.what());
         return -1;
     } catch (const std::string & s) {
-        log::error(std::string("Error parsing config file: ") + s);
+        console::error(std::string("Error parsing config file: ") + s);
         return -1;
     } catch (const char * s) {
-        log::error(std::string("Error parsing config file: ") + s);
+        console::error(std::string("Error parsing config file: ") + s);
         return -1;
     }
 
@@ -82,13 +82,13 @@ int main(int argc, char * argv[]) try {
     for (const size_t & index : params.sampled_objects) {
         const Hittable & obj = *params.objects[index];
         if (!obj.is_samplable()) {
-            log::warn("Trying to sample an object that is not samplable.");
+            console::warn("Trying to sample an object that is not samplable.");
         }
         sampled_hittables.add(obj);
     }
 
     if (!sampled_hittables.is_samplable()) {
-        log::warn("Trying to sample an object that is not samplable.");
+        console::warn("Trying to sample an object that is not samplable.");
     }
 
     // Create two half buffer images to fill with pixels
@@ -98,7 +98,7 @@ int main(int argc, char * argv[]) try {
                               vector<double>(width * height) };
 
     ProgressBar pb(width * height);
-    log::message("Rendering image...");
+    console::log("Rendering image...");
 
     pb.start(term_colours::CYAN);
 
@@ -142,30 +142,30 @@ int main(int argc, char * argv[]) try {
 
     pb.stop("Image rendered");
 
-    log::message("Applying firefly filter...");
+    console::log("Applying firefly filter...");
 
     img.clamp();
     img.fireflies_filter(var[0], var[1]);
 
-    log::message("Saving image...");
+    console::log("Saving image...");
 
     img.save_png("image.png");
     Image::from_grayscale(var[0], width, height).save_png("variance.png");
 
-    log::message("Done!");
+    console::log("Done!");
 
     return EXIT_SUCCESS;
 
 } catch (const char * s) {
-    log::error(std::string("Uncaught exception: ") + s);
+    console::error(std::string("Uncaught exception: ") + s);
     return -1;
 } catch (const std::string & s) {
-    log::error(std::string("Uncaught exception: ") + s);
+    console::error(std::string("Uncaught exception: ") + s);
     return -1;
 } catch (const std::exception & e) {
-    log::error(std::string("Uncaught exception: ") + e.what());
+    console::error(std::string("Uncaught exception: ") + e.what());
     return -1;
 } catch (...) {
-    log::error("Uncaught exception: unknown exception");
+    console::error("Uncaught exception: unknown exception");
     return -1;
 }
