@@ -11,8 +11,12 @@
 #include <hittable.hpp>
 
 class ParseJsonException : public std::exception {
+    const char * msg;
+
 public:
-    ParseJsonException(const char * msg) : std::exception(msg) {}
+    ParseJsonException(const char * msg) {}
+
+    virtual const char * what() const override { return msg; }
 };
 
 struct ImageInfo {
