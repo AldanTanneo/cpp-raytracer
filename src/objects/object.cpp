@@ -5,9 +5,10 @@
 #include <objects/object.hpp>
 #include <utils/vec3.hpp>
 
-std::vector<Triangle>
-    Object::triangles_from_file(const std::string & obj_file_name) noexcept {
+std::vector<Triangle> Object::build_triangles_from_file(
+    const std::string & obj_file_name) noexcept {
     std::ifstream obj_file(obj_file_name);
+
     if (!obj_file.is_open()) {
         std::cout << "/!\\ Unable to open " << obj_file_name << " /!\\"
                   << std::endl;
