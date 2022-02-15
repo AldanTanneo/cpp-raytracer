@@ -98,7 +98,7 @@ int main(int argc, char * argv[]) try {
                               vector<double>(width * height) };
 
     ProgressBar pb(width * height);
-    log::log("Rendering image...");
+    log::message("Rendering image...");
 
     pb.start(term_colours::CYAN);
 
@@ -142,17 +142,17 @@ int main(int argc, char * argv[]) try {
 
     pb.stop("Image rendered");
 
-    log::log("Applying firefly filter...");
+    log::message("Applying firefly filter...");
 
     img.clamp();
     img.fireflies_filter(var[0], var[1]);
 
-    log::log("Saving image...");
+    log::message("Saving image...");
 
     img.save_png("image.png");
     Image::from_grayscale(var[0], width, height).save_png("variance.png");
 
-    log::log("Done!");
+    log::message("Done!");
 
     return EXIT_SUCCESS;
 

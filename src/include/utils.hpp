@@ -80,7 +80,7 @@ namespace term_colours {
 
 namespace log {
     // Log output to stdout
-    inline void log(const std::string & msg) noexcept {
+    inline void message(const std::string & msg) noexcept {
         std::cout << msg << std::endl;
     }
     // Log warnings to stderr
