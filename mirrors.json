@@ -1,0 +1,263 @@
+{
+    "image": {
+        "height": 500,
+        "spp": 1000,
+        "max_bounces": 15,
+        "aspect_ratio": [
+            16,
+            9
+        ]
+    },
+    "camera": {
+        "origin": [
+            2.5,
+            0,
+            1
+        ],
+        "look_at": [
+            2,
+            3,
+            0
+        ],
+        "up_vector": [
+            0,
+            0,
+            1
+        ],
+        "vertical_fov": 45
+    },
+    "lights": [],
+    "materials": {
+        "ground1": {
+            "material_type": "lambertian",
+            "colour": [
+                0.8,
+                0.8,
+                0
+            ]
+        },
+        "ground2": {
+            "material_type": "dielectric",
+            "colour": [
+                0.8,
+                0.8,
+                0.8
+            ],
+            "refraction_index": 1.5
+        },
+        "ground3": {
+            "material_type": "metal",
+            "colour": [
+                0.7,
+                0.7,
+                0.7
+            ],
+            "fuzziness": 0
+        },
+        "mat1": {
+            "material_type": "metal",
+            "colour": [
+                1,
+                1,
+                1
+            ],
+            "fuzziness": 0
+        },
+        "mat2": {
+            "material_type": "plastic",
+            "colour": [
+                1,
+                1,
+                1
+            ],
+            "roughness": 0.1
+        },
+        "mat3": {
+            "material_type": "dielectric",
+            "colour": [
+                0.7,
+                0.7,
+                0.7
+            ],
+            "refraction_index": 1.5
+        },
+        "light": {
+            "material_type": "black_body",
+            "colour": [
+                1,
+                1,
+                1
+            ],
+            "intensity": 2
+        }
+    },
+    "objects": [
+        {
+            "object_type": "parallelogram",
+            "material": "ground1",
+            "vertices": [
+                [
+                    4,
+                    6,
+                    0
+                ],
+                [
+                    0,
+                    6,
+                    0
+                ],
+                [
+                    4,
+                    0,
+                    0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground3",
+            "vertices": [
+                [
+                    0,
+                    6,
+                    0
+                ],
+                [
+                    0,
+                    6,
+                    4
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground3",
+            "vertices": [
+                [
+                    4,
+                    6,
+                    0
+                ],
+                [
+                    4,
+                    6,
+                    4
+                ],
+                [
+                    4,
+                    0,
+                    0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground3",
+            "vertices": [
+                [
+                    4,
+                    6,
+                    4
+                ],
+                [
+                    0,
+                    6,
+                    4
+                ],
+                [
+                    4,
+                    0,
+                    4
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground3",
+            "vertices": [
+                [
+                    4,
+                    6,
+                    4
+                ],
+                [
+                    0,
+                    6,
+                    4
+                ],
+                [
+                    4,
+                    6,
+                    0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground3",
+            "vertices": [
+                [
+                    4,
+                    0,
+                    4
+                ],
+                [
+                    0,
+                    0,
+                    4
+                ],
+                [
+                    4,
+                    0,
+                    0
+                ]
+            ]
+        },
+        {
+            "object_type": "sphere",
+            "material": "mat1",
+            "center": [
+                1,
+                3,
+                0.5
+            ],
+            "radius": 0.5
+        },
+        {
+            "object_type": "sphere",
+            "material": "mat2",
+            "center": [
+                2,
+                3,
+                0.5
+            ],
+            "radius": 0.5
+        },
+        {
+            "object_type": "sphere",
+            "material": "mat3",
+            "center": [
+                3,
+                3,
+                0.5
+            ],
+            "radius": 0.5
+        },
+        {
+            "object_type": "sphere",
+            "material": "light",
+            "center": [
+                2.2,
+                3.0,
+                1.6
+            ],
+            "radius": 0.5,
+            "sampled": true
+        }
+    ]
+}

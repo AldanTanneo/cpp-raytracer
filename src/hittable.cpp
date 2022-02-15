@@ -1,4 +1,5 @@
 #include <memory>
+#include <omp.h>
 
 // From src/include
 #include <hittable.hpp>
@@ -12,12 +13,14 @@ bool HittableList::hit(const Ray & ray_in,
                        double tmax,
                        HitRecord & hit_record) const noexcept {
     bool hit = false;
+
     for (const Hittable & obj : *this) {
         if (obj.hit(ray_in, tmin, tmax, hit_record)) {
             hit = true;
             tmax = hit_record.time;
         }
     }
+
     return hit;
 }
 

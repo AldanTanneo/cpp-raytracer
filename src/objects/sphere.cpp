@@ -37,3 +37,39 @@ bool Sphere::hit(const Ray & ray,
         return false;
     }
 }
+
+double Sphere::pdf_value(const Point3 & origin,
+                         const Vec3 & direction) const noexcept {
+    HitRecord rec;
+    if (!this->hit(Ray(origin, direction), utils::EPSILON, utils::INF, rec)) {
+        return 0;
+    }
+
+    double cos_theta_max =
+        sqrt(1.0 - radius * radius / (centre - origin).squared_norm());
+    double solid_angle = utils::TAU * (1.0 - cos_theta_max);
+
+    return 1.0 / solid_angle;
+}
+
+static inline Vec3 random_to_sphere(double radius,
+                                    double distance_squared) noexcept {
+    double r1 = rng::gen();
+    double r2 = rng::gen();
+    double z =
+        1.0 + r2 * (sqrt(1.0 - radius * radius / distance_squared) - 1.0);
+
+    double phi = utils::TAU * r1;
+    double x = cos(phi) * sqrt(1 - z * z);
+    double y = sin(phi) * sqrt(1 - z * z);
+
+    return Vec3(x, y, z);
+}
+
+Vec3 Sphere::random(const Point3 & origin) const noexcept {
+    Vec3 direction = centre - origin;
+    double distance_squared = direction.squared_norm();
+    Onb uvw;
+    uvw.from_unit_normal(direction / sqrt(distance_squared));
+    return uvw.local(random_to_sphere(radius, distance_squared));
+}

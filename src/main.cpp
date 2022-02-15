@@ -15,8 +15,6 @@
 #include <utils/load_json.hpp>
 #include <utils/progress_bar.hpp>
 
-using std::cout;
-using std::endl;
 using std::vector;
 using namespace colour;
 
@@ -67,11 +65,9 @@ int main(int argc, char * argv[]) try {
     const double width_scale = 1.0 / double(width - 1);
 
     const int spp = params.info.spp;
-    DEBUG(spp);
     const double spp_scale = 1.0 / double(spp);
     const double half_spp_scale = 2.0 / double(spp);
     const int max_bounces = params.info.max_bounces;
-    DEBUG(max_bounces);
 
     const Camera cam = params.cam;
 

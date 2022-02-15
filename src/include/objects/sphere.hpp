@@ -31,6 +31,16 @@ public:
                      const double tmin,
                      const double tmax,
                      HitRecord & hit_record) const noexcept override;
+
+    // Virtual function override
+    virtual double pdf_value(const Point3 & origin,
+                             const Vec3 & direction) const noexcept override;
+
+    // Virtual function override
+    virtual Vec3 random(const Vec3 & origin) const noexcept override;
+
+    // Virtual function override
+    virtual bool is_samplable() const noexcept override { return true; }
 };
 
 #endif

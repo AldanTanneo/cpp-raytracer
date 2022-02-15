@@ -1,8 +1,8 @@
 {
     "image": {
         "height": 1000,
-        "spp": 250,
-        "max_bounces": 20,
+        "spp": 500,
+        "max_bounces": 10,
         "aspect_ratio": 1.0
     },
     "camera": {
@@ -26,12 +26,13 @@
     "lights": [],
     "materials": {
         "mat_left": {
-            "material_type": "lambertian",
+            "material_type": "microfacet",
             "colour": [
                 0.0,
                 0.0,
                 0.95
-            ]
+            ],
+            "sigma": 0.0
         },
         "mat_right": {
             "material_type": "metal",
@@ -233,7 +234,8 @@
                 90.0,
                 150.0
             ],
-            "radius": 90.0
+            "radius": 90.0,
+            "sampled": true
         }
     ]
 }
