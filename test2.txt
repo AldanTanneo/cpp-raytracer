@@ -1,0 +1,14 @@
+# Blender v2.93.1 OBJ File: 'turn.blend'
+# www.blender.org
+mtllib 3d.mtl
+o Tree
+v 0.0 100.0 0.0
+v 100.0 100.0 0.0
+v 0.0 100.0 100.0
+vt 0.578968 0.185388
+vt 0.499314 0.176719
+vn -0.5309 -0.7098 -0.4629
+vn 0.1296 -0.9862 -0.1034
+usemtl trunk_color
+s 1
+f 1/2/1 2/1/1 3/2/1
