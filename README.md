@@ -15,6 +15,18 @@ Le `Makefile` fourni permet d'utiliser les commandes :
 * `make benchmark` pour exécuter le projet en mode `release`
 * `make clean` pour effacer les exécutables et les artéfacts de compilation
 
+Pour exécuter le programme avec un fichier `test.json`, entrez la commande
+
+```bash
+./xtrem-raytracer ./test.json
+```
+
+ou sous Windows
+
+```powershell
+.\xtrem-raytracer.exe .\test.json
+```
+
 ## Compilateur
 
 Le compilateur utilisé est 
