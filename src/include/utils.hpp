@@ -78,6 +78,26 @@ namespace term_colours {
                   << std::endl;
 #endif
 
+namespace log {
+    // Log output to stdout
+    inline void log(const std::string & msg) noexcept {
+        std::cout << msg << std::endl;
+    }
+    // Log warnings to stderr
+    inline void warn(const std::string & msg) noexcept {
+        std::cerr << term_colours::YELLOW << term_colours::BOLD
+                  << "[WARNING]: " << term_colours::NO_BOLD
+                  << term_colours::DEFAULT_FOREGROUND << msg << std::endl;
+    }
+
+    // Log errors to stderr
+    inline void error(const std::string & msg) noexcept {
+        std::cerr << term_colours::RED << term_colours::BOLD
+                  << "[ERROR]: " << term_colours::NO_BOLD
+                  << term_colours::DEFAULT_FOREGROUND << msg << std::endl;
+    }
+} // namespace log
+
 namespace utils {
     // Outputs a newline
     inline void newline() {

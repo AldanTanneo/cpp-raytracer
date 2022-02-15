@@ -4,26 +4,13 @@
 #include <cstdio>
 #include <ctime>
 // C++ headers
-#include <algorithm>
-#include <chrono>
-#include <functional>
 #include <iostream>
-#include <memory>
 #include <string>
 // Parallelization lib
 #include <omp.h>
 
 // From src/include
 #include <camera.hpp>
-#include <materials/dielectric.hpp>
-#include <materials/diffuse.hpp>
-#include <materials/emissive.hpp>
-#include <materials/metal.hpp>
-#include <materials/plastic.hpp>
-#include <objects/cylinder.hpp>
-#include <objects/parallelogram.hpp>
-#include <objects/sphere.hpp>
-#include <objects/triangle.hpp>
 #include <utils/image.hpp>
 #include <utils/load_json.hpp>
 #include <utils/progress_bar.hpp>
@@ -49,11 +36,13 @@ int main(int argc, char * argv[]) try {
     }
 
     if (argc < 2) {
-        cout << term_colours::RED << term_colours::BOLD
-             << "[ERROR]: " << term_colours::RESET << "Missing config file."
-             << endl
-             << endl
-             << "Usage: xtrem-raytracer.exe <json config file>" << endl;
+        log::error("Missing config file.\n\n"
+#ifdef _WIN32
+                   "Usage: .\\xtrem-raytracer.exe <json config file>"
+#else
+                   "Usage: ./xtrem-raytracer <json config file>"
+#endif
+        );
         return -1;
     }
 
@@ -61,18 +50,13 @@ int main(int argc, char * argv[]) try {
     try {
         params = Params::load_params(argv[1]);
     } catch (const std::exception & e) {
-        cout << term_colours::RED << term_colours::BOLD
-             << "[ERROR]: " << term_colours::RESET
-             << "Error parsing config file: " << e.what() << endl;
+        log::error(std::string("Error parsing config file: ") + e.what());
         return -1;
     } catch (const std::string & s) {
-        cout << term_colours::RED << term_colours::BOLD
-             << "[ERROR]: " << term_colours::RESET
-             << "Error parsing config file: " << s << endl;
+        log::error(std::string("Error parsing config file: ") + s);
+        return -1;
     } catch (const char * s) {
-        cout << term_colours::RED << term_colours::BOLD
-             << "[ERROR]: " << term_colours::RESET
-             << "Error parsing config file: " << s << endl;
+        log::error(std::string("Error parsing config file: ") + s);
         return -1;
     }
 
@@ -102,17 +86,13 @@ int main(int argc, char * argv[]) try {
     for (const size_t & index : params.sampled_objects) {
         const Hittable & obj = *params.objects[index];
         if (!obj.is_samplable()) {
-            cout << term_colours::YELLOW << term_colours::BOLD
-                 << "[WARN]: " << term_colours::RESET
-                 << "Trying to sample an object that is not samplable." << endl;
+            log::warn("Trying to sample an object that is not samplable.");
         }
         sampled_hittables.add(obj);
     }
 
     if (!sampled_hittables.is_samplable()) {
-        cout << term_colours::YELLOW << term_colours::BOLD
-             << "[WARN]: " << term_colours::RESET
-             << "Trying to sample an object that is not samplable." << endl;
+        log::warn("Trying to sample an object that is not samplable.");
     }
 
     // Create two half buffer images to fill with pixels
@@ -122,7 +102,7 @@ int main(int argc, char * argv[]) try {
                               vector<double>(width * height) };
 
     ProgressBar pb(width * height);
-    cout << "Rendering image..." << endl;
+    log::log("Rendering image...");
 
     pb.start(term_colours::CYAN);
 
@@ -166,39 +146,30 @@ int main(int argc, char * argv[]) try {
 
     pb.stop("Image rendered");
 
-    cout << "Applying firefly filter..." << endl;
+    log::log("Applying firefly filter...");
 
-    // img.clamp();
+    img.clamp();
     img.fireflies_filter(var[0], var[1]);
 
-    cout << "Saving image...";
+    log::log("Saving image...");
 
     img.save_png("image.png");
     Image::from_grayscale(var[0], width, height).save_png("variance.png");
 
-    cout << " Done!" << endl;
+    log::log("Done!");
 
     return EXIT_SUCCESS;
 
 } catch (const char * s) {
-    std::cout << term_colours::RED << term_colours::BOLD
-              << "[ERROR]: " << term_colours::RESET
-              << "Uncaught exception: " << s << std::endl;
+    log::error(std::string("Uncaught exception: ") + s);
     return -1;
 } catch (const std::string & s) {
-    std::cout << term_colours::RED << term_colours::BOLD
-              << "[ERROR]: " << term_colours::DEFAULT_FOREGROUND
-              << term_colours::NO_BOLD << "Uncaught exception: " << s
-              << std::endl;
+    log::error(std::string("Uncaught exception: ") + s);
     return -1;
 } catch (const std::exception & e) {
-    std::cout << term_colours::RED << term_colours::BOLD
-              << "[ERROR]: " << term_colours::RESET
-              << "Uncaught exception: " << e.what() << std::endl;
+    log::error(std::string("Uncaught exception: ") + e.what());
     return -1;
 } catch (...) {
-    std::cout << term_colours::RED << term_colours::BOLD
-              << "[ERROR]: " << term_colours::RESET
-              << "Uncaught exception: unknown exception" << std::endl;
+    log::error("Uncaught exception: unknown exception");
     return -1;
 }

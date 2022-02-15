@@ -73,14 +73,14 @@ static vector<GlobalIllumination> load_lights(const json & j) {
     LightType light_type;
     Point3 position;
     if (!j.is_array()) {
-        throw "Invalid JSON: global_lights must be an array of "
-              "GlobalIllumination objects.";
+        throw ParseJsonException("Invalid JSON: global_lights must be an array "
+                                 "of GlobalIllumination objects.");
     }
 
     for (const json & light : j) {
         if (!light.is_object()) {
-            throw "Invalid JSON: global_lights must be an array of "
-                  "GlobalIllumination objects.";
+            throw ParseJsonException("Invalid JSON: global_lights must be an "
+                                     "array of GlobalIllumination objects.");
         }
 
         colour = load_colour(light.at("colour"));
@@ -99,7 +99,7 @@ static vector<GlobalIllumination> load_lights(const json & j) {
             position = load_vec3(light.at("position"));
 
         } else {
-            throw "Invalid light type!";
+            throw ParseJsonException("Invalid light type!");
         }
 
         lights.push_back(GlobalIllumination(colour, light_type, position));
@@ -110,8 +110,8 @@ static vector<GlobalIllumination> load_lights(const json & j) {
 static unordered_map<string, shared_ptr<Material>>
     load_materials(const json & j) {
     if (!j.is_object()) {
-        throw "Invalid JSON: global_lights must be a map of Material "
-              "objects.";
+        throw ParseJsonException(
+            "Invalid JSON: global_lights must be a map of Material objects.");
     }
 
     unordered_map<string, shared_ptr<Material>> materials;
@@ -121,8 +121,8 @@ static unordered_map<string, shared_ptr<Material>>
 
     for (const auto & [key, mat] : j.items()) {
         if (!mat.is_object()) {
-            throw "Invalid JSON: global_lights must be a map of Material "
-                  "objects.";
+            throw ParseJsonException("Invalid JSON: global_lights must be a "
+                                     "map of Material objects.");
         }
 
         colour = load_colour(mat.at("colour"));
@@ -174,7 +174,7 @@ static unordered_map<string, shared_ptr<Material>>
                 key, make_unique<BlackBody>(colour, generic_double));
 
         } else {
-            throw "Invalid material type!";
+            throw ParseJsonException("Invalid material type!");
         }
     }
     return materials;
@@ -184,7 +184,8 @@ static pair<vector<shared_ptr<Hittable>>, vector<size_t>> load_objects(
     const json & j,
     const unordered_map<string, shared_ptr<Material>> & materials) {
     if (!j.is_array()) {
-        throw "Invalid JSON: objects must be an array of Hittable objects.";
+        throw ParseJsonException(
+            "Invalid JSON: objects must be an array of Hittable objects.");
     }
 
     vector<shared_ptr<Hittable>> objects;
@@ -195,7 +196,8 @@ static pair<vector<shared_ptr<Hittable>>, vector<size_t>> load_objects(
 
     for (const json & obj : j) {
         if (!obj.is_object()) {
-            throw "Invalid JSON: objects must be an array of Hittable objects.";
+            throw ParseJsonException(
+                "Invalid JSON: objects must be an array of Hittable objects.");
         }
 
         object_type = obj.at("object_type").get<string>();
@@ -238,7 +240,7 @@ static pair<vector<shared_ptr<Hittable>>, vector<size_t>> load_objects(
                 (const Material &)*materials.at(material_name)));
 
         } else {
-            throw "Invalid object type!";
+            throw ParseJsonException("Invalid object type!");
         }
 
         if (obj.contains("sampled") && obj.at("sampled").get<bool>()) {
@@ -253,7 +255,8 @@ static pair<vector<shared_ptr<Hittable>>, vector<size_t>> load_objects(
 Params Params::load_params(const char * file_name) {
     ifstream file(file_name, ios_base::in | ios_base::binary);
     if (!file) {
-        throw "Could not load json file: could not open file!";
+        throw ParseJsonException(
+            "Could not load json file: could not open file!");
     }
 
     const json j = json::parse(file);

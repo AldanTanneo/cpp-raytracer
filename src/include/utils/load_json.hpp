@@ -10,6 +10,11 @@
 #include <extern/json.hpp>
 #include <hittable.hpp>
 
+class ParseJsonException : public std::exception {
+public:
+    ParseJsonException(const char * msg) : std::exception(msg) {}
+};
+
 struct ImageInfo {
     size_t height;
     int max_bounces;
