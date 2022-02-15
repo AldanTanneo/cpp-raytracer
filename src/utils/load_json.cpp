@@ -83,8 +83,8 @@ static vector<GlobalIllumination> load_lights(const json & j) {
                   "GlobalIllumination objects.";
         }
 
-        colour = load_colour(j.at("colour"));
-        light_type_string = j.at("light_type").get<string>();
+        colour = load_colour(light.at("colour"));
+        light_type_string = light.at("light_type").get<string>();
 
         if (light_type_string == "ambient") {
             light_type = Ambient;
@@ -92,11 +92,11 @@ static vector<GlobalIllumination> load_lights(const json & j) {
 
         } else if (light_type_string == "infinite") {
             light_type = Infinite;
-            position = load_vec3(j.at("direction"));
+            position = load_vec3(light.at("direction"));
 
         } else if (light_type_string == "point") {
             light_type = Point;
-            position = load_vec3(j.at("position"));
+            position = load_vec3(light.at("position"));
 
         } else {
             throw "Invalid light type!";
