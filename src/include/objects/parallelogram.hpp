@@ -53,6 +53,8 @@ public:
 
     // Virtual function override
     virtual Vec3 random(const Point3 & origin) const noexcept override;
+
+    virtual bool is_samplable() const noexcept override { return true; }
 };
 
 #endif

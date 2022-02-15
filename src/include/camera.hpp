@@ -14,9 +14,12 @@
 struct AspectRatio {
 private:
     // The wrapped aspect ratio
-    const double aspect_ratio;
+    double aspect_ratio;
 
 public:
+    // Default constructor
+    constexpr AspectRatio() : aspect_ratio(1.0) {}
+
     // Construct an aspect ratio from two integers
     constexpr AspectRatio(unsigned int width, unsigned int height)
         : aspect_ratio(double(width) / double(height)) {
@@ -50,12 +53,12 @@ enum LightType {
 // Global light
 struct GlobalIllumination {
     // The global light type
-    const LightType type;
+    LightType type;
     // For point lights, the position of the light; for infinite lights, the
     // direction of the light
-    const Point3 position;
+    Point3 position;
     // The colour of the light
-    const Colour colour;
+    Colour colour;
 
     // Construct a global light instance
     constexpr GlobalIllumination(const Colour colour,
@@ -70,7 +73,7 @@ struct GlobalIllumination {
 class Camera {
 private:
     // Origin point
-    const Point3 origin;
+    Point3 origin;
     // Vector from the origin to the bottom left corner of the screen
     Vec3 origin_to_bottom_left_corner;
     // Vertical vector of the screen space
@@ -81,12 +84,14 @@ private:
     Onb base;
 
 public:
+    Camera() = default;
+
     // Construct a camera
     Camera(Point3 origin,
            Point3 look_at,
            Vec3 up_vector,
            double vertical_fov,
-           AspectRatio aspect_ratio);
+           const AspectRatio & aspect_ratio);
 
     // Get a ray from normalized coordinates in the virtual screen space
     constexpr Ray get_ray(double u, double v) const noexcept {

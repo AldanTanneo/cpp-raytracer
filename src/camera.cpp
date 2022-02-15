@@ -9,7 +9,7 @@ Camera::Camera(Point3 origin,
                Point3 look_at,
                Vec3 up_vector,
                double vertical_fov,
-               AspectRatio aspect_ratio)
+               const AspectRatio & aspect_ratio)
     : origin(origin) {
     if (vertical_fov < utils::EPSILON || vertical_fov > 180 - utils::EPSILON) {
         throw "Could not build camera: vertical fov must be an angle between "
@@ -56,7 +56,7 @@ Colour Camera::cast_ray(const Hittable & world,
     Colour ray_colour = colour::WHITE;
     HitRecord hit_record;
     ScatterRecord scatter;
-    uint32_t iter;
+    uint32_t iter = 0;
     double pdf_coeff = 1.0;
     double pdf_value = 1.0;
     for (iter = 0; iter < max_bounces; ++iter) {
@@ -82,7 +82,11 @@ Colour Camera::cast_ray(const Hittable & world,
             ray.direction = scatter.specular_direction;
         } else {
             const HittablePdf light_pdf(sampled_object, hit_record.hit_point);
-            const MixturePdf pdf((const Pdf &)*scatter.pdf.get(), light_pdf);
+            const MixturePdf mixture_pdf((const Pdf &)*scatter.pdf.get(),
+                                         light_pdf);
+            const Pdf & pdf = sampled_object.is_samplable()
+                                  ? mixture_pdf
+                                  : (const Pdf &)*scatter.pdf.get();
             ray_colour *= scatter.attenuation;
             ray.direction = pdf.generate();
             if (ray.direction.dot(hit_record.surface_normal) < utils::EPSILON) {

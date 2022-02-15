@@ -1,0 +1,239 @@
+{
+    "image": {
+        "height": 1000,
+        "spp": 250,
+        "max_bounces": 20,
+        "aspect_ratio": 1.0
+    },
+    "camera": {
+        "origin": [
+            277.5,
+            277.5,
+            -800.0
+        ],
+        "look_at": [
+            277.5,
+            277.5,
+            0.0
+        ],
+        "up_vector": [
+            0.0,
+            1.0,
+            0.0
+        ],
+        "vertical_fov": 38.15
+    },
+    "lights": [],
+    "materials": {
+        "mat_left": {
+            "material_type": "lambertian",
+            "colour": [
+                0.0,
+                0.0,
+                0.95
+            ]
+        },
+        "mat_right": {
+            "material_type": "metal",
+            "colour": [
+                0.9,
+                0.0,
+                0.0
+            ],
+            "fuzziness": 0.0
+        },
+        "mat_ground": {
+            "material_type": "lambertian",
+            "colour": [
+                0.6,
+                0.6,
+                0.6
+            ]
+        },
+        "mat_back": {
+            "material_type": "lambertian",
+            "colour": [
+                0.9,
+                0.9,
+                0.9
+            ],
+            "roughness": 0.1
+        },
+        "mat_light": {
+            "material_type": "black_body",
+            "colour": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "intensity": 20.0
+        },
+        "mat_plastic": {
+            "material_type": "plastic",
+            "colour": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "roughness": 0.0
+        },
+        "mat_glass": {
+            "material_type": "dielectric",
+            "colour": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "refraction_index": 1.5
+        }
+    },
+    "objects": [
+        {
+            "object_type": "parallelogram",
+            "material": "mat_back",
+            "vertices": [
+                [
+                    0.0,
+                    0.0,
+                    555.0
+                ],
+                [
+                    0.0,
+                    555.0,
+                    555.0
+                ],
+                [
+                    555.0,
+                    0.0,
+                    555.0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "mat_right",
+            "vertices": [
+                [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    555.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    555.0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "mat_left",
+            "vertices": [
+                [
+                    555.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    555.0,
+                    555.0,
+                    0.0
+                ],
+                [
+                    555.0,
+                    0.0,
+                    555.0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "mat_ground",
+            "vertices": [
+                [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    555.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    555.0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "mat_ground",
+            "vertices": [
+                [
+                    0.0,
+                    555.0,
+                    0.0
+                ],
+                [
+                    555.0,
+                    555.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    555.0,
+                    555.0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "mat_light",
+            "vertices": [
+                [
+                    200.0,
+                    554.0,
+                    200.0
+                ],
+                [
+                    355.0,
+                    554.0,
+                    200.0
+                ],
+                [
+                    200.0,
+                    554.0,
+                    355.0
+                ]
+            ],
+            "sampled": true
+        },
+        {
+            "object_type": "sphere",
+            "material": "mat_plastic",
+            "center": [
+                370.0,
+                150.0,
+                370.0
+            ],
+            "radius": 150.0
+        },
+        {
+            "object_type": "sphere",
+            "material": "mat_glass",
+            "center": [
+                150.0,
+                90.0,
+                150.0
+            ],
+            "radius": 90.0
+        }
+    ]
+}

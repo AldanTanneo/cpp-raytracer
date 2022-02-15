@@ -5,9 +5,9 @@
 #include <utils/vec3.hpp>
 
 Lambertian::ScatterType
-Lambertian::scatter(const HitRecord & hit_record,
-                    const Ray & ray_in,
-                    ScatterRecord & scatter) const noexcept {
+    Lambertian::scatter(const HitRecord & hit_record,
+                        const Ray & ray_in,
+                        ScatterRecord & scatter) const noexcept {
     scatter.attenuation = albedo;
     scatter.is_specular = false;
     scatter.pdf = std::make_unique<CosinePdf>(hit_record.surface_normal);
@@ -23,9 +23,9 @@ double Lambertian::scattering_pdf(const HitRecord & hit_record,
 }
 
 MicroFacet::ScatterType
-MicroFacet::scatter(const HitRecord & hit_record,
-                    const Ray & ray_in,
-                    ScatterRecord & scatter) const noexcept {
+    MicroFacet::scatter(const HitRecord & hit_record,
+                        const Ray & ray_in,
+                        ScatterRecord & scatter) const noexcept {
     scatter.attenuation = albedo;
     scatter.is_specular = false;
     scatter.pdf = std::make_unique<OrenNayar>(

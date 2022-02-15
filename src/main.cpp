@@ -9,12 +9,12 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <string>
 // Parallelization lib
 #include <omp.h>
 
 // From src/include
 #include <camera.hpp>
-#include <main.hpp>
 #include <materials/dielectric.hpp>
 #include <materials/diffuse.hpp>
 #include <materials/emissive.hpp>
@@ -25,6 +25,7 @@
 #include <objects/sphere.hpp>
 #include <objects/triangle.hpp>
 #include <utils/image.hpp>
+#include <utils/load_json.hpp>
 #include <utils/progress_bar.hpp>
 
 using std::cout;
@@ -39,92 +40,86 @@ constexpr double processing_kernel_offset =
 constexpr double processing_kernel_min = 0.0 - processing_kernel_offset;
 constexpr double processing_kernel_max = 1.0 + processing_kernel_offset;
 
-// Image
-constexpr AspectRatio aspect_ratio(1);
-constexpr size_t height = 1000;
-constexpr size_t width = height * aspect_ratio.value();
-constexpr double height_scale = 1.0 / double(height - 1);
-constexpr double width_scale = 1.0 / double(width - 1);
-// Render
-constexpr int spp = 200;
-constexpr double half_spp_scale = 2.0 / double(spp);
-constexpr int max_bounces = 20;
-
-// Global lights
-const vector<GlobalIllumination> global_lights = {};
-
-// Define scene materials
-const MicroFacet mat_left(0.95 * GREEN, 20);
-const MicroFacet mat_right(0.9 * RED, 70);
-const Lambertian mat_ground(0.6 * WHITE);
-const MicroFacet mat_back(0.9 * WHITE, 45);
-const BlackBody mat_light(WHITE, 15);
-const Plastic mat_plastic1(WHITE);
-const Metal mat_plastic2(WHITE, 0.3);
-
-// Define scene objects
-const Parallelogram
-    back(Point3(0, 0, 555), Point3(0, 555, 555), Point3(555, 0, 555), mat_back);
-const Parallelogram
-    right(Point3(0, 0, 0), Point3(0, 555, 0), Point3(0, 0, 555), mat_right);
-const Parallelogram
-    left(Point3(555, 0, 0), Point3(555, 555, 0), Point3(555, 0, 555), mat_left);
-const Parallelogram
-    ground(Point3(0, 0, 0), Point3(555, 0, 0), Point3(0, 0, 555), mat_ground);
-const Parallelogram ceiling(Point3(0, 555, 0),
-                            Point3(555, 555, 0),
-                            Point3(0, 555, 555),
-                            mat_ground);
-const Parallelogram light(Point3(200, 554, 200),
-                          Point3(355, 554, 200),
-                          Point3(200, 554, 355),
-                          mat_light);
-const Sphere sphere1(Point3(370, 150, 370), 150, mat_plastic1);
-const Sphere sphere2(Point3(150, 90, 150), 90, mat_plastic2);
-
-// Camera
-const Camera cam(Point3(277.5, 277.5, -800),
-                 Point3(277.5, 277.5, 0),
-                 vec3::Y,
-                 38.15,
-                 aspect_ratio);
-
-constexpr bool compare_luminance(const Colour & a, const Colour & b) noexcept {
-    return a.luminance() < b.luminance();
-}
-
-int main(int argc, char * argv[]) {
-    // Initialize the RNG
+int main(int argc, char * argv[]) try {
+    // Initialize the RNG for all threads
 #pragma omp parallel
     {
         rng::seed(time(0));
         rng::jump(omp_get_thread_num());
     }
 
-    // const vector<double> gaussian_coeffs = compute_gaussian_coeffs(spp,
-    // 0.05);
+    if (argc < 2) {
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET << "Missing config file."
+             << endl
+             << endl
+             << "Usage: xtrem-raytracer.exe <json config file>" << endl;
+        return -1;
+    }
 
-    // Create world and add objects to it
+    Params params;
+    try {
+        params = Params::load_params(argv[1]);
+    } catch (const std::exception & e) {
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET
+             << "Error parsing config file: " << e.what() << endl;
+        return -1;
+    } catch (const std::string & s) {
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET
+             << "Error parsing config file: " << s << endl;
+    } catch (const char * s) {
+        cout << term_colours::RED << term_colours::BOLD
+             << "[ERROR]: " << term_colours::RESET
+             << "Error parsing config file: " << s << endl;
+        return -1;
+    }
+
+    const size_t height = params.info.height;
+    const size_t width = params.info.height * params.info.aspect_ratio.value();
+
+    const double height_scale = 1.0 / double(height - 1);
+    const double width_scale = 1.0 / double(width - 1);
+
+    const int spp = params.info.spp;
+    DEBUG(spp);
+    const double spp_scale = 1.0 / double(spp);
+    const double half_spp_scale = 2.0 / double(spp);
+    const int max_bounces = params.info.max_bounces;
+    DEBUG(max_bounces);
+
+    const Camera cam = params.cam;
+
+    const vector<GlobalIllumination> global_lights = params.global_lights;
+
     HittableList world;
-    world.add(ground);
-    world.add(back);
-    world.add(ceiling);
-    world.add(left);
-    world.add(right);
-    world.add(sphere1);
-    world.add(sphere2);
-    world.add(light);
+    for (const std::shared_ptr<Hittable> & obj : params.objects) {
+        world.add((const Hittable &)*obj);
+    }
 
     HittableList sampled_hittables;
-    sampled_hittables.add(light);
-    // sampled_hittables.add(sphere1);
-    // sampled_hittables.add(sphere2);
+    for (const size_t & index : params.sampled_objects) {
+        const Hittable & obj = *params.objects[index];
+        if (!obj.is_samplable()) {
+            cout << term_colours::YELLOW << term_colours::BOLD
+                 << "[WARN]: " << term_colours::RESET
+                 << "Trying to sample an object that is not samplable." << endl;
+        }
+        sampled_hittables.add(obj);
+    }
+
+    if (!sampled_hittables.is_samplable()) {
+        cout << term_colours::YELLOW << term_colours::BOLD
+             << "[WARN]: " << term_colours::RESET
+             << "Trying to sample an object that is not samplable." << endl;
+    }
 
     // Create two half buffer images to fill with pixels
     Image img(width, height);
 
-    vector<double> var[2] = {vector<double>(width * height),
-                             vector<double>(width * height)};
+    vector<double> var[2] = { vector<double>(width * height),
+                              vector<double>(width * height) };
 
     ProgressBar pb(width * height);
     cout << "Rendering image..." << endl;
@@ -158,7 +153,7 @@ int main(int argc, char * argv[]) {
             var[k & 1][index] += luminance * luminance;
         }
         // Compute final pixel
-        img[index] = (pixel_colour[0] + pixel_colour[1]) / spp;
+        img[index] = (pixel_colour[0] + pixel_colour[1]) * spp_scale;
 
         // fill half buffers with variance
         double l0 = pixel_colour[0].luminance() * half_spp_scale;
@@ -173,7 +168,7 @@ int main(int argc, char * argv[]) {
 
     cout << "Applying firefly filter..." << endl;
 
-    img.clamp();
+    // img.clamp();
     img.fireflies_filter(var[0], var[1]);
 
     cout << "Saving image...";
@@ -184,4 +179,26 @@ int main(int argc, char * argv[]) {
     cout << " Done!" << endl;
 
     return EXIT_SUCCESS;
+
+} catch (const char * s) {
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::RESET
+              << "Uncaught exception: " << s << std::endl;
+    return -1;
+} catch (const std::string & s) {
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::DEFAULT_FOREGROUND
+              << term_colours::NO_BOLD << "Uncaught exception: " << s
+              << std::endl;
+    return -1;
+} catch (const std::exception & e) {
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::RESET
+              << "Uncaught exception: " << e.what() << std::endl;
+    return -1;
+} catch (...) {
+    std::cout << term_colours::RED << term_colours::BOLD
+              << "[ERROR]: " << term_colours::RESET
+              << "Uncaught exception: unknown exception" << std::endl;
+    return -1;
 }

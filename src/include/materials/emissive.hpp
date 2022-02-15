@@ -19,9 +19,9 @@ public:
 
     // Virtual function override
     virtual ScatterType
-    scatter(const HitRecord & hit_record,
-            const Ray & ray_in,
-            ScatterRecord & scatter) const noexcept override;
+        scatter(const HitRecord & hit_record,
+                const Ray & ray_in,
+                ScatterRecord & scatter) const noexcept override;
 };
 
 // Perfect light source material: always absorb the ray (black body model)
@@ -37,9 +37,9 @@ public:
 
     // Virtual function override
     virtual ScatterType
-    scatter(const HitRecord & hit_record,
-            const Ray & ray_in,
-            ScatterRecord & scatter) const noexcept override;
+        scatter(const HitRecord & hit_record,
+                const Ray & ray_in,
+                ScatterRecord & scatter) const noexcept override;
 };
 
 #endif

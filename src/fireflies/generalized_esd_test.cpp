@@ -38,7 +38,7 @@ void esd_test(const vector<double> & var,
         for (size_t i = top; i < bottom; ++i) {
             size_t index = i * width + j;
             double variance = var[index];
-            queue.push_back(IndexedValue(variance, index));
+            queue.push_back(IndexedValue { variance, index });
         }
     }
 
@@ -80,7 +80,7 @@ void esd_test(const vector<double> & var,
 
     vector<Sums> sums;
     {
-        Sums old_sums(0.0, 0.0);
+        Sums old_sums { 0., 0. };
         for (const IndexedValue & val : queue) {
             old_sums.sum += val.value;
             old_sums.sum2 += val.value * val.value;
