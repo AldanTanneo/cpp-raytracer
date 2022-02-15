@@ -15,7 +15,7 @@ std::vector<Triangle> Object::triangles_from_file(const std::string & obj_file_n
     }
   
     std::vector<Triangle> triangles_set;
-    // vector corresponding to the points in the .obj file 
+    // vector corresponding to the points in the .obj file makema
     std::vector<Point3> obj_points;
     // current word in the file
     std::string word;
