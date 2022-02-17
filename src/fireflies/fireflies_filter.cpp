@@ -6,11 +6,13 @@
 #include <utils.hpp>
 #include <utils/image.hpp>
 
-static const constinit double gaussian_5x5_kernel[5][5] = {{1, 4, 7, 4, 1},
-                                                           {4, 16, 26, 16, 4},
-                                                           {7, 26, 41, 26, 7},
-                                                           {4, 16, 26, 16, 4},
-                                                           {1, 4, 7, 4, 1}};
+static const constinit double gaussian_5x5_kernel[5][5] = {
+    { 1, 4, 7, 4, 1 },
+    { 4, 16, 26, 16, 4 },
+    { 7, 26, 41, 26, 7 },
+    { 4, 16, 26, 16, 4 },
+    { 1, 4, 7, 4, 1 }
+};
 
 void Image::reconstruct(const size_t index,
                         std::vector<bool> & outliers) noexcept {

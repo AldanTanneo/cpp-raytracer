@@ -368,10 +368,16 @@ public:
         }
     }
 
+    // Filter fireflies in an image given two variance half buffers
+    //
+    // Source: "Firefly Detection with Half Buffers", article by Keith Jeffery,
+    // at DreamWorks (2018)
     void fireflies_filter(const std::vector<double> & var1,
                           const std::vector<double> & var2) noexcept;
 
 private:
+    // Compute the size of the intersection between a 5x5 kernel and the image
+    // at the given position
     constexpr int patch_size(const size_t i, const size_t j) const noexcept {
         int w = 5, h = 5;
         if (j < 2)
@@ -385,9 +391,11 @@ private:
         return w * h;
     }
 
+    // Reconstruct the image without outliers using a 5x5 gaussian kernel
     void reconstruct(const size_t index, std::vector<bool> & outliers) noexcept;
 
 public:
+    // Construct an image from a single-value buffer
     static Image from_grayscale(const std::vector<double> & values,
                                 const size_t width,
                                 const size_t height) noexcept;

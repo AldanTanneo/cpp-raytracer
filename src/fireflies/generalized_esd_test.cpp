@@ -16,6 +16,9 @@ struct Sums {
     constexpr Sums(double sum, double sum2) noexcept : sum(sum), sum2(sum2) {}
 };
 
+// Generalized ESD Test for Outliers
+//
+// https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm
 void esd_test(const vector<double> & var,
               const size_t width,
               const size_t height,

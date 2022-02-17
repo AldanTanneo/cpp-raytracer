@@ -27,6 +27,13 @@ ou sous Windows
 .\xtrem-raytracer.exe .\test.json
 ```
 
+4 fichiers image sont créés :
+
+* `image.png` contient l'image finale, filtrée
+* `unfiltered_image.png` contient l'image non filtrée
+* `variance0.png` et `variance1.png` contiennent les deux half-buffers de variance
+  créés pendant l'exécution
+
 ## Compilateur
 
 Le compilateur utilisé est 

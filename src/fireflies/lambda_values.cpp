@@ -8,13 +8,15 @@
 
 // Compute a lambda value at compile time
 consteval const double
-ct_lambda(const int n, const int i, const double alpha) noexcept {
+    ct_lambda(const int n, const int i, const double alpha) noexcept {
     double p = 1.0 - alpha / (2.0 * (n - i + 1.0));
     double t = stats::qt(p, n - i - 1.0);
     return (n - i) * t / gcem::sqrt((n - i - 1.0 + t * t) * (n - i + 1.0));
 }
 
 // Helper class for computing lambda values at compile time
+//
+// https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm
 class LambdaValues {
 private:
     double nine[7];

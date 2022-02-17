@@ -10,6 +10,8 @@
 #include <extern/json.hpp>
 #include <hittable.hpp>
 
+// Exception returned by the JSON parser on invalid input (ex: invalid object
+// type, unknown material...)
 class ParseJsonException : public std::exception {
     const char * msg;
 
@@ -19,6 +21,7 @@ public:
     virtual const char * what() const noexcept override { return msg; }
 };
 
+// Basic image information
 struct ImageInfo {
     size_t height;
     int max_bounces;
@@ -26,6 +29,7 @@ struct ImageInfo {
     AspectRatio aspect_ratio;
 };
 
+// Parameters of a render. Allocates the necessary memory.
 struct Params {
     Camera cam;
     ImageInfo info;
@@ -34,6 +38,7 @@ struct Params {
     std::vector<std::shared_ptr<Hittable>> objects;
     std::vector<size_t> sampled_objects;
 
+    // Load the parameters from a JSON filename
     static Params load_params(const char * filename);
 };
 
