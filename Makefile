@@ -36,9 +36,9 @@ DEPS_RELEASE := $(patsubst $(SRC)/%.cpp,$(OBJ_RELEASE)/%.d,$(SRCS))
 CC          := clang++
 CFLAGS      := -I$(INCLUDE) -Wall -Werror -Wfatal-errors \
                -MMD -MP -fopenmp=libomp -std=c++20 -fconstexpr-depth=4096 \
-               -fconstexpr-steps=9999999
+               -fconstexpr-steps=9999999 
 OPT_DEBUG   := -O0
-OPT_RELEASE := -Ofast -mavx2 -march=native
+OPT_RELEASE := -Ofast -mavx2 -march=native -ffast-math
 
 MODE_DEBUG   := [debug]
 MODE_RELEASE := [release]

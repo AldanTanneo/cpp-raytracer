@@ -109,6 +109,7 @@ int main(int argc, char * argv[]) try {
         const size_t j = height - 1 - (index / width);
 
         Colour pixel_colour[2];
+        double luminance;
         for (int k = 0; k < spp; ++k) {
             // Compute camera coordinates
             double u =
@@ -123,10 +124,10 @@ int main(int argc, char * argv[]) try {
             Colour c = cam.cast_ray(world, global_lights, sampled_hittables,
                                     max_bounces, u, v);
             // Add it to the pixel colour (separated in half buffers)
-            pixel_colour[k & 1] += c;
+            pixel_colour[k % 2] += c;
             // Compute luminance and squared luminance
-            double luminance = c.luminance();
-            var[k & 1][index] += luminance * luminance;
+            luminance = c.luminance();
+            var[k % 2][index] += luminance * luminance;
         }
         // Compute final pixel
         img[index] = (pixel_colour[0] + pixel_colour[1]) * spp_scale;
@@ -141,6 +142,7 @@ int main(int argc, char * argv[]) try {
     }
 
     pb.stop("Image rendered");
+    img.save_png("unfiltered_image.png");
 
     console::log("Applying firefly filter...");
 
@@ -150,7 +152,8 @@ int main(int argc, char * argv[]) try {
     console::log("Saving image...");
 
     img.save_png("image.png");
-    Image::from_grayscale(var[0], width, height).save_png("variance.png");
+    Image::from_grayscale(var[0], width, height).save_png("variance0.png");
+    Image::from_grayscale(var[1], width, height).save_png("variance1.png");
 
     console::log("Done!");
 

@@ -1,7 +1,7 @@
 {
     "image": {
-        "height": 500,
-        "spp": 1000,
+        "height": 1080,
+        "spp": 250,
         "max_bounces": 15,
         "aspect_ratio": [
             16,

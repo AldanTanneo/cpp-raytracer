@@ -1,0 +1,198 @@
+{
+    "image": {
+        "height": 500,
+        "spp": 1000,
+        "max_bounces": 20,
+        "aspect_ratio": 1
+    },
+    "camera": {
+        "origin": [
+            5,
+            2,
+            5
+        ],
+        "look_at": [
+            1,
+            0.75,
+            1
+        ],
+        "up_vector": [
+            0,
+            1,
+            0
+        ],
+        "vertical_fov": 30
+    },
+    "lights": [],
+    "materials": {
+        "ground": {
+            "material_type": "lambertian",
+            "colour": [
+                0.9,
+                0.9,
+                0.9
+            ]
+        },
+        "light": {
+            "material_type": "black_body",
+            "colour": [
+                1,
+                1,
+                1
+            ],
+            "intensity": 20
+        },
+        "test": {
+            "material_type": "metal",
+            "colour": [
+                0.9,
+                0.4,
+                0
+            ],
+            "refraction_index": 1.5,
+            "fuzziness": 0,
+            "surface_fuzziness": 0,
+            "roughness": 0.1,
+            "intensity": 2,
+            "sigma": 20
+        }
+    },
+    "objects": [
+        {
+            "object_type": "sphere",
+            "material": "ground",
+            "center": [
+                0,
+                -1000,
+                0
+            ],
+            "radius": 1000
+        },
+        {
+            "object_type": "sphere",
+            "material": "ground",
+            "center": [
+                0,
+                1006,
+                0
+            ],
+            "radius": 1000
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground",
+            "vertices": [
+                [
+                    -1,
+                    -1,
+                    0
+                ],
+                [
+                    6,
+                    -1,
+                    0
+                ],
+                [
+                    -1,
+                    6,
+                    0
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground",
+            "vertices": [
+                [
+                    0,
+                    -1,
+                    -1
+                ],
+                [
+                    0,
+                    -1,
+                    6
+                ],
+                [
+                    0,
+                    6,
+                    -1
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground",
+            "vertices": [
+                [
+                    6,
+                    -1,
+                    -1
+                ],
+                [
+                    6,
+                    -1,
+                    6
+                ],
+                [
+                    6,
+                    6,
+                    -1
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "ground",
+            "vertices": [
+                [
+                    -1,
+                    -1,
+                    6
+                ],
+                [
+                    6,
+                    -1,
+                    6
+                ],
+                [
+                    -1,
+                    6,
+                    6
+                ]
+            ]
+        },
+        {
+            "object_type": "parallelogram",
+            "material": "light",
+            "vertices": [
+                [
+                    2,
+                    2.67,
+                    0.5
+                ],
+                [
+                    2.33,
+                    2.67,
+                    0.5
+                ],
+                [
+                    2,
+                    2.67,
+                    0.83
+                ]
+            ],
+            "sampled": true
+        },
+        {
+            "object_type": "sphere",
+            "material": "test",
+            "center": [
+                1,
+                0.75,
+                1
+            ],
+            "radius": 0.75
+        }
+    ]
+}
