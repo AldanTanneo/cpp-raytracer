@@ -23,19 +23,29 @@ public:
 
 // Basic image information
 struct ImageInfo {
+    // Height of the image
     size_t height;
+    // Iteration limit
     int max_bounces;
+    // Samples per pixel
     int spp;
+    // AspectRatio of the image
     AspectRatio aspect_ratio;
 };
 
 // Parameters of a render. Allocates the necessary memory.
 struct Params {
+    // Virtual camera settings
     Camera cam;
+    // Basic image and rendering settings
     ImageInfo info;
+    // Vector of global lights
     std::vector<GlobalIllumination> global_lights;
+    // Map of named materials
     std::unordered_map<std::string, std::shared_ptr<Material>> materials;
+    // Vector of objects
     std::vector<std::shared_ptr<Hittable>> objects;
+    // Vector of sampled objects
     std::vector<size_t> sampled_objects;
 
     // Load the parameters from a JSON filename
